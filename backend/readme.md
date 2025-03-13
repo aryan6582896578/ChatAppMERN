@@ -5,3 +5,8 @@
 - check webtransport https://socket.io/get-started/webtransport#requirements
 
 
+connect to db before running server
+https://www.npmjs.com/package/bcrypt
+argon2 for hash 
+
+https://expressjs.com/en/5x/api.html#router
