@@ -2,9 +2,10 @@ export default function  ChatPage(){
 
     return (
 
-<>
-Chat Page
-</>
+<div className="bg-primaryColor min-h-screen w-full overflow-hidden text-textColor ">
+
+    chat 
+</div>
 
     )
 }

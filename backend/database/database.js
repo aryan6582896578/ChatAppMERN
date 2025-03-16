@@ -2,7 +2,7 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 import { mongoose, Schema } from "mongoose";
-const uri = `mongodb+srv://${process.env.dbUsername}:${process.env.dbPassword}@chatappv3.zgiru.mongodb.net/hm?retryWrites=true&w=majority&appName=ChatAppV3`;
+const uri = `mongodb+srv://${process.env.dbUsername}:${process.env.dbPassword}@chatappv3.zgiru.mongodb.net/CHATAPPMERN?retryWrites=true&w=majority&appName=ChatAppV3`;
 
 async function dbApp() {
   try {

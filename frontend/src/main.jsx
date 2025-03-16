@@ -18,12 +18,11 @@ createRoot(root).render(
    
     <Routes>
           <Route path="/" element={<App />} />
-          <Route path="/test" element={<TestPage />} />
-          <Route element={<AuthCheckPre />}>
-                <Route path="v1/login" element={<LoginPage />} />
-                <Route path="v1/register" element={<RegisterPage />} />
+          <Route path={`${import.meta.env.VITE_VERSION}`} element={<AuthCheckPre />}>
+                <Route path="login" element={<LoginPage />} />
+                <Route path="register" element={<RegisterPage />} />
           </Route>
-          <Route path="/me" element={<AuthCheckMain />}>
+          <Route path={`${import.meta.env.VITE_VERSION}/me`}element={<AuthCheckMain />}>
                 <Route path="chat" element={<ChatPage />} />
           </Route>
 

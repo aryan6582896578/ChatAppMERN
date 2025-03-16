@@ -10,3 +10,7 @@ https://www.npmjs.com/package/bcrypt
 argon2 for hash 
 
 https://expressjs.com/en/5x/api.html#router
+
+configur cors in socket and base middelware
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format to create id and math .random

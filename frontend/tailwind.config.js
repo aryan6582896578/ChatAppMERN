@@ -11,6 +11,7 @@ export default {
         textColor:'#29A19C',
         text1Color:'#A3F7BF',
         text2Color:'#76ABAE',
+        text3Color:'#f0757b',
         otherColor:'#EEEEEE'
 
       }
