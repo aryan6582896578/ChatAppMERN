@@ -1,8 +1,24 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"
 
+
+function signJwt(username,userId){
+let createJwtToken = jwt.sign({ username:username ,userId:userId }, process.env.privateKey)
+return(createJwtToken)
+}
+
+function verifyJwt(token){
+
+try {
+    let verifyJwtToken =jwt.verify(token, process.env.privateKey);
+    return verifyJwtToken
+} catch (error) {
+    console.log("nooo11")
+}
+
+}
 function createUserId(){
     let date = new Date();
     let someRandom =Math.floor(Math.random() * (999 - 111) + 100)
@@ -22,4 +38,4 @@ async function checkPasswordHash(plainPassword,hashedPassword){
  }
 
 
-export {createPasswordHash,checkPasswordHash,createUserId}
+export {createPasswordHash,checkPasswordHash,createUserId,signJwt,verifyJwt}

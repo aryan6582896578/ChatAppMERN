@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import { dbApp } from "./database/database.js";
 import { userDataModel } from "./database/schema/databaseSchema.js";
-import { createUserId ,createPasswordHash,checkPasswordHash} from "./database/managedata.js";
+import { createUserId ,createPasswordHash,checkPasswordHash, signJwt,verifyJwt} from "./database/managedata.js";
 const app = express();
 const httpServer = createServer(app);
 
@@ -43,6 +43,8 @@ app.post("/v1/registeruser", async (req, res) => {
           userid: `${userID}`,
           createdDate:`${userID}`
         });
+        let createToken = signJwt(usernameRegister,userID)
+        res.cookie("tokenJwt",createToken ,{ maxAge: (15*24*60*60*1000) })
         res.json({ status: "userCreated" });
       } catch (error) {
         res.json({ status: "userExists" });
@@ -57,46 +59,56 @@ app.post("/v1/registeruser", async (req, res) => {
 });
 
 
+app.get("/v1/loginUser", async (req, res) => {
+  res.send("okk")
+})
+
 app.post("/v1/loginUser", async (req, res) => {
   const usernameLogin = req.body.username;
   const passwordLogin = req.body.password;
   console.log(
-    "Username Login-",
-    usernameLogin,
-    "Password-",
-    passwordLogin,
-    "Password check-",
-    passwordLogin,
+    "Username Login-",usernameLogin,
+    "Password-",passwordLogin,
     req.cookies
   );
-
-  if (usernameLogin && passwordLogin) {
-
-      // let userID = createUserId();
-    
-      const getUserdata =await userDataModel.findOne({
-        _id:usernameLogin
+    const validToken = verifyJwt(req.cookies.tokenJwt)
+    if(validToken){
+      res.json({ status: "userValid" });
+    }else{
+      if (usernameLogin && passwordLogin) {
+        const getUserdata =await userDataModel.findOne({
+          _id:usernameLogin
+        }).exec()
+        if(getUserdata){
+          let checkHash = await checkPasswordHash(passwordLogin,getUserdata.password)
         
-      }).exec()
-      let checkHash = await checkPasswordHash(passwordLogin,getUserdata.password)
-      try {
-        if(getUserdata&&checkHash===true){
-          res.json({ status: "userValid" });
+          try {
+            if(getUserdata&&checkHash===true){
+              res.json({ status: "userValid" });
+            }else{
+              res.json({ status: "userInValid" });
+            }
+          } catch (error) {
+            res.json({ status: "userInValid" });
+            
+            console.log(error,"some err")
+          }
         }else{
           res.json({ status: "userInValid" });
         }
-      } catch (error) {
-        res.json({ status: "userInValid" });
-        
-        console.log(error,"some err")
-      }
-
-    // res.cookie("zz", "z1", { expires: new Date(Date.now() + 9999999999) });
-    // res.json({status:"hmm"})
-  } else {
-    res.json({ status: "missingUsernamePassword" });
-  }
+    } else {
+      res.json({ status: "missingUsernamePassword" });
+    }
+    }
+  
 });
+app.post("/test",async (req, res) => {
+
+res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
+
+
+res.json({"o":"k"})
+})
 
 // app.use((req, res, next) => {
 //   // console.log(req.ip)

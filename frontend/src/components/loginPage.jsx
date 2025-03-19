@@ -21,6 +21,15 @@ const [userData, setuserData] = useState({ username: "", password: "" });
     }
   }
 
+ 
+
+  useEffect(() => {
+    const cookieValue = document.cookie.split("; ").find((row) => row.startsWith("tokenJwt"))?.split("=")[1];
+    if(cookieValue){
+      navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)
+    }
+  }, [])
+  
   const sendData = async () => {
     const url = `http://localhost:4500/${import.meta.env.VITE_VERSION}/loginUser`
     try {

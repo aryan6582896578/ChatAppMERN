@@ -11,3 +11,7 @@ Currently, two official plugins are available:
 
 https://react.dev/learn/updating-objects-in-state update value of states
 dont put input felds in component or ig use update state properly idk
+
+
+read cookie
+https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie#example_2_get_a_sample_cookie_named_test2
