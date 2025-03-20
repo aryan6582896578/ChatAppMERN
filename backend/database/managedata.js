@@ -15,7 +15,7 @@ try {
     let verifyJwtToken =jwt.verify(token, process.env.privateKey);
     return verifyJwtToken
 } catch (error) {
-    console.log("nooo11")
+    console.log("invalid jwt")
 }
 
 }

@@ -12,6 +12,7 @@ import ChatPage from './components/chatPage.jsx';
 import TestPage from './components/test.jsx';
 import AuthCheckPre from './components/authCheckPre.jsx';
 import AuthCheckMain from './components/authCheckMain.jsx';
+import ErrorPage from './components/errorPage.jsx';
 const root = document.getElementById("root");
 createRoot(root).render(
   <BrowserRouter>
@@ -25,6 +26,7 @@ createRoot(root).render(
           <Route path={`${import.meta.env.VITE_VERSION}/me`}element={<AuthCheckMain />}>
                 <Route path="chat" element={<ChatPage />} />
           </Route>
+          <Route path="*" element={<ErrorPage />} />
 
     </Routes>
     </BrowserRouter>

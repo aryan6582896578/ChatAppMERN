@@ -18,7 +18,46 @@ app.use(
     credentials: true,
   })
 );
-app.post("/v1/registeruser", async (req, res) => {
+
+function checkJwt(req, res, next) {
+const validToken = verifyJwt(req.cookies.tokenJwt)
+try {
+  let usernamee = validToken.username
+  if(validToken){
+    req.validUser = true,
+    req.username = usernamee
+  }else{
+    req.validUser = false
+  }
+} catch (error) {
+  console.log("no cookie")
+}
+
+  next()
+}
+
+app.get("/test", checkJwt, async (req, res) => {
+  const username = {"u":req.username}
+
+  res.send(username)
+  })
+app.get("/v1/verify", checkJwt, async (req, res) => {
+
+    if(req.validUser){
+      res.json({status:"userValid"})
+    }else{
+      res.json({status:"userInvalid"})
+    }
+    })
+
+    
+app.get("/v1/userdata", checkJwt, async (req, res) => {
+
+      if(req.validUser){
+        res.json({username:req.username})
+      }
+      })    
+app.post("/v1/registeruser",checkJwt, async (req, res) => {
   const usernameRegister = req.body.username;
   const passwordRegister = req.body.password;
   console.log(
@@ -59,9 +98,6 @@ app.post("/v1/registeruser", async (req, res) => {
 });
 
 
-app.get("/v1/loginUser", async (req, res) => {
-  res.send("okk")
-})
 
 app.post("/v1/loginUser", async (req, res) => {
   const usernameLogin = req.body.username;
@@ -103,12 +139,11 @@ app.post("/v1/loginUser", async (req, res) => {
   
 });
 app.post("/test",async (req, res) => {
-
 res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
-
-
 res.json({"o":"k"})
 })
+
+
 
 // app.use((req, res, next) => {
 //   // console.log(req.ip)

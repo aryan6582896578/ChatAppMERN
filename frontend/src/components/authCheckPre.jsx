@@ -1,26 +1,32 @@
 import { useState,useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
-export default function authCheckPre(){
-
+import axios from "axios";
+export default function AuthCheckPre(){
     const navigate = useNavigate();
-    const [authStatus,setAuthStatus]=useState(false)
+
     useEffect(() => {
+
+        axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`,{ withCredentials: true })
+      .then((data) => {
         
-        if(authStatus){
-            return navigate("/me/chat")
-     
-         }
-
-    }, [authStatus,navigate])
-    
-
-     
-     
-        return(
-            <>  
-         
-            <Outlet/>
-            </>
-        )
-    
+        console.log(data.data.status)
+        if(data.data.status==="userValid"){
+    navigate(`/${import.meta.env.VITE_VERSION}/me/`)
+}else{
+    navigate(`/${import.meta.env.VITE_VERSION}/login`)
 }
+       })
+      .catch(function (error) {
+        console.log(error.toJSON());
+      });
+      
+    }, [])
+    
+ 
+        return(
+            <Outlet/>
+        )
+
+}
+
+
