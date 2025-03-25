@@ -6,8 +6,9 @@ export default function LandingPage(){
 const [buttonStatus ,setButtonStatus] = useState(false)
 useEffect(() => {
   
-// setButtonStatus(true)
-  
+if(document.cookie){ 
+    setButtonStatus(true)
+}
 },[] )
 
     return(
@@ -19,7 +20,7 @@ useEffect(() => {
      ChatApp 
     </div>
     <div>  
-        {buttonStatus ?<Link to={{pathname:"/me"}} > 
+        {buttonStatus ?<Link to={{pathname:`${import.meta.env.VITE_VERSION}/me/chat`}} > 
          <button className="bg-text2Color min-w-[200px] text-otherColor p-[20px] font-semibold rounded-full border-solid border-transparent border-[2px] text-[30px] bg-opacity-50 
              hover:text-text2Color hover:bg-transparent hover:transition hover:delay-100 hover:border-x-text1Color">  Open Chat
          </button>

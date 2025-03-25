@@ -20,3 +20,7 @@ later try custom sign and verify
 https://www.npmjs.com/package/jsonwebtoken
 add expiry later
 
+try to prevent race condition in database
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of
+to complete async function ig ?

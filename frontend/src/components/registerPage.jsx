@@ -54,7 +54,7 @@ export default function RegisterPage() {
   return (
     <>
       {loadingPage ? (
-        <LoadingPage />
+        <LoadingPage someError={"Loading..."} />
       ) : (
         <div className="bg-primaryColor min-h-screen w-full overflow-hidden text-textColor   ">
           <div className="flex flex-col bg-secondaryColor mt-[50px] ml-auto mr-auto min-w-fit w-[500px] h-fit rounded-[10px] p-[20px]">

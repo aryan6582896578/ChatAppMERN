@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 
-import { io } from "socket.io-client";
+
+
 import LandingPage from './components/landingPage';
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
   return (
 <LandingPage />
   )
+
 }
 
 export default App

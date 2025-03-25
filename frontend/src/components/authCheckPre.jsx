@@ -11,7 +11,7 @@ export default function AuthCheckPre(){
         
         console.log(data.data.status)
         if(data.data.status==="userValid"){
-    navigate(`/${import.meta.env.VITE_VERSION}/me/`)
+    navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)
 }else{
     navigate(`/${import.meta.env.VITE_VERSION}/login`)
 }

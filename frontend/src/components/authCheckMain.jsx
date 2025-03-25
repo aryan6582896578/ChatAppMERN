@@ -4,7 +4,7 @@ import axios from "axios";
 export default function AuthCheckMain(){
 
     const navigate = useNavigate();
-
+    const [userStatus,setuserStatus] = useState(false)
     useEffect(() => {
 
         axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`,{ withCredentials: true })
@@ -12,7 +12,7 @@ export default function AuthCheckMain(){
         
         console.log(data.data.status)
         if(data.data.status==="userValid"){
-            navigate(`chat`)
+          setuserStatus(true)
         }else{
             navigate(`/${import.meta.env.VITE_VERSION}/login`)
         }
@@ -23,9 +23,10 @@ export default function AuthCheckMain(){
       
     }, [])
     
- 
-        return(
-            <Outlet/>
-        )
+    return(
+      
+      <Outlet/>
+  )
+      
     
 }

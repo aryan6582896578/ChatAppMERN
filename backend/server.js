@@ -6,8 +6,10 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import { dbApp } from "./database/database.js";
-import { userDataModel } from "./database/schema/databaseSchema.js";
-import { createUserId ,createPasswordHash,checkPasswordHash, signJwt,verifyJwt} from "./database/managedata.js";
+import { channelsDataModel, userDataModel,serverDataModel } from "./database/schema/databaseSchema.js";
+import { createUserId ,createPasswordHash,checkPasswordHash, signJwt,verifyJwt, getUserChannels ,getChannelData,getUserId} from "./database/managedata.js";
+
+import runsocket from "./sockets/managesocket.js";
 const app = express();
 const httpServer = createServer(app);
 
@@ -38,7 +40,15 @@ try {
 
 app.get("/test", checkJwt, async (req, res) => {
   const username = {"u":req.username}
-
+ 
+//  let id = "12345678"
+//  await channelsDataModel.findOneAndUpdate({name:"Global"},{ $push: {members:`${id}`}})
+//  let a = channelsDataModel.findOne({name:"Global"})
+//  console.log(a.members)
+// console.log(createUserId().length)
+// console.log(("00000000000000000000").length)
+let a = "/v1/me/chat/00000000000000000000"
+console.log(a.replace("/v1/me/chat/",""))
   res.send(username)
   })
 app.get("/v1/verify", checkJwt, async (req, res) => {
@@ -54,9 +64,21 @@ app.get("/v1/verify", checkJwt, async (req, res) => {
 app.get("/v1/userdata", checkJwt, async (req, res) => {
 
       if(req.validUser){
-        res.json({username:req.username})
+        let getchannels = await getUserChannels(req.username)
+        res.json({username:req.username ,channels:getchannels.servers})
+        
       }
       })    
+app.get("/v1/getChannelData/:id", checkJwt, async (req, res) => {
+
+        if(req.validUser){
+          // console.log(req.params.id)
+          let channelData =await getChannelData(req.params.id)
+          // console.log(channelData)
+          res.json({"channelData":channelData})
+          
+        }
+        })  
 app.post("/v1/registeruser",checkJwt, async (req, res) => {
   const usernameRegister = req.body.username;
   const passwordRegister = req.body.password;
@@ -73,6 +95,7 @@ app.post("/v1/registeruser",checkJwt, async (req, res) => {
   if (usernameRegister && passwordRegister) {
 
       let userID = createUserId();
+      let channelGlobal = "00000000000000000000";
       let hashedhPassword = await createPasswordHash(passwordRegister)
       try {
         await userDataModel.create({
@@ -80,8 +103,11 @@ app.post("/v1/registeruser",checkJwt, async (req, res) => {
           username: `${usernameRegister}`,
           password: `${hashedhPassword}`,
           userid: `${userID}`,
-          createdDate:`${userID}`
+          createdDate:`${userID}`,
         });
+        await userDataModel.findOneAndUpdate({userid:`${userID}`},{$push:{servers:channelGlobal}})
+        await channelsDataModel.findOneAndUpdate({name:"Global"},{ $push: {members:`${userID}`}})
+   
         let createToken = signJwt(usernameRegister,userID)
         res.cookie("tokenJwt",createToken ,{ maxAge: (15*24*60*60*1000) })
         res.json({ status: "userCreated" });
@@ -90,7 +116,6 @@ app.post("/v1/registeruser",checkJwt, async (req, res) => {
         console.log(error,"some err")
       }
 
-    // res.cookie("zz", "z1", { expires: new Date(Date.now() + 9999999999) });
    
   } else {
     res.json({ status: "missingUsernamePassword" });
@@ -145,11 +170,33 @@ res.json({"o":"k"})
 
 
 
-// app.use((req, res, next) => {
-//   // console.log(req.ip)
-//   next()
-// })
-// const router = express.Router([options])  middelware use it for case sensitive strict https://expressjs.com/en/5x/api.html#router
+app.post("/v1/me/createServer",checkJwt,async (req, res) => {
+  if(req.validUser){
+    try {
+      let serverId= createUserId()
+      let getUserid = await getUserId(req.username)
+      const ServerName = req.body.serverName
+      serverDataModel.create({
+        _id: serverId,
+        name:ServerName,
+        admin:req.username,
+        adminId:getUserid,
+        createdDate: serverId,
+        serverId:serverId,
+        members: [getUserid]
+      })
+      // await serverDataModel.findOneAndUpdate({serverId:"20250325192254296000"},{ $push: {members:`${4444444}`}})
+      await userDataModel.findOneAndUpdate({userid:`${getUserid}`},{ $push: {servers:`${serverId}`}})
+      await res.json({"status":"CreatedServer","serverId":`${serverId}`})
+    } catch (error) {
+      console.log(error,"error in creating server ")
+    }
+  
+  }
+  
+  })
+
+
 app.get("/", (res, req) => {
   req.json({ hm: "hi" });
 });
@@ -157,7 +204,6 @@ app.get("/", (res, req) => {
 //app.delete to delete ""...
 
 const socket = new Server(httpServer, {
-  path: "/v2",
   cors: {
     origin: "http://localhost:5173",
     credentials: true,
@@ -174,14 +220,7 @@ const socket = new Server(httpServer, {
   ],
 });
 
-socket.on("connection", (socket) => {
-  console.log("a user connected");
-
-  socket.on("disconnect", (reason) => {
-    console.log("user disconnected- ", reason);
-  });
-  socket.emit("hello", ["world ??", "ok"]);
-});
+runsocket(socket)
 
 async function runServer() {
   try {
