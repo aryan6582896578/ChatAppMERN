@@ -55,7 +55,7 @@ export default function ChatPage() {
 
   return (connectionStatus?
     <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  ">
-      {createServerDisplay? <div className="w-max h-max bg-textColor bg-opacity-10 border-solid border-[1px] rounded-[5px] p-[10px] border-textColor right-1/3  top-1/4  fixed z-[100]" id="createServer">
+      {createServerDisplay? <div className="w-max h-max bg-textColor bg-opacity-10 border-solid border-[1px] rounded-[5px] p-[10px] border-textColor right-[40%]  top-1/3  fixed z-[100]" id="createServer">
       <div className="text-center text-otherColor text-[30px]" >Create Server</div>
         <input onChange={(e)=>{
           setcreateServerData({serverName:e.target.value})

@@ -7,17 +7,17 @@ const userData = mongoose.Schema({
  userid:{type:String,require:true},
  servers:{type:Array}
 });
-const userDataModel = mongoose.model("userData", userData);
+const userDataModel = mongoose.model("userdatas", userData);
 
 
-const channels = mongoose.Schema({
-    // _id: {type:String,required: true},
-    // name:{type:String,required: true},
-    // createdDate: { type:String,required: true },
-    // channelId:{type:Number,require:true},
-    members: [{type:Array}]
-})
-const channelsDataModel = mongoose.model("channelData", channels);
+// const channels = mongoose.Schema({
+//     // _id: {type:String,required: true},
+//     // name:{type:String,required: true},
+//     // createdDate: { type:String,required: true },
+//     // channelId:{type:Number,require:true},
+//     members: [{type:Array}]
+// })
+// const channelsDataModel = mongoose.model("channelData", channels);
 
 const server = mongoose.Schema({
     _id: {type:String,required: true},
@@ -29,4 +29,4 @@ const server = mongoose.Schema({
     members: [{type:Array}]
 })
 const serverDataModel = mongoose.model("serverData", server);
-export { userDataModel,channelsDataModel,serverDataModel };
+export { userDataModel,serverDataModel };

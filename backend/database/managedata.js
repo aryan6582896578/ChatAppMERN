@@ -2,10 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
-import { channelsDataModel, userDataModel } from "./schema/databaseSchema.js";
+import {userDataModel,serverDataModel } from "./schema/databaseSchema.js";
 
 function signJwt(username,userId){
-let createJwtToken = jwt.sign({ username:username ,userId:userId }, process.env.privateKey)
+let createJwtToken = jwt.sign({ username:username ,userId:userId ,test:true}, process.env.privateKey)
 return(createJwtToken)
 }
 
@@ -42,36 +42,29 @@ async function getUserChannels(username) {
     return channels
 }
 
-async function getChannelData(channelId) {
-    let channelData = await channelsDataModel.findOne({channelId:channelId})
-    let a = channelData.members
+async function getChannelData(serverId) {
+    let serverData = await serverDataModel.findOne({serverId:serverId})
+    let memberList = serverData?.members
     let list = {}
-    for (const [key, element] of a.entries()) {
-        // console.log(element[0], key , "channel data");
+    for (const [key, element] of memberList.entries()) {
         try {
-            list[a[key]] = await getUsername(element[0]);
+            list[memberList[key]] = await getUsername(element[0]);
         } catch (error) {
             console.log(error, "err");
         }
     }
-    // (async (value,key)=>{console.log(value[0] ,key)   , list[key] =  await getUsername(value[0]) })
     return(list)
-    // console.log(await getUsername(a.map((x)=>{x[0]})))
 }
 
-//add channel name later for tab title
+//add server name later for tab title
 
 async function getUsername(memberIds) {
-    let getUsername = await userDataModel.findOne({userid:memberIds})
-    // console.log(getUsername.username ,"hmmmmmmm")
+    let getUsername = await userDataModel.findOne({userid:`${memberIds}`})
     return(getUsername.username)
 }
 
 async function getUserId(username) {
-    let getUserId = await userDataModel.findOne({username:username})
-    // // console.log(getUsername.username ,"hmmmmmmm")
-    // console.log(getUserId,"gg",username);
-    
+    let getUserId = await userDataModel.findOne({username:username}) 
     return(getUserId.userid)
 }
 export {createPasswordHash,checkPasswordHash,createUserId,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId}

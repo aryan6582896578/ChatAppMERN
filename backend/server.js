@@ -6,7 +6,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import { dbApp } from "./database/database.js";
-import { channelsDataModel, userDataModel,serverDataModel } from "./database/schema/databaseSchema.js";
+import {userDataModel,serverDataModel } from "./database/schema/databaseSchema.js";
 import { createUserId ,createPasswordHash,checkPasswordHash, signJwt,verifyJwt, getUserChannels ,getChannelData,getUserId} from "./database/managedata.js";
 
 import runsocket from "./sockets/managesocket.js";
@@ -32,25 +32,17 @@ try {
     req.validUser = false
   }
 } catch (error) {
-  console.log("no cookie")
+  console.log("no cookie jwtcheck")
 }
-
   next()
 }
 
-app.get("/test", checkJwt, async (req, res) => {
-  const username = {"u":req.username}
- 
-//  let id = "12345678"
-//  await channelsDataModel.findOneAndUpdate({name:"Global"},{ $push: {members:`${id}`}})
-//  let a = channelsDataModel.findOne({name:"Global"})
-//  console.log(a.members)
-// console.log(createUserId().length)
-// console.log(("00000000000000000000").length)
-let a = "/v1/me/chat/00000000000000000000"
-console.log(a.replace("/v1/me/chat/",""))
-  res.send(username)
-  })
+// app.get("/test", checkJwt, async (req, res) => {
+//   const username = {"u":req.username}
+// let a = "/v1/me/chat/00000000000000000000"
+// console.log(a.replace("/v1/me/chat/",""))
+//   res.send(username)
+//   })
 app.get("/v1/verify", checkJwt, async (req, res) => {
 
     if(req.validUser){
@@ -62,21 +54,16 @@ app.get("/v1/verify", checkJwt, async (req, res) => {
 
     
 app.get("/v1/userdata", checkJwt, async (req, res) => {
-
       if(req.validUser){
         let getchannels = await getUserChannels(req.username)
-        res.json({username:req.username ,channels:getchannels.servers})
-        
+        res.json({username:req.username ,channels:getchannels.servers}) 
       }
       })    
-app.get("/v1/getChannelData/:id", checkJwt, async (req, res) => {
 
+app.get("/v1/getChannelData/:id", checkJwt, async (req, res) => {
         if(req.validUser){
-          // console.log(req.params.id)
           let channelData =await getChannelData(req.params.id)
-          // console.log(channelData)
           res.json({"channelData":channelData})
-          
         }
         })  
 app.post("/v1/registeruser",checkJwt, async (req, res) => {
@@ -93,7 +80,6 @@ app.post("/v1/registeruser",checkJwt, async (req, res) => {
   );
 
   if (usernameRegister && passwordRegister) {
-
       let userID = createUserId();
       let channelGlobal = "00000000000000000000";
       let hashedhPassword = await createPasswordHash(passwordRegister)
@@ -106,8 +92,7 @@ app.post("/v1/registeruser",checkJwt, async (req, res) => {
           createdDate:`${userID}`,
         });
         await userDataModel.findOneAndUpdate({userid:`${userID}`},{$push:{servers:channelGlobal}})
-        await channelsDataModel.findOneAndUpdate({name:"Global"},{ $push: {members:`${userID}`}})
-   
+        await serverDataModel.findOneAndUpdate({serverId:"00000000000000000000"},{ $push: {members:`${userID}`}})
         let createToken = signJwt(usernameRegister,userID)
         res.cookie("tokenJwt",createToken ,{ maxAge: (15*24*60*60*1000) })
         res.json({ status: "userCreated" });
@@ -115,8 +100,6 @@ app.post("/v1/registeruser",checkJwt, async (req, res) => {
         res.json({ status: "userExists" });
         console.log(error,"some err")
       }
-
-   
   } else {
     res.json({ status: "missingUsernamePassword" });
   }
@@ -163,10 +146,10 @@ app.post("/v1/loginUser", async (req, res) => {
     }
   
 });
-app.post("/test",async (req, res) => {
-res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
-res.json({"o":"k"})
-})
+// app.post("/test",async (req, res) => {
+// res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
+// res.json({"o":"k"})
+// })
 
 
 
@@ -185,7 +168,6 @@ app.post("/v1/me/createServer",checkJwt,async (req, res) => {
         serverId:serverId,
         members: [getUserid]
       })
-      // await serverDataModel.findOneAndUpdate({serverId:"20250325192254296000"},{ $push: {members:`${4444444}`}})
       await userDataModel.findOneAndUpdate({userid:`${getUserid}`},{ $push: {servers:`${serverId}`}})
       await res.json({"status":"CreatedServer","serverId":`${serverId}`})
     } catch (error) {
