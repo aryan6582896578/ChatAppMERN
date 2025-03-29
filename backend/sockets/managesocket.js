@@ -23,14 +23,23 @@ socket.use((socket,next)=>{
         socket.on('connection', (socket) => {
             
             if(socket.validUser){
-                console.log(`${socket.username} connected`);
+        console.log(`${socket.username} connected `)
                 socket.join(`${socket.path}`);
+           
                 socket.on(`${socket.path}`, (data) => {
-                  console.log(`Message received in room ${socket.path}:`, data);
-                  socket.server.to(`${socket.path}`).emit(`${socket.path}`, data); // Broadcast to users in the same room
+                  
+                  console.log(`${socket.username} connected to ${socket.path}`);
+                  console.log(`Message received in room ${socket.path}:`, data,socket.username);
+                  const chatData = {
+                    username:socket.username,
+                    message:data,
+                    channelId:socket.path
+                  }
+                  console.log(chatData)
+                  socket.server.to(`${socket.path}`).emit(`${socket.path}`, chatData);
                 });
                 
             }
           });
-          
+
 }

@@ -14,10 +14,10 @@ export default function ChannelChatPage() {
   const [connectionStatus,setconnectionStatus] = useState(false);
   const [createServerDisplay,setcreateServerDisplay] = useState(false)
   const[createServerData,setcreateServerData]=useState({serverName:""})
-  const[s,ss]=useState([]);
+  const[serverData,setserverData]=useState("")
+  const[messageData,setmessageData]=useState({username:"",message:""});
+
   async function ServerData(){
-    // setcreateServerData({serverName:"hi"})
-    console.log(createServerData.serverName)
     sendData()
   }
   const sendData = async () => {
@@ -32,44 +32,53 @@ export default function ChannelChatPage() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
       const json  = await response.json();
       if(json.status==="CreatedServer"){
         setcreateServerDisplay(false)
-        await navigate(`${import.meta.env.VITE_VERSION}/me/chat/${json.serverId}`)
+        await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${json.serverId}`)
       }
     } catch (error) {
       console.error("Fetch Error:", error.message);
     }
   };
+  function ee(){
+ console.log("new message")
+  }
+
+  const path = document.URL.split("chat/")[1];
   useEffect(() => {
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userdata`, {
-        withCredentials: true,
-      }).then((data) => {
-        setchannelList(data.data.channels), setuserName(data.data.username);
-      }).catch(function (error) {
-        console.log(error.toJSON());
-      });
+      withCredentials: true,
+    }).then((data) => {
+      setchannelList(data.data.channels);
+      setuserName(data.data.username);
+    }).catch(function (error) {
+      console.log(error.toJSON());
+    });
     let url = String(window.location.pathname);
     let idurl = url.replace("/v1/me/chat/", "");
+
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getChannelData/${idurl}`,{
           withCredentials: true,
         }).then((data) => {
-        setuserListId(Object.keys(data.data.channelData));
-        setuserListUsername(Object.values(data.data.channelData));
+        setserverData(data.data.channelData.name)
+        setuserListId(Object.keys(data.data.channelData.members));
+        setuserListUsername(Object.values(data.data.channelData.members));
       }).catch(function (error) {
         console.log(error.toJSON());
       });
-  }, []);
-  const path = document.URL.split("chat/")[1];
-  useEffect(() => {
+  }, [path]);
 
+
+
+  useEffect(() => {
+    socket.on(`${path}`,async (message) => {
+        
+      setmessageData({...messageData,username:message.username ,message:message.message})
+      console.log(messageData)
+  ee()
     
-      socket.on(`${path}`, (message) => {
-        console.log("hmmm", message);
-        ss((a)=>[...a,message])
-      });
-    
+    });
 
     function getJWTToken() {
       const match = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
@@ -89,11 +98,23 @@ export default function ChannelChatPage() {
 
 
     return () => {
+      // setmessageData("")
+      setserverData("")
       socket.disconnect();
-      ss("")
+ 
     };
   }, [path]);
- 
+
+  async function ee(){
+    // let a = document.getElementById("id")
+    // let somediv = document.createElement("div")
+    // console.log(`${messageData.message}`,"hmm")
+    // somediv.innerText = `${messageData.message}`;
+    // a.append(somediv)
+    console.log(messageData)
+    // await setmessageData({username:"" ,message:""})
+  }
+  
   function inputFieldData(e) {
     e.preventDefault();
     socket.emit(`${path}`, inputFieldValue);
@@ -102,34 +123,6 @@ export default function ChannelChatPage() {
 
   return (
     connectionStatus?
-    // <div className="bg-primaryColor min-h-screen w-full  text-textColor flex ">
-    //   <div className=" h-[100vh] min-w-[4%] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden ">
-    //     <div className="flex">
-    //       <button
-    //         onClick={() => {
-    //           navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
-    //         }}
-    //         className="min-w-[5px] min-h-[30px] bg-textColor mt-[10px] hover:cursor-pointer hover:bg-text3Color mb-[25px] ml-auto mr-auto"
-    //       ></button>
-    //     </div>
-    //     <div className="flex flex-col">
-    //       {channelList?.map((channel, index) => (
-    //         <div key={index} className="m-auto">
-    //           <button
-    //             key={index}
-    //             onClick={() => {
-    //               navigate(
-    //                 `/${import.meta.env.VITE_VERSION}/me/chat/${channel}`
-    //               );
-    //             }}
-    //             className="bg-textColor bg-opacity-20 text-[20px] border-transparent border-solid border-[2px] text-text1Color w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor hover:bg-transparent hover:text-otherColor"
-    //           >
-    //             c{index}
-    //           </button>
-    //         </div>
-    //       ))}
-    //     </div>
-    //   </div>
     <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  ">
       {createServerDisplay? <div className="w-max h-max bg-textColor bg-opacity-10 border-solid border-[1px] rounded-[5px] p-[10px] border-textColor right-[40%]  top-1/3  fixed z-[100]" id="createServer">
       <div className="text-center text-otherColor text-[30px]" >Create Server</div>
@@ -152,7 +145,7 @@ export default function ChannelChatPage() {
             {channelList.map((channel, index) => (
               <div key={index} className="m-auto">
                 <button key={index} onClick={()=>{
-                  navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${channel}`)
+                  navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${channel}`)///
                 }} className="bg-textColor bg-opacity-20 text-[20px] border-transparent border-solid border-[2px] text-text1Color w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor hover:bg-transparent hover:text-otherColor" >
                   s{index}
                 </button>     
@@ -166,6 +159,7 @@ export default function ChannelChatPage() {
       </div>
       <div className="bg-secondaryColor w-[16%] text-otherColor relative h-[100vh] ">
         <div className="w-[100%] h-[95%] overflow-y-auto overflow-x-hidden">
+          <div className="bg-primaryColor h-[40px] text-text2Color text-[20px] font-semibold text-center pt-[3px] border-solid border-b-[1px] border-textColor">{serverData}</div>
           channels
         </div>
         <div className="w-[100%] h-[5%] bg-primaryColor absolute bottom-[0px] rounded-[5px] text-[25px]  pl-[10px] hover:rounded-none hover:cursor-pointer">
@@ -178,11 +172,10 @@ export default function ChannelChatPage() {
 
       <div className="bg-primaryColor w-[65%] p-[10px] pb-[10px]  flex flex-col ">
         <div className="bg-primaryColor w-[100%] h-[95%] mb-[0px]" id="aa">
-          {
-          s?  s.map((x,y)=>{
-            return(<div key={y}>{x}</div>)
-          }):""
-        }
+          
+  <div id="id">
+
+  </div>
         </div>
         <div className="h-[5%]  w-[100%]">
           <form onSubmit={inputFieldData} className="h-[100%]  w-[100%]">

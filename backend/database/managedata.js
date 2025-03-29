@@ -44,6 +44,7 @@ async function getUserChannels(username) {
 
 async function getChannelData(serverId) {
     let serverData = await serverDataModel.findOne({serverId:serverId})
+    let serverName = serverData.name
     let memberList = serverData?.members
     let list = {}
     for (const [key, element] of memberList.entries()) {
@@ -53,7 +54,11 @@ async function getChannelData(serverId) {
             console.log(error, "err");
         }
     }
-    return(list)
+    const serverInfo={
+        name:serverName,
+        members:list
+    }
+    return(serverInfo)
 }
 
 //add server name later for tab title
