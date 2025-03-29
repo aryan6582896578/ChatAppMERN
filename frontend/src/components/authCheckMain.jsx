@@ -1,32 +1,23 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import axios from "axios";
-export default function AuthCheckMain(){
-
-    const navigate = useNavigate();
-    const [userStatus,setuserStatus] = useState(false)
-    useEffect(() => {
-
-        axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`,{ withCredentials: true })
-      .then((data) => {
-        
-        console.log(data.data.status)
-        if(data.data.status==="userValid"){
-          setuserStatus(true)
-        }else{
-            navigate(`/${import.meta.env.VITE_VERSION}/login`)
+export default function AuthCheckMain() {
+  const navigate = useNavigate();
+  const [userStatus, setuserStatus] = useState(false);
+  useEffect(() => {
+    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
+        withCredentials: true,
+      }).then((data) => {
+        console.log(data.data.status);
+        if (data.data.status === "userValid") {
+          setuserStatus(true);
+        } else {
+          navigate(`/${import.meta.env.VITE_VERSION}/login`);
         }
-       })
-      .catch(function (error) {
+      }).catch(function (error) {
         console.log(error.toJSON());
       });
-      
-    }, [])
-    
-    return(
-      
-      <Outlet/>
-  )
-      
-    
+  }, []);
+
+  return <Outlet />;
 }

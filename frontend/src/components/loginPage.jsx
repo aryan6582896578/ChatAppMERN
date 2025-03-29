@@ -1,37 +1,28 @@
 import { useState, useRef, useEffect } from "react";
-import { Link ,useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import LoadingPage from "./loadingPage";
 
-
-
 export default function LoginPage() {
-const [userData, setuserData] = useState({ username: "", password: "" });
+  const [userData, setuserData] = useState({ username: "", password: "" });
   const [loadingPage, setloadingPage] = useState(false);
   const [displayPassword, setdisplayPassword] = useState(false);
   const [displayError, setdisplayError] = useState("");
   let navigate = useNavigate();
   async function LoginUser() {
     setuserData({ username: "", password: "" });
-    console.log("yes dataset", userData.username);
+    // console.log("yes dataset", userData.username);
     if (userData.username && userData.password) {
-      setloadingPage(true)
+      setloadingPage(true);
       await sendData();
     } else {
       console.log("no data");
     }
   }
 
- 
-
-  useEffect(() => {
-    const cookieValue = document.cookie.split("; ").find((row) => row.startsWith("tokenJwt"))?.split("=")[1];
-    if(cookieValue){
-      navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)
-    }
-  }, [])
-  
   const sendData = async () => {
-    const url = `http://localhost:4500/${import.meta.env.VITE_VERSION}/loginUser`
+    const url = `http://localhost:4500/${
+      import.meta.env.VITE_VERSION
+    }/loginUser`;
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -43,12 +34,12 @@ const [userData, setuserData] = useState({ username: "", password: "" });
         throw new Error("Network response was not ok");
       }
 
-      const json  = await response.json();
-      if(json.status === "userValid"){
-        navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)
-      }else{
-        setloadingPage(false)
-        setdisplayError("username or password is invalid")
+      const json = await response.json();
+      if (json.status === "userValid") {
+        navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
+      } else {
+        setloadingPage(false);
+        setdisplayError("username or password is invalid");
       }
     } catch (error) {
       console.error("Fetch Error:", error.message);
@@ -65,14 +56,20 @@ const [userData, setuserData] = useState({ username: "", password: "" });
   return (
     <>
       {loadingPage ? (
-        <LoadingPage  someError={"Loading..."}/>
+        <LoadingPage someError={"Loading..."} />
       ) : (
         <div className="bg-primaryColor min-h-screen w-full overflow-hidden text-textColor   ">
           <div className="flex flex-col bg-secondaryColor mt-[50px] ml-auto mr-auto min-w-fit w-[500px] h-fit rounded-[10px] p-[20px]">
             <div className="text-[50px] text-center font-semibold ">Login</div>
 
             <div className="flex flex-col mb-[5px]">
-              <div className="text-[15px] mb-[5px] font-bold">USERNAME <span className="text-text3Color font-semibold">*</span> &nbsp; <span className="text-red-500 font-semibold text-[13px]">{displayError?displayError:""}</span></div>
+              <div className="text-[15px] mb-[5px] font-bold">
+                USERNAME{" "}
+                <span className="text-text3Color font-semibold">*</span> &nbsp;{" "}
+                <span className="text-red-500 font-semibold text-[13px]">
+                  {displayError ? displayError : ""}
+                </span>
+              </div>
               <input
                 type="text"
                 onChange={(e) =>
@@ -83,7 +80,10 @@ const [userData, setuserData] = useState({ username: "", password: "" });
                 placeholder="Username"
                 className="p-[5px] outline-none bg-primaryColor text-otherColor rounded-[5px] mb-[5px]"
               />
-              <div className="text-[15px] mb-[5px] font-bold">PASSWORD <span className="text-text3Color font-semibold">*</span></div>
+              <div className="text-[15px] mb-[5px] font-bold">
+                PASSWORD{" "}
+                <span className="text-text3Color font-semibold">*</span>
+              </div>
               <div className="relative">
                 <input
                   type={displayPassword ? "text" : "password"}
@@ -108,7 +108,14 @@ const [userData, setuserData] = useState({ username: "", password: "" });
             <div className="flex ">
               <div>
                 <span className=" text-text2Color hover:underline hover:text-text1Color ">
-                  <Link to={{ pathname: `/${import.meta.env.VITE_VERSION}/register` }}> Register? </Link>
+                  <Link
+                    to={{
+                      pathname: `/${import.meta.env.VITE_VERSION}/register`,
+                    }}
+                  >
+                    {" "}
+                    Register?{" "}
+                  </Link>
                 </span>
               </div>
               <div className="mr-auto ml-auto">
@@ -126,5 +133,5 @@ const [userData, setuserData] = useState({ username: "", password: "" });
         </div>
       )}
     </>
-  )
+  );
 }

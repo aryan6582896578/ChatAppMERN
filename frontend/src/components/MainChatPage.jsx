@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
-import { socket } from "./socket.js";
+import { socket } from "./managesocket.js";
 import LoadingPage from "./loadingPage.jsx";
 
-export default function ChannelChatPage() {
+export default function MainChatPage() {
   let navigate = useNavigate();
   const [userName, setuserName] = useState("someshitisseriouslywrong");
   const [channelList, setchannelList] = useState([]);
