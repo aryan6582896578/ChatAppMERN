@@ -1,6 +1,7 @@
 import {userDataModel,serverDataModel,} from "../database/schema/databaseSchema.js";
-import {createUserId,createPasswordHash,checkPasswordHash,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,} from "../database/managedata.js";
-export default function runroutes(app) {
+import {createUserId,createPasswordHash,checkPasswordHash,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId} from "../database/managedata.js";
+import runsocket from "../sockets/managesocket.js";
+export default function runroutes(app,socket) {
   // app.get("/", (res, req) => {
   //     req.json({ hm :"from other file" });
   //   });
@@ -9,8 +10,9 @@ export default function runroutes(app) {
     const validToken = verifyJwt(req.cookies.tokenJwt);
     try {
       let usernamee = validToken.username;
+      let idd = validToken.userId
       if (validToken) {
-        (req.validUser = true), (req.username = usernamee);
+        (req.validUser = true), (req.username = usernamee),(req.userId = idd);
       } else {
         // res.clearCookie("tokenJwt")
         req.validUser = false;
@@ -22,7 +24,7 @@ export default function runroutes(app) {
   }
   app.get("/v1/verify", checkJwt, async (req, res) => {
     if (req.validUser) {
-      res.json({ status: "userValid" });
+      res.json({ status: "userValid" ,username:req.username ,userId :req.userId});
     } else {
       res.clearCookie("tokenJwt");
       res.json({ status: "userInvalid" });
@@ -55,6 +57,7 @@ export default function runroutes(app) {
           { $push: { members: `${userID}` } }
         );
         let createToken = signJwt(usernameRegister, userID);
+        await socket.emit("00000000000000000000",{server:"update"})
         res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000,});
         res.json({ status: "userCreated" });
       } catch (error) {
@@ -109,10 +112,22 @@ export default function runroutes(app) {
   app.get("/v1/getChannelData/:id", checkJwt, async (req, res) => {
     if (req.validUser) {
       let channelData = await getChannelData(req.params.id);
+      
       res.json({ channelData: channelData });
     }
   });
-
+  app.get("/v1/permissionCheck/:cid/:uid", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      let channelData = await getChannelDataUserId(req.params.cid);
+      let a = req.params.uid
+      if(channelData.includes(a)){
+        res.json({ status: "validUser" });
+      }else{
+        res.json({ status: "invalidUser" });
+      }
+      
+    }
+  });
   app.post("/v1/me/createServer", checkJwt, async (req, res) => {
     if (req.validUser) {
       try {
@@ -138,13 +153,18 @@ export default function runroutes(app) {
       }
     }
   });
+
+  app.post("/test",async (req, res) => {
+
+    res.json({"o":"k"})
+    })
 }
 
 //   app.put to update findbyidandupdate
 //   app.delete to delete ""...
 
 // app.post("/test",async (req, res) => {
-// res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
+// // res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
 // res.json({"o":"k"})
 // })
 

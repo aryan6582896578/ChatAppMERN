@@ -8,7 +8,7 @@ export default function AuthCheckMain() {
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
         withCredentials: true,
       }).then((data) => {
-        console.log(data.data.status);
+        // console.log(data.data.status);
         if (data.data.status === "userValid") {
           setuserStatus(true);
         } else {

@@ -19,16 +19,6 @@ app.use(
     credentials: true,
   })
 );
-
-
-
-
-
-
-
-
-
-runroutes(app)
 const socket = new Server(httpServer, {
   cors: {
     origin: "http://localhost:5173",
@@ -45,7 +35,7 @@ const socket = new Server(httpServer, {
     "polling",
   ],
 });
-
+runroutes(app,socket)
 runsocket(socket)
 
 async function runServer() {

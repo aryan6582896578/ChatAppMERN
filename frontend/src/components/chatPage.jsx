@@ -11,7 +11,6 @@ export default function ChatPage() {
   const [createServerDisplay,setcreateServerDisplay] = useState(false)
   const[createServerData,setcreateServerData]=useState({serverName:""})
   async function ServerData(){
-    // setcreateServerData({serverName:"hi"})
     console.log(createServerData.serverName)
     sendData()
   }

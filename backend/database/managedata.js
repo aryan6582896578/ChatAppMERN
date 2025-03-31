@@ -45,7 +45,7 @@ async function getUserChannels(username) {
 async function getChannelData(serverId) {
     let serverData = await serverDataModel.findOne({serverId:serverId})
     let serverName = serverData.name
-    let memberList = serverData?.members
+    let memberList = serverData.members
     let list = {}
     for (const [key, element] of memberList.entries()) {
         try {
@@ -61,7 +61,11 @@ async function getChannelData(serverId) {
     return(serverInfo)
 }
 
-//add server name later for tab title
+async function getChannelDataUserId(serverId){
+    let serverData = await serverDataModel.findOne({serverId:serverId})
+    
+    return serverData.members
+}
 
 async function getUsername(memberIds) {
     let getUsername = await userDataModel.findOne({userid:`${memberIds}`})
@@ -72,4 +76,4 @@ async function getUserId(username) {
     let getUserId = await userDataModel.findOne({username:username}) 
     return(getUserId.userid)
 }
-export {createPasswordHash,checkPasswordHash,createUserId,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId}
+export {createPasswordHash,checkPasswordHash,createUserId,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId}

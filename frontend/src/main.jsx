@@ -5,10 +5,12 @@ import App from "./App.jsx";
 import LoginPage from "./components/loginPage.jsx";
 import RegisterPage from "./components/registerPage.jsx";
 import ChatPage from "./components/chatPage.jsx";
-import AuthCheckPre from "./components/authCheckPre.jsx";
-import AuthCheckMain from "./components/authCheckMain.jsx";
+import AuthCheckPre from "./components/Auth/authCheckPre.jsx";
+import AuthCheckMain from "./components/Auth/authCheckMain.jsx";
+import AuthCheckRoute from "./components/Auth/authCheckRoute.jsx";
 import ErrorPage from "./components/errorPage.jsx";
 import MainChatPage from "./components/MainChatPage.jsx";
+
 
 let container = null;
 document.addEventListener("DOMContentLoaded", function (event) {
@@ -25,7 +27,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
           </Route>
           <Route path={`${import.meta.env.VITE_VERSION}/me`} element={<AuthCheckMain />}>
             <Route path="chat" element={<ChatPage />} />
-            <Route path="chat/:id" element={<MainChatPage />} />
+            <Route element={<AuthCheckRoute/>} >
+             <Route path="chat/:id" element={<MainChatPage />} />
+            </Route>
           </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>

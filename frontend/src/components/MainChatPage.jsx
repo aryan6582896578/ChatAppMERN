@@ -3,181 +3,144 @@ import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { socket } from "./managesocket.js";
 import LoadingPage from "./loadingPage.jsx";
-
+import {ServerList,ServerOptions,ServerCreateBox} from "./chatPage/ServerList.jsx"
+import { UserSetting } from "./chatPage/UserSetting.jsx";
 export default function MainChatPage() {
-  let navigate = useNavigate();
-  const [userName, setuserName] = useState("someshitisseriouslywrong");
-  const [channelList, setchannelList] = useState([]);
+  const navigate = useNavigate();
+  const path = document.URL.split("chat/")[1];
+
+  const [connectionStatus, setconnectionStatus] = useState(false);
+
+  const [serverData, setserverData] = useState("");
   const [userListId, setuserListId] = useState([]);
   const [userListUsername, setuserListUsername] = useState([]);
   const [inputFieldValue, setinputFieldValue] = useState("");
-  const [connectionStatus,setconnectionStatus] = useState(false);
-  const [createServerDisplay,setcreateServerDisplay] = useState(false)
-  const[createServerData,setcreateServerData]=useState({serverName:""})
-  const[serverData,setserverData]=useState("")
-  const[messageData,setmessageData]=useState({username:"",message:""});
 
-  async function ServerData(){
-    sendData()
-  }
-  const sendData = async () => {
-    const url = `http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createServer`
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(createServerData),
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const json  = await response.json();
-      if(json.status==="CreatedServer"){
-        setcreateServerDisplay(false)
-        await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${json.serverId}`)
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error.message);
-    }
-  };
-  function ee(){
- console.log("new message")
-  }
 
-  const path = document.URL.split("chat/")[1];
-  useEffect(() => {
+  const [serverList, setserverList] = useState([]);
+  const [serverOptionsDisplay, setserverOptionsDisplay] = useState(false);
+  const[serverCreateBoxDisplay , setserverCreateBoxDisplay] =  useState(false);
+  const [createServerData, setcreateServerData] = useState({ serverName: "" });
+  
+  const [username, setusername] = useState("someshitisseriouslywrong");
+
+  function getUserData() {
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userdata`, {
-      withCredentials: true,
-    }).then((data) => {
-      setchannelList(data.data.channels);
-      setuserName(data.data.username);
-    }).catch(function (error) {
-      console.log(error.toJSON());
-    });
-    let url = String(window.location.pathname);
-    let idurl = url.replace("/v1/me/chat/", "");
-
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getChannelData/${idurl}`,{
-          withCredentials: true,
-        }).then((data) => {
-        setserverData(data.data.channelData.name)
-        setuserListId(Object.keys(data.data.channelData.members));
-        setuserListUsername(Object.values(data.data.channelData.members));
+        withCredentials: true,
+      }).then((data) => {
+        setserverList(data.data.channels);
+        setusername(data.data.username);
       }).catch(function (error) {
         console.log(error.toJSON());
       });
-  }, [path]);
+  }
+  
+ async function postCreateServer(){
+    if(createServerData.serverName){
+      console.log(createServerData)
+      axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
+        withCredentials: true
+      }).then(async (data)=>{
+        if(data.data.status==="CreatedServer"){
+          setserverCreateBoxDisplay(false);
+          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
+        }
+      })
+    }
+  }
 
-
-
+  
   useEffect(() => {
-    socket.on(`${path}`,async (message) => {
-        
-      setmessageData({...messageData,username:message.username ,message:message.message})
-      console.log(messageData)
-  ee()
-    
+    getUserData();
+
+    const chatBox = document.getElementById("chatBox");
+    if (chatBox) {
+      chatBox.innerHTML = null;
+    }
+
+    function getChannelData() {
+      axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getChannelData/${path}`,{
+            withCredentials: true,
+          }).then((data) => {
+          setserverData(data.data.channelData.name);
+          setuserListId(Object.keys(data.data.channelData.members));
+          setuserListUsername(Object.values(data.data.channelData.members));
+        }).catch(function (error) {
+          console.log(error.toJSON());
+        });
+    }
+    getChannelData();
+
+    socket.on(`${path}`, async (message) => {
+      if (message.server) {
+        getChannelData();
+      } else {
+        displayMessage(message);
+      }
     });
+
+    async function displayMessage(message) {
+      let chatBox = document.getElementById("chatBox");
+      let usernameDiv = document.createElement("div");
+      usernameDiv.attributes;
+      usernameDiv.className = "text-white";
+      usernameDiv.innerText = message.username;
+      chatBox.append(usernameDiv);
+
+      let messageDiv = document.createElement("div");
+      messageDiv.innerText = message.message;
+      chatBox.append(messageDiv);
+    }
 
     function getJWTToken() {
       const match = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
       return match ? match[1] : null;
     }
-    // try {
-     function something(){
+
+    function setJWTToken() {
       const jwt = getJWTToken();
       socket.auth = { path, jwt };
-      socket.connect()
+      socket.connect();
       socket.on("connect", () => {
-        setconnectionStatus(true)
+        setconnectionStatus(true);
       });
-      
-     }
-     something();
-
+    }
+    setJWTToken();
 
     return () => {
-      // setmessageData("")
-      setserverData("")
+      setserverData("");
       socket.disconnect();
- 
     };
   }, [path]);
 
-  async function ee(){
-    // let a = document.getElementById("id")
-    // let somediv = document.createElement("div")
-    // console.log(`${messageData.message}`,"hmm")
-    // somediv.innerText = `${messageData.message}`;
-    // a.append(somediv)
-    console.log(messageData)
-    // await setmessageData({username:"" ,message:""})
-  }
-  
   function inputFieldData(e) {
     e.preventDefault();
     socket.emit(`${path}`, inputFieldValue);
     setinputFieldValue("");
   }
 
-  return (
-    connectionStatus?
-    <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  ">
-      {createServerDisplay? <div className="w-max h-max bg-textColor bg-opacity-10 border-solid border-[1px] rounded-[5px] p-[10px] border-textColor right-[40%]  top-1/3  fixed z-[100]" id="createServer">
-      <div className="text-center text-otherColor text-[30px]" >Create Server</div>
-        <input onChange={(e)=>{
-          setcreateServerData({serverName:e.target.value})
-        }} type="text" className="bg-textColor w-[300px] bg-opacity-40 rounded-[5px] h-[40px] outline-none mt-[10px] text-otherColor p-[10px]" placeholder="server name" />
-        <div className="flex mt-[10px] justify-evenly"> 
-          <button onClick={()=>{setcreateServerDisplay(false)}} className="w-[100px] bg-text3Color bg-opacity-100 Color rounded text-otherColor h-[40px] border-solid border-[2px] border-text3Color hover:bg-opacity-25 " >Cancel</button> 
-          <button  onClick={()=>{
-            ServerData()
-          }} className="w-[100px] bg-text1Color bg-opacity-100 Color rounded text-textColor h-[40px] border-solid border-[2px] border-text1Color hover:bg-opacity-25 hover:text-text1Color " >Create</button>
-        </div>  
-      </div>:""}
-     
-      <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative ">
-          <div className="flex">
-            <button onClick={()=>{navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)}} className="min-w-[5px] min-h-[30px] bg-textColor mt-[10px] hover:cursor-pointer hover:bg-text3Color mb-[25px] ml-auto mr-auto"></button>
-          </div>
-          <div className="flex flex-col relative ">
-            {channelList.map((channel, index) => (
-              <div key={index} className="m-auto">
-                <button key={index} onClick={()=>{
-                  navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${channel}`)///
-                }} className="bg-textColor bg-opacity-20 text-[20px] border-transparent border-solid border-[2px] text-text1Color w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor hover:bg-transparent hover:text-otherColor" >
-                  s{index}
-                </button>     
-              </div> 
-            ))}
-            <button onClick={()=>{
-              setcreateServerDisplay(true)
-            }} className="bg-secondaryColor text-[25px] p-[0px] border-secondaryColor border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-otherColor hover:border-opacity-50 hover:bg-transparent hover:text-otherColor">+</button> 
-        
-          </div>
-      </div>
+  return connectionStatus ? (
+    <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden">
+      {serverOptionsDisplay ? <ServerOptions setserverOptionsDisplay={setserverOptionsDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay}/>: ""}
+      {serverCreateBoxDisplay ?<ServerCreateBox setcreateServerData={setcreateServerData} createServerData={createServerData} setserverCreateBoxDisplay={setserverCreateBoxDisplay} postCreateServer={postCreateServer} /> :""}
+      <ServerList serverList={serverList} setserverOptionsDisplay={setserverOptionsDisplay}/>
+      
       <div className="bg-secondaryColor w-[16%] text-otherColor relative h-[100vh] ">
         <div className="w-[100%] h-[95%] overflow-y-auto overflow-x-hidden">
-          <div className="bg-primaryColor h-[40px] text-text2Color text-[20px] font-semibold text-center pt-[3px] border-solid border-b-[1px] border-textColor">{serverData}</div>
+          <div className="bg-primaryColor h-[40px] text-text2Color text-[20px] font-semibold text-center pt-[3px] border-solid border-b-[1px] border-textColor">
+            {serverData}
+          </div>
           channels
         </div>
-        <div className="w-[100%] h-[5%] bg-primaryColor absolute bottom-[0px] rounded-[5px] text-[25px]  pl-[10px] hover:rounded-none hover:cursor-pointer">
-          <div className="flex relative w-full h-full">
-            <span className="hover:text-text3Color">{userName}</span>
-            <div className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-text3Color absolute right-[0px] bottom-[0px] hover:cursor-not-allowed "></div>
-          </div>
-        </div>
+        <UserSetting username={username} />
       </div>
 
-      <div className="bg-primaryColor w-[65%] p-[10px] pb-[10px]  flex flex-col ">
-        <div className="bg-primaryColor w-[100%] h-[95%] mb-[0px]" id="aa">
-          
-  <div id="id">
-
-  </div>
+      <div className="bg-primaryColor w-[65%] p-[10px] pb-[10px] min-h-[93vh] flex flex-col overflow-y-auto">
+        <div className="bg-primaryColor w-[100%]  min-h-[93vh] max-h-[93vh] mb-[0px] overflow-y-auto">
+          <div id="chatBox" className=" pl-[10px]  "></div>
         </div>
-        <div className="h-[5%]  w-[100%]">
+
+        <div className="h-[5vh]  w-[100%] ">
           <form onSubmit={inputFieldData} className="h-[100%]  w-[100%]">
             <input
               id="inputField"
@@ -211,7 +174,16 @@ export default function MainChatPage() {
           </div>
         </div>
       </div>
-    </div>:<LoadingPage someError={`server offline`}/>
-    
+    </div>
+  ) : (
+    <LoadingPage someError={`server offline`} />
   );
+
+
+
+
+
+ 
+  
 }
+
