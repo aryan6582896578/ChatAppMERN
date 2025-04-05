@@ -29,4 +29,13 @@ const server = mongoose.Schema({
     members: [{type:Array}]
 })
 const serverDataModel = mongoose.model("serverData", server);
-export { userDataModel,serverDataModel };
+
+
+const inviteData = mongoose.Schema({
+    _id: {type:String,required: true},
+    serverId:{type:String,required: true},
+    inviteCode:{type:String,required: true},
+    createdDate: { type:String,required: true },
+   });
+   const inviteDataModel = mongoose.model("inviteData", inviteData);
+export { userDataModel,serverDataModel,inviteDataModel };

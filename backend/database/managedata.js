@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
-import {userDataModel,serverDataModel } from "./schema/databaseSchema.js";
+import {userDataModel,serverDataModel,inviteDataModel } from "./schema/databaseSchema.js";
 
 function signJwt(username,userId){
 let createJwtToken = jwt.sign({ username:username ,userId:userId ,test:true}, process.env.privateKey)
@@ -76,4 +76,67 @@ async function getUserId(username) {
     let getUserId = await userDataModel.findOne({username:username}) 
     return(getUserId.userid)
 }
-export {createPasswordHash,checkPasswordHash,createUserId,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId}
+
+function randomChar(){
+    let someRandom =Math.floor(Math.random() * (90 - 65+1) + 65)
+    let someRandomChar = String.fromCharCode(someRandom)
+    return someRandomChar
+}
+
+async function createInviteCode(){
+    let createdInviteCode=""
+    for(let i=0;i<8;i++){
+        createdInviteCode += randomChar()
+    }
+    return createdInviteCode
+}
+
+
+async function validInviteCode(serverId) {
+  let someflag = 0;
+
+  while (someflag == 0) {
+    const inviteCode = await createInviteCode();
+    let usedInviteCode = await inviteDataModel.findOne({
+      inviteCode: `${inviteCode}`,
+    });
+    if(usedInviteCode){
+        console.log("yes")
+    }else{
+        let createdId = createUserId();
+              await inviteDataModel.create({
+      _id: `${inviteCode}`,
+      serverId:`${serverId}`,
+      inviteCode:`${inviteCode}`,
+      createdDate: `${createdId}`,
+    });
+    return inviteCode
+    }
+  }
+}
+
+
+// try {
+//     const inviteCode = await createInviteCode()
+//     let createdId = createUserId();
+
+//     let usedInviteCode = await inviteDataModel.findOne(
+//       { inviteCode: `${inviteCode}` },
+//     );
+//     if(usedInviteCode){
+//       console.log("yes")
+//     }else{
+//       console.log("no")
+//       await userDataModel.create({
+//       _id: {type:String,required: true},
+//       serverId:`${req.params.cid}`,
+//       inviteCode:{type:String,required: true},
+//       createdDate: `${createdId}`,
+//     });
+//     }
+
+//   } catch (error) {
+//       console.log(error,"creating invite ")
+//   }
+
+export {createPasswordHash,checkPasswordHash,createUserId,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId,createInviteCode,validInviteCode}

@@ -1,5 +1,5 @@
-import {userDataModel,serverDataModel,} from "../database/schema/databaseSchema.js";
-import {createUserId,createPasswordHash,checkPasswordHash,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId} from "../database/managedata.js";
+import {userDataModel,serverDataModel, inviteDataModel,} from "../database/schema/databaseSchema.js";
+import {createUserId,createPasswordHash,checkPasswordHash,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId,validInviteCode} from "../database/managedata.js";
 import runsocket from "../sockets/managesocket.js";
 export default function runroutes(app,socket) {
   // app.get("/", (res, req) => {
@@ -126,6 +126,67 @@ export default function runroutes(app,socket) {
         res.json({ status: "invalidUser" });
       }
       
+    }
+  });
+  app.get("/v1/inviteCode/:cid", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      try {
+        let serverInviteCode = await inviteDataModel.findOne({
+          serverId: `${req.params.cid}`,
+        });
+        if(serverInviteCode){
+          res.json({"inviteCode":`${serverInviteCode.inviteCode}`})
+        }else{
+          let inviteCode = await validInviteCode(req.params.cid)
+          res.json({"inviteCode":`${inviteCode}`})
+        }
+      } catch (error) {
+        console.log(error,"create invite code")
+      }
+
+      
+      
+    }
+  });
+  app.post("/v1/me/joinServer", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      const serverInviteCodeJoin = req.body.serverInviteCode
+      try {
+        let serverInviteCode = await inviteDataModel.findOne({
+          inviteCode: `${serverInviteCodeJoin}`,
+        });
+        if(serverInviteCode){
+          let getUserid = await getUserId(req.username);
+
+          let userInServerCheck = await userDataModel.findOne(
+            { userid: `${getUserid}` },
+          );
+
+          if(userInServerCheck.servers.includes(serverInviteCode.serverId)){
+            await res.json({ status: "alreadyJoined", serverId: `${serverInviteCode.serverId}` });
+          }else{
+          await userDataModel.findOneAndUpdate(
+          { userid: `${getUserid}` },
+          { $push: { servers: `${serverInviteCode.serverId}` } }
+          
+        );
+        await serverDataModel.findOneAndUpdate(
+          { serverId: `${serverInviteCode.serverId}` },
+          { $push: { members: `${getUserid}` } })
+          await res.json({ status: "ServerJoined", serverId: `${serverInviteCode.serverId}` });
+          }
+
+          
+
+
+
+        }else{
+          res.json({ status: "invalidCode" });
+        }
+
+      } catch (error) {
+        console.log(error, "error in joining server ");
+      }
     }
   });
   app.post("/v1/me/createServer", checkJwt, async (req, res) => {

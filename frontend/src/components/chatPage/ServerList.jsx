@@ -44,30 +44,31 @@ export function ServerList({serverList,setserverOptionsDisplay}) {
     );
   }
 
-  export function ServerOptions({setserverOptionsDisplay,setserverCreateBoxDisplay}){
+  export function ServerOptions({setserverOptionsDisplay,setserverCreateBoxDisplay,setserverJoinBoxDisplay}){
     
     return (<div className="w-max h-max bg-textColor bg-opacity-10 border-solid border-[1px] rounded-[5px] p-[10px] border-textColor right-[40%]  top-1/3  fixed z-[100]"id="createServer"> 
       <div className="text-center text-otherColor text-[30px]">
         Server
       </div>
-      <div className="flex mt-[10px] justify-evenly w-[350px]">
+      <div className="flex mt-[10px] justify-evenly w-[400px]">
       <button onClick={() => {
             setserverOptionsDisplay(false)
             
-          }}className="w-[100px] bg-text3Color bg-opacity-100 Color rounded text-otherColor h-[40px] border-solid border-[2px] border-text3Color hover:bg-opacity-25">
+          }}className="w-[120px] bg-text3Color bg-opacity-100 Color rounded text-otherColor h-[40px] border-solid border-[2px] border-text3Color hover:bg-opacity-25">
           Cancel
         </button>
         <button onClick={() => {
             setserverOptionsDisplay(false)
             setserverCreateBoxDisplay(true)
-          }}className="w-[100px] bg-textColor bg-opacity-100 Color rounded text-otherColor h-[40px] border-solid border-[2px] border-textColor hover:bg-opacity-25">
+          }}className="w-[120px] bg-textColor bg-opacity-100 Color rounded text-otherColor h-[40px] border-solid border-[2px] border-textColor hover:bg-opacity-25">
           Create Server
         </button>
         <button
           onClick={() => {
-            console.log("join Server")
+            setserverOptionsDisplay(false)
+            setserverJoinBoxDisplay(true)
           }}
-          className="w-[100px] bg-text1Color bg-opacity-100 Color rounded text-textColor h-[40px] border-solid border-[2px] border-text1Color hover:bg-opacity-25 hover:text-text1Color ">
+          className="w-[120px] bg-text1Color bg-opacity-100 Color rounded text-textColor h-[40px] border-solid border-[2px] border-text1Color hover:bg-opacity-25 hover:text-text1Color ">
           Join Server
         </button>
       </div>
@@ -111,4 +112,43 @@ export function ServerCreateBox({setcreateServerData,createServerData,setserverC
         </div>
       </div>
     );
+  }
+  
+  export function ServerJoinBox({setjoinServerData,joinServerData,setserverJoinBoxDisplay,postJoinServer,serverJoinError}){
+    return(
+
+      <div className="w-max h-max bg-textColor bg-opacity-10 border-solid border-[1px] rounded-[5px] p-[10px] border-textColor right-[40%]  top-1/3  fixed z-[100]" id="createServer">
+        <div className="text-center text-otherColor text-[30px]">
+          Join Server
+        </div>
+        <div className="text-[15px] text-text3Color">{serverJoinError}</div>
+        <input
+         
+         onChange={(e) => {
+          
+          setjoinServerData({...joinServerData,serverInviteCode:e.target.value});
+         }}
+         maxLength={8}
+          type="text"className="bg-textColor w-[300px] bg-opacity-40 rounded-[5px] h-[40px] outline-none mt-[10px] text-otherColor p-[10px]" placeholder="invite code"
+        />
+        <div className="flex mt-[10px] justify-evenly">
+          <button
+            onClick={() => {
+              setserverJoinBoxDisplay(false);
+            }}
+            className="w-[100px] bg-text3Color bg-opacity-100 Color rounded text-otherColor h-[40px] border-solid border-[2px] border-text3Color hover:bg-opacity-25 "
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              postJoinServer()
+            }}
+            className="w-[100px] bg-text1Color bg-opacity-100 Color rounded text-textColor h-[40px] border-solid border-[2px] border-text1Color hover:bg-opacity-25 hover:text-text1Color "
+          >
+            Join Server
+          </button>
+        </div>
+      </div>
+    )
   }

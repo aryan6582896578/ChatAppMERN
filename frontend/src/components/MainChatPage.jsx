@@ -3,8 +3,9 @@ import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { socket } from "./managesocket.js";
 import LoadingPage from "./loadingPage.jsx";
-import {ServerList,ServerOptions,ServerCreateBox} from "./chatPage/ServerList.jsx"
+import {ServerList,ServerOptions,ServerCreateBox,ServerJoinBox} from "./chatPage/ServerList.jsx"
 import { UserSetting } from "./chatPage/UserSetting.jsx";
+import { ServerSettingBox, ServerSettingInviteBox } from "./chatPage/ServerSetting.jsx";
 export default function MainChatPage() {
   const navigate = useNavigate();
   const path = document.URL.split("chat/")[1];
@@ -21,6 +22,13 @@ export default function MainChatPage() {
   const [serverOptionsDisplay, setserverOptionsDisplay] = useState(false);
   const[serverCreateBoxDisplay , setserverCreateBoxDisplay] =  useState(false);
   const [createServerData, setcreateServerData] = useState({ serverName: "" });
+  const[serverJoinBoxDisplay , setserverJoinBoxDisplay] =  useState(false);
+  const[joinServerData , setjoinServerData] =  useState({ serverInviteCode: "" });
+  const[serverJoinError,setserverJoinError]=useState("");
+
+  const [serverSettingBoxDisplay,setserverSettingBoxDisplay] = useState(false);
+  const [serverSettingInviteBoxDisplay,setserverSettingInviteBoxDisplay] = useState(false);
+  const [inviteCode,setinviteCode] = useState(false);
   
   const [username, setusername] = useState("someshitisseriouslywrong");
 
@@ -37,7 +45,6 @@ export default function MainChatPage() {
   
  async function postCreateServer(){
     if(createServerData.serverName){
-      console.log(createServerData)
       axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
         withCredentials: true
       }).then(async (data)=>{
@@ -49,7 +56,36 @@ export default function MainChatPage() {
     }
   }
 
-  
+  async function postJoinServer(){
+    if(joinServerData.serverInviteCode){
+      axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
+        withCredentials: true
+      }).then(async (data)=>{
+        console.log(data.data)
+        if(data.data.status==="alreadyJoined"){
+          setserverJoinBoxDisplay(false)
+          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
+        }else if(data.data.status==="ServerJoined"){
+          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
+        }else{
+          setserverJoinError("*invalid code")
+          
+        }
+      })
+    }
+  }
+
+  async function createServerInvite() {
+    
+  axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/inviteCode/${path}`,{
+   withCredentials: true,
+ }).then((data) => {
+setinviteCode(data.data.inviteCode)
+
+}).catch(function (error) {
+ console.log(error.toJSON());
+});
+}
   useEffect(() => {
     getUserData();
 
@@ -107,6 +143,12 @@ export default function MainChatPage() {
     }
     setJWTToken();
 
+    setserverOptionsDisplay(false)
+    setserverCreateBoxDisplay(false)
+    setserverSettingBoxDisplay(false)
+    setserverSettingInviteBoxDisplay(false)
+    setserverJoinBoxDisplay(false)
+
     return () => {
       setserverData("");
       socket.disconnect();
@@ -121,14 +163,25 @@ export default function MainChatPage() {
 
   return connectionStatus ? (
     <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden">
-      {serverOptionsDisplay ? <ServerOptions setserverOptionsDisplay={setserverOptionsDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay}/>: ""}
+      {serverOptionsDisplay ? <ServerOptions setserverOptionsDisplay={setserverOptionsDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setserverJoinBoxDisplay={setserverJoinBoxDisplay}/> : ""}
       {serverCreateBoxDisplay ?<ServerCreateBox setcreateServerData={setcreateServerData} createServerData={createServerData} setserverCreateBoxDisplay={setserverCreateBoxDisplay} postCreateServer={postCreateServer} /> :""}
+      {serverJoinBoxDisplay?<ServerJoinBox  setjoinServerData ={setjoinServerData} joinServerData={joinServerData} setserverJoinBoxDisplay={setserverJoinBoxDisplay} postJoinServer={postJoinServer} serverJoinError={serverJoinError}/>:""}
+
       <ServerList serverList={serverList} setserverOptionsDisplay={setserverOptionsDisplay}/>
-      
+
+      {serverSettingBoxDisplay?<ServerSettingBox setserverSettingBoxDisplay={setserverSettingBoxDisplay} setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} createServerInvite={createServerInvite}/> :""}
+      {serverSettingInviteBoxDisplay?<ServerSettingInviteBox setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} inviteCode={inviteCode}/>:""}
+
+
+
       <div className="bg-secondaryColor w-[16%] text-otherColor relative h-[100vh] ">
         <div className="w-[100%] h-[95%] overflow-y-auto overflow-x-hidden">
-          <div className="bg-primaryColor h-[40px] text-text2Color text-[20px] font-semibold text-center pt-[3px] border-solid border-b-[1px] border-textColor">
-            {serverData}
+          <div className="bg-primaryColor max-h-[40px] text-text2Color text-[20px] font-semibold text-center pt-[3px] border-solid border-b-[1px] border-textColor flex">
+            <div className="ml-[5px]">{serverData}</div>
+            <div className="ml-auto"><button onClick={()=>{
+              setserverSettingBoxDisplay(true)
+            }} className="min-w-[5px] min-h-[30px] bg-textColor hover:bg-otherColor  "/></div>
+             
           </div>
           channels
         </div>
@@ -187,3 +240,8 @@ export default function MainChatPage() {
   
 }
 
+function ServerSettingsOptions(){
+  return(
+    <></>
+  )
+}
