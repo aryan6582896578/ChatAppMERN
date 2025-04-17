@@ -125,7 +125,6 @@ export function ServerCreateBox({setcreateServerData,createServerData,setserverC
         <input
          
          onChange={(e) => {
-          
           setjoinServerData({...joinServerData,serverInviteCode:e.target.value});
          }}
          maxLength={8}

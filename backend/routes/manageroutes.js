@@ -105,7 +105,7 @@ export default function runroutes(app,socket) {
   app.get("/v1/userdata", checkJwt, async (req, res) => {
     if (req.validUser) {
       let getchannels = await getUserChannels(req.username);
-      res.json({ username: req.username, channels: getchannels.servers });
+      res.json({ username: req.username, serverList: getchannels.servers });
     }
   });
 

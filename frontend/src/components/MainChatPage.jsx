@@ -3,9 +3,10 @@ import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { socket } from "./managesocket.js";
 import LoadingPage from "./loadingPage.jsx";
-import {ServerList,ServerOptions,ServerCreateBox,ServerJoinBox} from "./chatPage/ServerList.jsx"
+
 import { UserSetting } from "./chatPage/UserSetting.jsx";
 import { ServerSettingBox, ServerSettingInviteBox } from "./chatPage/ServerSetting.jsx";
+import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
 export default function MainChatPage() {
   const navigate = useNavigate();
   const path = document.URL.split("chat/")[1];
@@ -18,14 +19,6 @@ export default function MainChatPage() {
   const [inputFieldValue, setinputFieldValue] = useState("");
 
 
-  const [serverList, setserverList] = useState([]);
-  const [serverOptionsDisplay, setserverOptionsDisplay] = useState(false);
-  const[serverCreateBoxDisplay , setserverCreateBoxDisplay] =  useState(false);
-  const [createServerData, setcreateServerData] = useState({ serverName: "" });
-  const[serverJoinBoxDisplay , setserverJoinBoxDisplay] =  useState(false);
-  const[joinServerData , setjoinServerData] =  useState({ serverInviteCode: "" });
-  const[serverJoinError,setserverJoinError]=useState("");
-
   const [serverSettingBoxDisplay,setserverSettingBoxDisplay] = useState(false);
   const [serverSettingInviteBoxDisplay,setserverSettingInviteBoxDisplay] = useState(false);
   const [inviteCode,setinviteCode] = useState(false);
@@ -36,43 +29,10 @@ export default function MainChatPage() {
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userdata`, {
         withCredentials: true,
       }).then((data) => {
-        setserverList(data.data.channels);
         setusername(data.data.username);
       }).catch(function (error) {
         console.log(error.toJSON());
       });
-  }
-  
- async function postCreateServer(){
-    if(createServerData.serverName){
-      axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
-        withCredentials: true
-      }).then(async (data)=>{
-        if(data.data.status==="CreatedServer"){
-          setserverCreateBoxDisplay(false);
-          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
-        }
-      })
-    }
-  }
-
-  async function postJoinServer(){
-    if(joinServerData.serverInviteCode){
-      axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
-        withCredentials: true
-      }).then(async (data)=>{
-        console.log(data.data)
-        if(data.data.status==="alreadyJoined"){
-          setserverJoinBoxDisplay(false)
-          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
-        }else if(data.data.status==="ServerJoined"){
-          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
-        }else{
-          setserverJoinError("*invalid code")
-          
-        }
-      })
-    }
   }
 
   async function createServerInvite() {
@@ -142,12 +102,9 @@ setinviteCode(data.data.inviteCode)
       });
     }
     setJWTToken();
-
-    setserverOptionsDisplay(false)
-    setserverCreateBoxDisplay(false)
+ 
     setserverSettingBoxDisplay(false)
     setserverSettingInviteBoxDisplay(false)
-    setserverJoinBoxDisplay(false)
 
     return () => {
       setserverData("");
@@ -163,11 +120,7 @@ setinviteCode(data.data.inviteCode)
 
   return connectionStatus ? (
     <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden">
-      {serverOptionsDisplay ? <ServerOptions setserverOptionsDisplay={setserverOptionsDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setserverJoinBoxDisplay={setserverJoinBoxDisplay}/> : ""}
-      {serverCreateBoxDisplay ?<ServerCreateBox setcreateServerData={setcreateServerData} createServerData={createServerData} setserverCreateBoxDisplay={setserverCreateBoxDisplay} postCreateServer={postCreateServer} /> :""}
-      {serverJoinBoxDisplay?<ServerJoinBox  setjoinServerData ={setjoinServerData} joinServerData={joinServerData} setserverJoinBoxDisplay={setserverJoinBoxDisplay} postJoinServer={postJoinServer} serverJoinError={serverJoinError}/>:""}
-
-      <ServerList serverList={serverList} setserverOptionsDisplay={setserverOptionsDisplay}/>
+      <ServerListComponent/>
 
       {serverSettingBoxDisplay?<ServerSettingBox setserverSettingBoxDisplay={setserverSettingBoxDisplay} setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} createServerInvite={createServerInvite}/> :""}
       {serverSettingInviteBoxDisplay?<ServerSettingInviteBox setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} inviteCode={inviteCode}/>:""}
