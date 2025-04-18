@@ -72,7 +72,7 @@ export function ServerListComponent() {
           onClick={() => {
             navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
           }}
-          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-pointer hover:bg-text3Color  ml-auto mr-auto rounded-[10%]"
+          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-cell hover:bg-text3Color  ml-auto mr-auto rounded-[10%]"
         />
       </div>
 
@@ -82,7 +82,7 @@ export function ServerListComponent() {
             <button key={index} onClick={() => {
                 navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${server}`);
               }}
-              className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor"
+              className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor cursor-cell"
             >{index}</button>
           </div>
         ))}
@@ -91,7 +91,7 @@ export function ServerListComponent() {
           onClick={() => {
             setserverBoxDisplay(true);
           }}
-          className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor">
+          className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor cursor-cell">
           +
         </button>
         

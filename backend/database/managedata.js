@@ -44,27 +44,32 @@ async function getUserChannels(username) {
 
 async function getChannelData(serverId) {
     let serverData = await serverDataModel.findOne({serverId:serverId})
-    let serverName = serverData.name
-    let memberList = serverData.members
-    let list = {}
-    for (const [key, element] of memberList.entries()) {
-        try {
-            list[memberList[key]] = await getUsername(element[0]);
-        } catch (error) {
-            console.log(error, "err");
+    if(serverData){
+        let serverName = serverData.name
+        let memberList = serverData.members
+        let list = {}
+        for (const [key, element] of memberList.entries()) {
+            try {
+                list[memberList[key]] = await getUsername(element[0]);
+            } catch (error) {
+                console.log(error, "err");
+            }
         }
+        const serverInfo={
+            name:serverName,
+            members:list
+        }
+        return(serverInfo)
     }
-    const serverInfo={
-        name:serverName,
-        members:list
-    }
-    return(serverInfo)
+
 }
 
 async function getChannelDataUserId(serverId){
     let serverData = await serverDataModel.findOne({serverId:serverId})
-    
-    return serverData.members
+    if(serverData){
+        return serverData.members
+    }
+
 }
 
 async function getUsername(memberIds) {

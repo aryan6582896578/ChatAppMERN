@@ -34,7 +34,7 @@ export default function RegisterPage() {
 
       const json  = await response.json();
       if(json.status === "userCreated"){
-        navigate(`/${import.meta.env.VITE_VERSION}/login`)
+        navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)
       }else{
         setloadingPage(false)
         setdisplayError("Username already exists")

@@ -12,14 +12,15 @@ export default function AuthCheckPre() {
         if (data.data.status === "userValid") {
           setuserStatus(true);
           navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
-        } else {
-          navigate(`/${import.meta.env.VITE_VERSION}/login`);
-        }
+        } 
       }).catch(function (error) {
         console.log(error.toJSON());
       });
   }, []);
 
+  if(!userStatus){
+    return <Outlet />;
 
-  return <Outlet />;
+  }
+ 
 }

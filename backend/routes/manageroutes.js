@@ -120,11 +120,16 @@ export default function runroutes(app,socket) {
     if (req.validUser) {
       let channelData = await getChannelDataUserId(req.params.cid);
       let a = req.params.uid
-      if(channelData.includes(a)){
-        res.json({ status: "validUser" });
+      if(channelData){
+        if(channelData.includes(a)){
+          res.json({ status: "validUser" });
+        }else{
+          res.json({ status: "invalid" });
+        }
       }else{
-        res.json({ status: "invalidUser" });
+        res.json({ status: "invalid" });
       }
+     
       
     }
   });
