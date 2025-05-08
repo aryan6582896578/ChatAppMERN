@@ -20,18 +20,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
     root.render(
       <BrowserRouter>
         <Routes>
+
           <Route path="/" element={<App />} />
-          <Route path={`${import.meta.env.VITE_VERSION}`}element={<AuthCheckPre />}>
+          <Route path="*" element={<ErrorPage />} />
+
+          <Route path={`${import.meta.env.VITE_VERSION}`} element={<AuthCheckPre />}>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
           </Route>
-          <Route path={`${import.meta.env.VITE_VERSION}/me`} element={<AuthCheckMain />}>
+
+          <Route path={`${import.meta.env.VITE_VERSION}/@me`} element={<AuthCheckMain />}>
             <Route path="chat" element={<ChatPage />} />
-            <Route element={<AuthCheckRoute/>} >
-             <Route path="chat/:id" element={<MainChatPage />} />
+            <Route path="chat/:serverId/" element={<AuthCheckRoute/>} >
+             <Route path=":channelId" element={<MainChatPage />} />
             </Route>
           </Route>
-          <Route path="*" element={<ErrorPage />} />
+
         </Routes>
       </BrowserRouter>
     );

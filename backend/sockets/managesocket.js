@@ -1,4 +1,4 @@
-import { verifyJwt } from "../database/managedata.js";
+import { verifyJwt } from "../database/managedata/authData.js";
 
 export default async function runsocket(socket) {
   socket.use((socket, next) => {

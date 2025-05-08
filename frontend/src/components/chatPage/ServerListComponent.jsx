@@ -16,7 +16,7 @@ export function ServerListComponent() {
   const[serverJoinError,setserverJoinError]=useState("");
 
   function getUserData() {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userdata`, {
+    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userDataSeverList`, {
         withCredentials: true,
       }).then((data) => {
         setserverList(data.data.serverList);
@@ -44,7 +44,6 @@ export function ServerListComponent() {
       axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
         withCredentials: true
       }).then(async (data)=>{
-        console.log(data.data)
         if(data.data.status==="alreadyJoined"){
           setserverJoinBoxDisplay(false)
           await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);

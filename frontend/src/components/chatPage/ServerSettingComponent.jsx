@@ -3,28 +3,27 @@ import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 export function ServerSettingComponent() {
   const navigate = useNavigate();
-  const path = document.URL.split("chat/")[1];
+  const parms = useParams();
   const [serverData, setserverData] = useState("");
   const [serverSettingBoxDisplay, setserverSettingBoxDisplay] = useState(false);
-  const [serverSettingInviteBoxDisplay, setserverSettingInviteBoxDisplay] =
-    useState(false);
+  const [serverSettingInviteBoxDisplay, setserverSettingInviteBoxDisplay] =useState(false);
 
   const [inviteCode, setinviteCode] = useState(false);
    const [inviteCodeStatus,setinviteCodeStatus]= useState("Copy Code");
   async function createServerInvite() {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/inviteCode/${path}`,{
+    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/inviteCode/${parms.serverId}`,{
           withCredentials: true,
         }).then((data) => {
         setinviteCode(data.data.inviteCode);
       }).catch(function (error) {
-        console.log(error.toJSON());
+        console.log(error);
       });
   }
   function getServerData() {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getChannelData/${path}`,{
+    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getServerData/${parms.serverId}`,{
         withCredentials: true,
     }).then((data) => {
-        setserverData(data.data.channelData.name);
+        setserverData(data.data.serverName);
       }).catch(function (error) {
         console.log(error);
       });
@@ -33,7 +32,7 @@ export function ServerSettingComponent() {
     getServerData();
     setserverSettingBoxDisplay(false);
     setserverSettingInviteBoxDisplay(false);
-  },[path]);
+  },[parms.channelId]);
 
   return (
     <div className=" min-w-[250px] max-h-[55px] min-h-[45px] bg-primaryColor z-100 absolute  flex ">

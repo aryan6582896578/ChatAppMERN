@@ -1,10 +1,7 @@
-import {userDataModel,serverDataModel, inviteDataModel,} from "../database/schema/databaseSchema.js";
-import {createUserId,createPasswordHash,checkPasswordHash,signJwt,verifyJwt,getUserChannels,getChannelData,getUserId,getChannelDataUserId,validInviteCode} from "../database/managedata.js";
-import runsocket from "../sockets/managesocket.js";
+import {userDataModel,serverDataModel, inviteDataModel,serverChannelsDataModel} from "../database/schema/databaseSchema.js";
+import {createId,getServerData,getUserId,getServerMemberList,validInviteCode,userDataSeverList,getServerChannelList,getServerChannelMemberList} from "../database/managedata.js";
+import {signJwt,verifyJwt,createPasswordHash,checkPasswordHash} from "../database/managedata/authData.js"
 export default function runroutes(app,socket) {
-  // app.get("/", (res, req) => {
-  //     req.json({ hm :"from other file" });
-  //   });
 
   function checkJwt(req, res, next) {
     const validToken = verifyJwt(req.cookies.tokenJwt);
@@ -14,7 +11,6 @@ export default function runroutes(app,socket) {
       if (validToken) {
         (req.validUser = true), (req.username = usernamee),(req.userId = idd);
       } else {
-        // res.clearCookie("tokenJwt")
         req.validUser = false;
       }
     } catch (error) {
@@ -30,16 +26,19 @@ export default function runroutes(app,socket) {
       res.json({ status: "userInvalid" });
     }
   });
+  app.get("/v1/username", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      res.json({ username:req.username});
+    } 
+  });
 
   app.post("/v1/registeruser", checkJwt, async (req, res) => {
     const usernameRegister = req.body.username;
     const passwordRegister = req.body.password;
-    console.log("Username-",usernameRegister,"Password-",passwordRegister,"cookies",req.cookies?req.cookies:"no cookies");
-
     if (usernameRegister && passwordRegister) {
-      let userID = createUserId();
-      let channelGlobal = "00000000000000000000";
-      let hashedhPassword = await createPasswordHash(passwordRegister);
+      const userID = createId();
+      const serverGlobal = "00000000000000000000";
+      const hashedhPassword = await createPasswordHash(passwordRegister);
       try {
         await userDataModel.create({
           _id: `${usernameRegister}`,
@@ -50,14 +49,17 @@ export default function runroutes(app,socket) {
         });
         await userDataModel.findOneAndUpdate(
           { userid: `${userID}` },
-          { $push: { servers: channelGlobal } }
+          { $push: { servers: serverGlobal } }
         );
         await serverDataModel.findOneAndUpdate(
           { serverId: "00000000000000000000" },
           { $push: { members: `${userID}` } }
         );
-        let createToken = signJwt(usernameRegister, userID);
-        await socket.emit("00000000000000000000",{server:"update"})
+        const createToken = signJwt(usernameRegister, userID);
+        const userCreated = await userDataModel.findOne(
+          { userid: `${userID}` },
+        );
+        console.log(userCreated)
         res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000,});
         res.json({ status: "userCreated" });
       } catch (error) {
@@ -102,33 +104,48 @@ export default function runroutes(app,socket) {
       }
     }
   });
-  app.get("/v1/userdata", checkJwt, async (req, res) => {
+  app.get("/v1/userDataSeverList", checkJwt, async (req, res) => {
     if (req.validUser) {
-      let getchannels = await getUserChannels(req.username);
-      res.json({ username: req.username, serverList: getchannels.servers });
+      const userDataSevers = await userDataSeverList(req.username);
+      res.json({serverList: userDataSevers });
     }
   });
 
-  app.get("/v1/getChannelData/:id", checkJwt, async (req, res) => {
+  app.get("/v1/getServerData/:id", checkJwt, async (req, res) => {
     if (req.validUser) {
-      let channelData = await getChannelData(req.params.id);
-      
-      res.json({ channelData: channelData });
+      const serverData = await getServerData(req.params.id);
+      res.json({ serverName: serverData });
     }
   });
-  app.get("/v1/permissionCheck/:cid/:uid", checkJwt, async (req, res) => {
+
+  app.get("/v1/permissionCheckServer/:serverId/:userId", checkJwt, async (req, res) => {
     if (req.validUser) {
-      let channelData = await getChannelDataUserId(req.params.cid);
-      let a = req.params.uid
-      if(channelData){
-        if(channelData.includes(a)){
-          res.json({ status: "validUser" });
-        }else{
-          res.json({ status: "invalid" });
-        }
-      }else{
-        res.json({ status: "invalid" });
+      console.log("serverperms");
+      const serverId = req.params.serverId
+      const userId = req.params.userId
+      const serverDataMemberList = await getServerMemberList(serverId);
+      const serverChannelData=await getServerChannelList(serverId);
+      const defaultChannel = serverChannelData[0].channelId
+      const serverChannelId = String(defaultChannel)+String(serverId)
+      console.log(serverChannelId)
+      const a = await getServerChannelMemberList(serverChannelId)
+      console.log(a,"a")
+console.log(defaultChannel)
+
+      console.log(serverChannelData)
+
+      if(serverDataMemberList.includes(userId)){
+        console.log("server yes")
       }
+      // if(serverDataMemberList){
+      //   if(serverData.includes(userId)){
+      //     res.json({ status: "validUser" ,channelId:serverChannelRedirect});
+      //   }else{
+      //     res.json({ status: "invalid" });
+      //   }
+      // }else{
+      //   res.json({ status: "invalid" });
+      // }
      
       
     }
@@ -181,9 +198,6 @@ export default function runroutes(app,socket) {
           await res.json({ status: "ServerJoined", serverId: `${serverInviteCode.serverId}` });
           }
 
-          
-
-
 
         }else{
           res.json({ status: "invalidCode" });
@@ -197,7 +211,7 @@ export default function runroutes(app,socket) {
   app.post("/v1/me/createServer", checkJwt, async (req, res) => {
     if (req.validUser) {
       try {
-        let serverId = createUserId();
+        let serverId = createId();
         let getUserid = await getUserId(req.username);
         const ServerName = req.body.serverName;
         serverDataModel.create({
@@ -209,9 +223,32 @@ export default function runroutes(app,socket) {
           serverId: serverId,
           members: [getUserid],
         });
+        let channelId = createId();
+        let serverChannelId = String(createId())+ String(serverId);
+
+        await serverChannelsDataModel.create({
+          _id: serverChannelId,
+          name:"General",
+          createdDate: channelId,
+          serverChannelId:serverChannelId,
+          ChannelId:channelId,
+          serverId:serverId,
+          members: [getUserid]
+        })
+
+
         await userDataModel.findOneAndUpdate(
           { userid: `${getUserid}` },
           { $push: { servers: `${serverId}` } }
+        );
+        const channelDefault = {
+          name:"General",
+          channelId : channelId,
+          serverChannelId:serverChannelId,
+        }
+        await serverDataModel.findOneAndUpdate(
+          { serverId: `${serverId}` },
+          { $push: { channels:channelDefault }}
         );
         await res.json({ status: "CreatedServer", serverId: `${serverId}` });
       } catch (error) {
@@ -221,22 +258,10 @@ export default function runroutes(app,socket) {
   });
 
   app.post("/test",async (req, res) => {
-
     res.json({"o":"k"})
     })
+  app.get("/test",async (req, res) => {
+   const a =  createId()
+      res.json({"o":a})
+      })
 }
-
-//   app.put to update findbyidandupdate
-//   app.delete to delete ""...
-
-// app.post("/test",async (req, res) => {
-// // res.cookie("A","B" ,{ maxAge: (15*24*60*60*1000) })
-// res.json({"o":"k"})
-// })
-
-// app.get("/test", checkJwt, async (req, res) => {
-//   const username = {"u":req.username}
-// let a = "/v1/me/chat/00000000000000000000"
-// console.log(a.replace("/v1/me/chat/",""))
-//   res.send(username)
-//   })

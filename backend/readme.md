@@ -24,3 +24,9 @@ try to prevent race condition in database
 
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of
 to complete async function ig ?
+
+todo
+complete auth logic for everything
+save message
+friends
+

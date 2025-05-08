@@ -1,5 +1,5 @@
-react recap
-do routes
-do auth connect mongo
-socketio
-store message
+cd frontend
+npm run front
+
+cd backend
+npm run server
