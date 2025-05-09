@@ -9,6 +9,7 @@ import { dbApp } from "./database/database.js";
 
 import runsocket from "./sockets/managesocket.js";
 import runroutes from "./routes/manageroutes.js";
+import createDefaultData from "./database/default/createdefault.js";
 const app = express();
 const httpServer = createServer(app);
 
@@ -40,13 +41,13 @@ runsocket(socket)
 
 async function runServer() {
   try {
-    dbApp().then(() => {
-      httpServer.listen(process.env.SERVER_PORT, () => {
-        console.log(
-          `server running on http://localhost:${process.env.SERVER_PORT}`
-        );
-      });
-    });
-  } catch (error) {}
+    dbApp().then(async () => {
+       httpServer.listen(process.env.SERVER_PORT, () => {
+        console.log(`server running on http://localhost:${process.env.SERVER_PORT}`);
+      }), createDefaultData()   
+    })  
+  } catch (error) {
+    console.log(error,"error in server start")
+  }
 }
 runServer();

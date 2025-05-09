@@ -71,7 +71,7 @@ export function ServerListComponent() {
           onClick={() => {
             navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
           }}
-          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-cell hover:bg-text3Color  ml-auto mr-auto rounded-[10%]"
+          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-cell hover:bg-text3Color  ml-auto mr-auto rounded-[10%] duration-500"
         />
       </div>
 
@@ -110,16 +110,16 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
         <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
             <div className="flex align-middle justify-center mb-[10px] pt-[10px]"> 
                 <div className="text-[40px]">Server</div>
-                <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]" onClick={() => {
+                <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color duration-[0.5s]" onClick={() => {
                     setserverBoxDisplay(false);
                 }}/>
             </div>
             <div className="flex justify-evenly text-[20px]">
-                <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]" onClick={()=>{ 
+                <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{ 
                   setserverBoxDisplay(false) ,
                   setserverCreateBoxDisplay(true)
                   }}>Create Server</button>
-                <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]" onClick={()=>{
+                <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{
                   setserverBoxDisplay(false) ,
                   setserverJoinBoxDisplay(true)
                 }} >Join Server</button>
@@ -134,7 +134,7 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
       <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
           <div className="flex align-middle justify-center mb-[10px] pt-[10px]"> 
               <div className="text-[40px]">Create Server</div>
-              <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]" onClick={() => {
+              <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color duration-[0.5s]" onClick={() => {
                   setserverCreateBoxDisplay(false);
               }}/>
           </div>
@@ -143,15 +143,15 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
          onChange={(e) => {
           setcreateServerData({...createServerData,serverName:e.target.value});
          }}
-          type="text" className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px]" placeholder="server name"
+          type="text" className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] text-[20px] font-medium" placeholder="server name"
         />
           </div>
           <div className="flex justify-evenly text-[20px]">
-              <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 hover:border-red-500 transition-[1s]" onClick={()=>(
+              <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 hover:border-red-500 duration-[0.5s] font-medium" onClick={()=>(
                 setserverCreateBoxDisplay(false),
                 setserverBoxDisplay(true)
               )}>Go back</button>
-              <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]" onClick={()=>{
+              <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{
                 postCreateServer()
               }}>Create Server</button>
 
@@ -165,7 +165,7 @@ function ServerJoinBoxDisplay({setserverJoinBoxDisplay,setserverBoxDisplay ,setj
     <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
     <div className="flex align-middle justify-center mb-[10px] pt-[10px]"> 
         <div className="text-[40px]">Join Server</div>
-        <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]" onClick={() => {
+        <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color duration-[0.5s]" onClick={() => {
             setserverJoinBoxDisplay(false)
         }}/>
     </div>
@@ -175,15 +175,15 @@ function ServerJoinBoxDisplay({setserverJoinBoxDisplay,setserverBoxDisplay ,setj
    onChange={(e) => {
     setjoinServerData({...joinServerData,serverInviteCode:e.target.value});
    }}
-    type="text" className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] font-bold text-[20px]" placeholder="Invite Code" maxLength={8}
+    type="text" className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] font-medium text-[20px]" placeholder="Invite Code" maxLength={8}
   />
     </div>
     <div className="flex justify-evenly text-[20px]">
-        <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 hover:border-red-500 transition-[1s]" onClick={()=>(
+        <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 hover:border-red-500 duration-[0.5s] font-medium" onClick={()=>(
           setserverJoinBoxDisplay(false),
           setserverBoxDisplay(true)
         )}>Go back</button>
-        <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]" onClick={()=>{
+        <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{
           postJoinServer()
         }}>Join Server</button>
 

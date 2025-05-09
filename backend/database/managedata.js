@@ -9,10 +9,6 @@ function createId(){
     return id;
 }
 
-
-
-
-
 async function userDataSeverList(username) {
     const userDataSeverList = await userDataModel.findOne({username:username})
     return userDataSeverList.servers

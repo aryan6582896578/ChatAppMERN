@@ -1,4 +1,5 @@
 import { mongoose, Schema } from "mongoose";
+
 const userData = mongoose.Schema({
  _id: {type:String,required: true},
  username:{type:String,required: true},
@@ -9,27 +10,30 @@ const userData = mongoose.Schema({
 });
 const userDataModel = mongoose.model("userdata", userData);
 
-
-// const channels = mongoose.Schema({
-//     // _id: {type:String,required: true},
-//     // name:{type:String,required: true},
-//     // createdDate: { type:String,required: true },
-//     // channelId:{type:Number,required:true},
-//     members: [{type:Array}]
-// })
-// const channelsDataModel = mongoose.model("channelData", channels);
-
 const server = mongoose.Schema({
     _id: {type:String,required: true},
     name:{type:String,required: true},
-    admin:{type:String,required: true},
-    adminId:{type:String,required: true},
+    admins:[{type:Array}],
     createdDate: { type:String,required: true },
+    ownerId:{type:String},
     serverId:{type:String,required:true},
     members: [{type:Array}],
-    channels :[{type:Object}]
+    channels :[{type:Array}]
 })
 const serverDataModel = mongoose.model("serverData", server);
+
+
+
+const serverChannels = mongoose.Schema({
+        _id: {type:String,required: true},
+        name:{type:String,required: true},
+        createdDate: { type:String,required: true },
+        channelId:{type:String,required:true},
+        serverId:{type:String,required: true},
+        members: [{type:Array}]
+    })
+const serverChannelsDataModel = mongoose.model("serverChannelsData", serverChannels);
+
 
 
 const inviteData = mongoose.Schema({
@@ -39,18 +43,5 @@ const inviteData = mongoose.Schema({
     createdDate: { type:String,required: true },
    });
    const inviteDataModel = mongoose.model("inviteData", inviteData);
-
-
-const serverChannels = mongoose.Schema({
-        _id: {type:String,required: true},
-        name:{type:String,required: true},
-        createdDate: { type:String,required: true },
-        serverChannelId:{type:String,required:true},
-        ChannelId:{type:String,required:true},
-        serverId:{type:String,required: true},
-        members: [{type:Array}]
-    })
-const serverChannelsDataModel = mongoose.model("serverChannelsData", serverChannels);
-
 
 export { userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel };

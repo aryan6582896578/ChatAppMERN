@@ -5,25 +5,25 @@ import LoadingPage from "../loadingPage";
 export default function AuthCheckMain() {
   const navigate = useNavigate();
   const [userStatus, setuserStatus] = useState(false);
+
+  async function verifyUser(){
+    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
+      withCredentials: true,
+    })
+    if(userData.data.status === "userValid"){
+      setuserStatus(true);
+    }else{
+      navigate(`/${import.meta.env.VITE_VERSION}/login`);
+    }
+  }
+
   useEffect(() => {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
-        withCredentials: true,
-      }).then((data) => {
-        // console.log(data.data.status);
-        if (data.data.status === "userValid") {
-          setuserStatus(true);
-        } else {
-          navigate(`/${import.meta.env.VITE_VERSION}/login`);
-        }
-      }).catch(function (error) {
-        console.log(error.toJSON());
-      });
+    verifyUser()
   }, []);
 
-    if(userStatus){
-      return <Outlet />;
-    }else{
-  return <LoadingPage someError={"we are checking"}/>
+  if(userStatus){
+    return <Outlet />;
+  }else{
+    return <LoadingPage someError={"we are checking"}/>
     }
-
 }

@@ -10,7 +10,7 @@ export default function LoginPage() {
   let navigate = useNavigate();
   async function LoginUser() {
     setuserData({ username: "", password: "" });
-    // console.log("yes dataset", userData.username);
+
     if (userData.username && userData.password) {
       setloadingPage(true);
       await sendData();
@@ -20,9 +20,7 @@ export default function LoginPage() {
   }
 
   const sendData = async () => {
-    const url = `http://localhost:4500/${
-      import.meta.env.VITE_VERSION
-    }/loginUser`;
+    const url = `http://localhost:4500/${import.meta.env.VITE_VERSION}/loginUser`;
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -36,7 +34,7 @@ export default function LoginPage() {
 
       const json = await response.json();
       if (json.status === "userValid") {
-        navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
+        navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
       } else {
         setloadingPage(false);
         setdisplayError("username or password is invalid");
@@ -60,28 +58,22 @@ export default function LoginPage() {
       ) : (
         <div className="bg-primaryColor min-h-screen w-full overflow-hidden text-textColor   ">
           <div className="flex flex-col bg-secondaryColor mt-[50px] ml-auto mr-auto min-w-fit w-[500px] h-fit rounded-[10px] p-[20px]">
-            <div className="text-[50px] text-center font-semibold ">Login</div>
+
+            <div className="text-[50px] ml-auto mr-auto font-semibold ">Login</div>
 
             <div className="flex flex-col mb-[5px]">
               <div className="text-[15px] mb-[5px] font-bold">
-                USERNAME{" "}
+                USERNAME
                 <span className="text-text3Color font-semibold">*</span> &nbsp;{" "}
                 <span className="text-red-500 font-semibold text-[13px]">
                   {displayError ? displayError : ""}
                 </span>
               </div>
-              <input
-                type="text"
-                onChange={(e) =>
+              <input type="text" onChange={(e) =>
                   setuserData({ ...userData, username: e.target.value })
-                }
-                value={userData.username}
-                id="usernameRegister"
-                placeholder="Username"
-                className="p-[5px] outline-none bg-primaryColor text-otherColor rounded-[5px] mb-[5px]"
-              />
+                } value={userData.username}id="usernameRegister"placeholder="Username" className="p-[5px] outline-none bg-primaryColor text-otherColor rounded-[5px] mb-[5px]"/>
               <div className="text-[15px] mb-[5px] font-bold">
-                PASSWORD{" "}
+                PASSWORD
                 <span className="text-text3Color font-semibold">*</span>
               </div>
               <div className="relative">
@@ -89,42 +81,25 @@ export default function LoginPage() {
                   type={displayPassword ? "text" : "password"}
                   onChange={(e) =>
                     setuserData({ ...userData, password: e.target.value })
-                  }
-                  value={userData.password}
-                  id="passwordRegister"
-                  placeholder="Password"
-                  className="p-[5px] outline-none bg-primaryColor text-otherColor w-full rounded-[5px]"
-                />
-                <button
-                  onMouseEnter={changedisplayPassword}
-                  onMouseLeave={changedisplayPassword}
-                  className="absolute right-[5px] top-[5px] p-0"
-                >
-                  <div className="bg-text3Color hover:bg-text1Color min-w-[5px] min-h-[25px] "></div>
+                  } value={userData.password} id="passwordRegister"placeholder="Password"  className="p-[5px] outline-none bg-primaryColor text-otherColor w-full rounded-[5px]"/>
+                <button onMouseEnter={changedisplayPassword} onMouseLeave={changedisplayPassword} className="absolute right-[5px] top-[5px] p-0" >
+                  <div className="bg-text3Color hover:bg-text1Color min-w-[5px] min-h-[25px] duration-[0.5s]"></div>
                 </button>
-              </div>{" "}
+              </div>
               {/*  add password regex */}
             </div>
             <div className="flex ">
               <div>
-                <span className=" text-text2Color hover:underline hover:text-text1Color ">
-                  <Link
-                    to={{
-                      pathname: `/${import.meta.env.VITE_VERSION}/register`,
-                    }}
-                  >
-                    {" "}
-                    Register?{" "}
-                  </Link>
-                </span>
+                <button className="text-textColor hover:underline hover:text-otherColor duration-[0.5s] " onClick={()=>{
+                  navigate(`/${import.meta.env.VITE_VERSION}/register`)
+                }}>Register?</button>
               </div>
-              <div className="mr-auto ml-auto">
+              <div className="mr-auto ml-[70px]">
                 <button
                   onClick={() => {
                     LoginUser();
                   }}
-                  className="bg-textColor text-otherColor text-[25px] ml-auto mr-auto mt-[10px] p-[10px] rounded-[10px] w-[200px] border-solid border-[3px] border-transparent hover:bg-transparent hover:border-solid hover:border-textColor hover:border-[3px] hover:text-otherColor"
-                >
+                  className="bg-textColor text-otherColor text-[25px] ml-auto mr-auto mt-[10px] p-[10px] rounded-[10px] w-[200px] border-solid border-[3px] border-transparent hover:bg-transparent hover:border-solid hover:border-textColor hover:border-[3px] hover:text-otherColor duration-[0.5s] font-medium">
                   Login
                 </button>
               </div>

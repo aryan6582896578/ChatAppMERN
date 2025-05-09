@@ -1,15 +1,18 @@
 import {userDataModel,serverDataModel, inviteDataModel,serverChannelsDataModel} from "../database/schema/databaseSchema.js";
 import {createId,getServerData,getUserId,getServerMemberList,validInviteCode,userDataSeverList,getServerChannelList,getServerChannelMemberList} from "../database/managedata.js";
 import {signJwt,verifyJwt,createPasswordHash,checkPasswordHash} from "../database/managedata/authData.js"
+import { createCustomId } from "../database/managedata/customData.js";
 export default function runroutes(app,socket) {
 
   function checkJwt(req, res, next) {
-    const validToken = verifyJwt(req.cookies.tokenJwt);
     try {
-      let usernamee = validToken.username;
-      let idd = validToken.userId
+      const validToken = verifyJwt(req.cookies.tokenJwt);
       if (validToken) {
-        (req.validUser = true), (req.username = usernamee),(req.userId = idd);
+        const usernameValidToken = validToken.username;
+        const userIdValidToken = validToken.userId;
+        (req.validUser = true), 
+        (req.username = usernameValidToken),
+        (req.userId = userIdValidToken);
       } else {
         req.validUser = false;
       }
@@ -18,6 +21,7 @@ export default function runroutes(app,socket) {
     }
     next();
   }
+
   app.get("/v1/verify", checkJwt, async (req, res) => {
     if (req.validUser) {
       res.json({ status: "userValid" ,username:req.username ,userId :req.userId});
@@ -35,31 +39,42 @@ export default function runroutes(app,socket) {
   app.post("/v1/registeruser", checkJwt, async (req, res) => {
     const usernameRegister = req.body.username;
     const passwordRegister = req.body.password;
+
     if (usernameRegister && passwordRegister) {
-      const userID = createId();
-      const serverGlobal = "00000000000000000000";
+      const date = new Date();
+      const currentDate = date.toUTCString()
+      const userID = createCustomId().toString();
+      const defaultServer = "7326033090969600000";
       const hashedhPassword = await createPasswordHash(passwordRegister);
       try {
         await userDataModel.create({
           _id: `${usernameRegister}`,
-          username: `${usernameRegister}`,
-          password: `${hashedhPassword}`,
-          userid: `${userID}`,
-          createdDate: `${userID}`,
+          username:`${usernameRegister}`,
+          password:`${hashedhPassword}`,
+          createdDate: `${currentDate}`,
+          userid:`${userID}`,
         });
+
         await userDataModel.findOneAndUpdate(
           { userid: `${userID}` },
-          { $push: { servers: serverGlobal } }
+          { $push: { servers: `${defaultServer}` } }
         );
+
         await serverDataModel.findOneAndUpdate(
-          { serverId: "00000000000000000000" },
+          { serverId: `${defaultServer}` },
           { $push: { members: `${userID}` } }
         );
+
+        await serverChannelsDataModel.findOneAndUpdate(
+          { serverId: `${defaultServer}` },
+          { $push: { members: `${userID}` } }
+        )
+
         const createToken = signJwt(usernameRegister, userID);
         const userCreated = await userDataModel.findOne(
           { userid: `${userID}` },
         );
-        console.log(userCreated)
+        console.log(userCreated ,"new user created")
         res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000,});
         res.json({ status: "userCreated" });
       } catch (error) {
@@ -74,7 +89,7 @@ export default function runroutes(app,socket) {
   app.post("/v1/loginUser", async (req, res) => {
     const usernameLogin = req.body.username;
     const passwordLogin = req.body.password;
-    console.log("Username Login-",usernameLogin,"Password-",passwordLogin,"cookies",req.cookies?req.cookies:"no cookies");
+    console.log("Username Login-",usernameLogin,"Password-",passwordLogin,"cookies",req?.cookies);
     const validToken = verifyJwt(req.cookies.tokenJwt);
     if (validToken) {
       res.json({ status: "userValid" });
@@ -104,6 +119,7 @@ export default function runroutes(app,socket) {
       }
     }
   });
+
   app.get("/v1/userDataSeverList", checkJwt, async (req, res) => {
     if (req.validUser) {
       const userDataSevers = await userDataSeverList(req.username);
@@ -117,7 +133,59 @@ export default function runroutes(app,socket) {
       res.json({ serverName: serverData });
     }
   });
+  app.post("/v1/me/createServer", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      try {
+        const date = new Date();
+        const currentDate = date.toUTCString()
+        const serverId = createCustomId();
+        const userId = await req.userId;
+        const serverName = req.body.serverName;
+        await serverDataModel.create({
+          _id: `${serverId}`,
+          name:`${serverName}`,
+          createdDate: `${currentDate}`,
+          ownerId:`${userId}`,
+          serverId:`${serverId}`,
 
+        });
+
+        const channelId = createCustomId();
+        await serverChannelsDataModel.create({
+          _id: `${channelId}`,
+          name:"General",
+          createdDate: `${currentDate}`,
+          channelId:`${channelId}`,
+          serverId:`${serverId}`,
+        })
+
+        await userDataModel.findOneAndUpdate(
+          { userid: `${userId}` },
+          { $push: { servers: `${serverId}` } }
+        );
+
+        await serverDataModel.findOneAndUpdate(
+          { serverId: `${serverId}` },
+          { $push: { channels: `${channelId}` }}
+        );
+
+        await serverDataModel.findOneAndUpdate(
+          { serverId: `${serverId}` },
+          { $push: { members: `${userId}` }}
+        );
+
+        await serverChannelsDataModel.findOneAndUpdate(
+          { channelId:`${channelId}`, },
+          { $push: { members: `${userId}` }}
+        );
+        
+        await res.json({ status: "CreatedServer", serverId: `${serverId}` });
+      } catch (error) {
+        console.log(error, "error in creating server ");
+      }
+    }
+  });
+  
   app.get("/v1/permissionCheckServer/:serverId/:userId", checkJwt, async (req, res) => {
     if (req.validUser) {
       console.log("serverperms");
@@ -208,60 +276,14 @@ console.log(defaultChannel)
       }
     }
   });
-  app.post("/v1/me/createServer", checkJwt, async (req, res) => {
-    if (req.validUser) {
-      try {
-        let serverId = createId();
-        let getUserid = await getUserId(req.username);
-        const ServerName = req.body.serverName;
-        serverDataModel.create({
-          _id: serverId,
-          name: ServerName,
-          admin: req.username,
-          adminId: getUserid,
-          createdDate: serverId,
-          serverId: serverId,
-          members: [getUserid],
-        });
-        let channelId = createId();
-        let serverChannelId = String(createId())+ String(serverId);
 
-        await serverChannelsDataModel.create({
-          _id: serverChannelId,
-          name:"General",
-          createdDate: channelId,
-          serverChannelId:serverChannelId,
-          ChannelId:channelId,
-          serverId:serverId,
-          members: [getUserid]
-        })
-
-
-        await userDataModel.findOneAndUpdate(
-          { userid: `${getUserid}` },
-          { $push: { servers: `${serverId}` } }
-        );
-        const channelDefault = {
-          name:"General",
-          channelId : channelId,
-          serverChannelId:serverChannelId,
-        }
-        await serverDataModel.findOneAndUpdate(
-          { serverId: `${serverId}` },
-          { $push: { channels:channelDefault }}
-        );
-        await res.json({ status: "CreatedServer", serverId: `${serverId}` });
-      } catch (error) {
-        console.log(error, "error in creating server ");
-      }
-    }
-  });
 
   app.post("/test",async (req, res) => {
     res.json({"o":"k"})
     })
   app.get("/test",async (req, res) => {
-   const a =  createId()
-      res.json({"o":a})
+
+
+      res.json({"o":createCustomId().toString()})
       })
 }

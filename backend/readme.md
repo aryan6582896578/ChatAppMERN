@@ -30,3 +30,7 @@ complete auth logic for everything
 save message
 friends
 
+to remove files from github after adding to gitignore
+git rm -r --cached crypt
+
+custom id https://discord.com/developers/docs/reference#snowflakes

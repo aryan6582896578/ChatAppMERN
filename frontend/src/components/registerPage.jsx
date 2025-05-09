@@ -34,7 +34,7 @@ export default function RegisterPage() {
 
       const json  = await response.json();
       if(json.status === "userCreated"){
-        navigate(`/${import.meta.env.VITE_VERSION}/me/chat`)
+        navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`)
       }else{
         setloadingPage(false)
         setdisplayError("Username already exists")
@@ -89,23 +89,23 @@ export default function RegisterPage() {
                   onMouseLeave={changedisplayPassword}
                   className="absolute right-[5px] top-[5px] p-0"
                 >
-                  <div className="bg-text3Color hover:bg-text1Color min-w-[5px] min-h-[25px] "></div>
+                  <div className="bg-text3Color hover:bg-text1Color min-w-[5px] min-h-[25px] duration-[0.5s] "></div>
                 </button>
               </div>{" "}
               {/*  add password regex */}
             </div>
             <div className="flex ">
-              <div>
-                <span className=" text-text2Color hover:underline hover:text-text1Color ">
-                  <Link to={{ pathname: `/${import.meta.env.VITE_VERSION}/login` }}> Login? </Link>
-                </span>
+            <div>
+                <button className="text-textColor hover:underline hover:text-otherColor duration-[0.5s] font-semibold " onClick={()=>{
+                  navigate(`/${import.meta.env.VITE_VERSION}/login`)
+                }}>Login?</button>
               </div>
-              <div className="mr-auto ml-auto">
+              <div className="mr-auto ml-[80px]">
                 <button
                   onClick={() => {
                     registerUser();
                   }}
-                  className="bg-textColor text-otherColor text-[25px] ml-auto mr-auto mt-[10px] p-[10px] rounded-[10px] w-[200px] border-solid border-[3px] border-transparent hover:bg-transparent hover:border-solid hover:border-textColor hover:border-[3px] hover:text-otherColor"
+                  className="bg-textColor text-otherColor text-[25px] ml-auto mr-auto mt-[10px] p-[10px] rounded-[10px] w-[200px] border-solid border-[3px] border-transparent hover:bg-transparent hover:border-solid hover:border-textColor hover:border-[3px] hover:text-otherColor font-semibold duration-[0.5s]"
                 >
                   Register
                 </button>

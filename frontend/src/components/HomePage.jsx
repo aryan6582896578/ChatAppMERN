@@ -21,7 +21,13 @@ export default function HomePage(){
 function HomePageNavbar({buttonStatus}){
     const navigate = useNavigate();
 
-    const [bgLogo,setbgLogo]=useState("textColor")
+    const [bgLogo,setbgLogo]=useState("textColor");
+    // const tailwindfix = {
+    //     textColor: " bg-textColor",
+    //     otherColor: "bg-otherColor",
+    // }
+    //tailwind purges bg-${bgLogo} cause it is never written before 
+    // somehow now works 
     return(
         <div className="bg-secondaryColor min-h-[70px] flex  ">
             <div className="mt-[15px] ml-[10px] text-[25px] font-medium rounded-[15px] text-otherColor hover:text-textColor duration-[0.5s] flex"
