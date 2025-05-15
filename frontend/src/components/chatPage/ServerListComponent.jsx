@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 export function ServerListComponent() {
   const navigate = useNavigate();
-  const path = document.URL.split("chat/")[1];
+  const parms = useParams()
   const [serverList, setserverList] = useState([]);
 
   const [serverBoxDisplay ,setserverBoxDisplay] = useState(false);
@@ -33,7 +33,7 @@ export function ServerListComponent() {
         if(data.data.status==="CreatedServer"){
           setserverCreateBoxDisplay(false);
           setcreateServerData("")
-          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
+          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
         }
       })
     }
@@ -61,15 +61,15 @@ export function ServerListComponent() {
     setserverBoxDisplay(false);
     setserverCreateBoxDisplay(false);
     setserverJoinBoxDisplay(false);
-  },[path]);
+  },[parms.serverId,parms.channelId]);
 
   return (
-    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative ">
+    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative border-solid border-r-[1px] border-secondaryColor ">
 
       <div className="flex">
         <button
           onClick={() => {
-            navigate(`/${import.meta.env.VITE_VERSION}/me/chat`);
+            navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
           }}
           className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-cell hover:bg-text3Color  ml-auto mr-auto rounded-[10%] duration-500"
         />
@@ -79,9 +79,9 @@ export function ServerListComponent() {
         {serverList.map((server, index) => (
           <div key={index} className="m-auto">
             <button key={index} onClick={() => {
-                navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${server}`);
+                navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${server}`);
               }}
-              className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor cursor-cell"
+              className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor duration-[0.5s]"
             >{index}</button>
           </div>
         ))}
@@ -90,7 +90,7 @@ export function ServerListComponent() {
           onClick={() => {
             setserverBoxDisplay(true);
           }}
-          className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor cursor-cell">
+          className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor duration-[0.5s] ">
           +
         </button>
         

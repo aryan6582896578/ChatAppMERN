@@ -2,51 +2,45 @@ import dotenv from "dotenv";
 dotenv.config();
 import {userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel } from "./schema/databaseSchema.js";
 
-function createId(){
-    let date = new Date();
-    let someRandom =Math.floor(Math.random() * (999 - 100 +1) + 100)
-    let id = String(date.getUTCFullYear()) +String(date.getUTCMonth() + 1).padStart(2, '0') + String(date.getUTCDate()).padStart(2, '0') + String(date.getUTCHours()).padStart(2, '0') + String(date.getUTCMinutes()).padStart(2, '0') + String(date.getUTCSeconds()).padStart(2, '0') + String(date.getUTCMilliseconds()).padStart(3, '0') + String(someRandom);
-    return id;
-}
-
 async function userDataSeverList(username) {
     const userDataSeverList = await userDataModel.findOne({username:username})
     return userDataSeverList.servers
 }
 
-async function getChannelData(serverId) {
-    let serverData = await serverDataModel.findOne({serverId:serverId})
-    if(serverData){
-        let serverName = serverData.name
-        let memberList = serverData.members
-        let list = {}
-        for (const [key, element] of memberList.entries()) {
-            try {
-                list[memberList[key]] = await getUsername(element[0]);
-            } catch (error) {
-                console.log(error, "err");
-            }
-        }
-        const serverInfo={
-            name:serverName,
-            members:list
-        }
-        return(serverInfo)
-    }
-
-}
 
 async function getServerData(serverId){
-    let serverData = await serverDataModel.findOne({serverId:serverId})
+    const serverData = await serverDataModel.findOne({serverId:serverId})
     if(serverData){
-        return serverData.name
+        return serverData
     }
 
 }
-async function getServerMemberList(serverId){
-    let serverData = await serverDataModel.findOne({serverId:serverId})
-    if(serverData){
-        return serverData.members
+
+async function validServerChannelList(serverId,userId){
+    const channelList = await getServerChannelList(serverId)
+    const validChannelList=[]
+    for (const [x, channelId] of channelList.entries()) {
+        const channelData = await getServerChannelData(channelId);
+        const channelDataMemberList = await channelData.members
+        if (channelDataMemberList.includes(userId)) {
+            validChannelList.push(channelData.channelId)
+        }
+    }
+    return validChannelList
+}
+
+async function getChannelName(channelId) {
+    const channelName = await serverChannelsDataModel.findOne({channelId:channelId})
+    if(channelName){
+        return channelName.name
+    }
+    
+     
+}
+async function getServerChannelData(channelId){
+    const channelData = await serverChannelsDataModel.findOne({channelId:channelId})
+    if(channelData){
+        return channelData
     }
 
 }
@@ -59,10 +53,10 @@ async function getServerChannelList(serverId){
 
 }
 
-async function getServerChannelMemberList(serverChannelId){
-    let serverChannelData = await serverChannelsDataModel.findOne({serverChannelId:serverChannelId})
+async function getServerChannelMemberList(channelId){
+    let serverChannelData = await serverChannelsDataModel.findOne({channelId:channelId})
     if(serverChannelData){
-        return serverChannelData
+        return serverChannelData.members
     }
 
 }
@@ -73,8 +67,10 @@ async function getUsername(memberIds) {
 }
 
 async function getUserId(username) {
-    let getUserId = await userDataModel.findOne({username:username}) 
-    return(getUserId.userid)
+    const getUserId = await userDataModel.findOne({username:username})
+    if(getUserId){
+        return(getUserId.userid)
+    }
 }
 
 function randomChar(){
@@ -116,4 +112,4 @@ async function validInviteCode(serverId) {
 }
 
 
-export {createId,getChannelData,getUserId,getServerMemberList,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList}
+export {getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername}

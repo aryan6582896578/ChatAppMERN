@@ -7,7 +7,7 @@ export default async function createDefaultData(){
         const findDefault = await serverDataModel.findOne({serverId:"7326033090969600000"})
 
         if(findDefault){
-            console.log("default server exits \nserverId - 7326033090969600000 \nchannelId - 7326033090969690000");       
+            console.log("default server exists \nserverId - 7326033090969600000 \nchannelId - 7326033090969690000");       
         }else{
             console.log("default server does not exists \ntrying to create default server")
             try {
@@ -19,8 +19,7 @@ export default async function createDefaultData(){
                     admins:[{type:Array}],
                     createdDate: `${currentDate}`,
                     serverId:"7326033090969600000",
-                    members: [{type:Array}],
-                    channels :[{type:Array}]
+
                 })
 
                 await serverChannelsDataModel.create({

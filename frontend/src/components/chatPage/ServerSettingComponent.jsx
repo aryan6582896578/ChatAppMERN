@@ -23,7 +23,8 @@ export function ServerSettingComponent() {
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getServerData/${parms.serverId}`,{
         withCredentials: true,
     }).then((data) => {
-        setserverData(data.data.serverName);
+
+        setserverData(data.data.serverData.name);
       }).catch(function (error) {
         console.log(error);
       });
@@ -32,15 +33,15 @@ export function ServerSettingComponent() {
     getServerData();
     setserverSettingBoxDisplay(false);
     setserverSettingInviteBoxDisplay(false);
-  },[parms.channelId]);
+  },[parms.serverId,parms.channelId]);
 
   return (
-    <div className=" min-w-[250px] max-h-[55px] min-h-[45px] bg-primaryColor z-100 absolute  flex ">
-      <div className="text-[20px] p-[5px] font-semibold hover:text-otherColor hover:cursor-cell ">
+    <div className=" min-w-[250px] max-h-[45px] min-h-[45px] bg-primaryColor z-100 absolute  flex ">
+      <div className="text-[20px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer ">
         {serverData}
       </div>
       <button
-        className="min-w-[5px] min-h-[100%] absolute end-0 bg-textColor hover:bg-text3Color rounded-[10%]  hover:cursor-cell "onClick={() => {
+        className="min-w-[5px] min-h-[100%] absolute end-0 bg-textColor hover:bg-text3Color rounded-[10%]  hover:cursor-pointer "onClick={() => {
           setserverSettingBoxDisplay(true);
         }}
       />

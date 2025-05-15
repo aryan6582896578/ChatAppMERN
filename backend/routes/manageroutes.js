@@ -1,5 +1,5 @@
 import {userDataModel,serverDataModel, inviteDataModel,serverChannelsDataModel} from "../database/schema/databaseSchema.js";
-import {createId,getServerData,getUserId,getServerMemberList,validInviteCode,userDataSeverList,getServerChannelList,getServerChannelMemberList} from "../database/managedata.js";
+import {getServerData,getUserId,validInviteCode,userDataSeverList,validServerChannelList,getChannelName,getServerChannelMemberList,getUsername} from "../database/managedata.js";
 import {signJwt,verifyJwt,createPasswordHash,checkPasswordHash} from "../database/managedata/authData.js"
 import { createCustomId } from "../database/managedata/customData.js";
 export default function runroutes(app,socket) {
@@ -130,7 +130,7 @@ export default function runroutes(app,socket) {
   app.get("/v1/getServerData/:id", checkJwt, async (req, res) => {
     if (req.validUser) {
       const serverData = await getServerData(req.params.id);
-      res.json({ serverName: serverData });
+      res.json({ serverData: serverData });
     }
   });
   app.post("/v1/me/createServer", checkJwt, async (req, res) => {
@@ -185,36 +185,108 @@ export default function runroutes(app,socket) {
       }
     }
   });
-  
+
   app.get("/v1/permissionCheckServer/:serverId/:userId", checkJwt, async (req, res) => {
-    if (req.validUser) {
-      console.log("serverperms");
-      const serverId = req.params.serverId
-      const userId = req.params.userId
-      const serverDataMemberList = await getServerMemberList(serverId);
-      const serverChannelData=await getServerChannelList(serverId);
-      const defaultChannel = serverChannelData[0].channelId
-      const serverChannelId = String(defaultChannel)+String(serverId)
-      console.log(serverChannelId)
-      const a = await getServerChannelMemberList(serverChannelId)
-      console.log(a,"a")
-console.log(defaultChannel)
+    const userId = req.params.userId
+    const serverId = req.params.serverId
+    if (req.validUser && (req.userId === userId) && serverId) {
+      const serverData = await getServerData(req.params.serverId)
+      if(serverData){
+        const serverMemberList = serverData.members
+        if(serverMemberList.includes(userId)){
+         const channelList = await validServerChannelList(serverId,userId)
 
-      console.log(serverChannelData)
-
-      if(serverDataMemberList.includes(userId)){
-        console.log("server yes")
+         if(channelList.length >=1){
+          
+          res.json({status:"validChannel",channelId:channelList[0]})
+         }else{
+          res.json({status:"noChannel"})
+         }
+        }else{
+          res.json({ status: "userInValid" });
+        }
+      }else{
+        res.json({ status: "userInValid" });
       }
-      // if(serverDataMemberList){
-      //   if(serverData.includes(userId)){
-      //     res.json({ status: "validUser" ,channelId:serverChannelRedirect});
-      //   }else{
-      //     res.json({ status: "invalid" });
-      //   }
-      // }else{
-      //   res.json({ status: "invalid" });
-      // }
-     
+      
+    }
+  });
+
+    app.get("/v1/channelList/:serverId/:userId", checkJwt, async (req, res) => {
+    const userId = req.params.userId
+    const serverId = req.params.serverId
+    if (req.validUser && (req.userId === userId) && serverId) {
+      const serverData = await getServerData(req.params.serverId)
+      if(serverData){
+        const serverMemberList = serverData.members
+        if(serverMemberList.includes(userId)){
+         const channelList = await validServerChannelList(serverId,userId)
+         const names = await Promise.all( channelList.map(async (channelId)=>{
+          const channelName = await getChannelName(channelId)
+          return [channelId,channelName]
+       }))
+       const channelNameList = Object.fromEntries(names);
+       return res.json({ channelList:channelNameList });
+        }else{
+          res.json({ status: "userInValid" });
+        }
+      }else{
+        res.json({ status: "userInValid" });
+      }
+      
+    }
+  });
+
+  app.get("/v1/channelData/:serverId/:channelId/:userId", checkJwt, async (req, res) => {
+    const userId = req.params.userId
+    const serverId = req.params.serverId
+    const channelId = req.params.channelId
+    if (req.validUser && (req.userId === userId) && serverId) {
+      const serverData = await getServerData(req.params.serverId)
+      if(serverData){
+        const serverMemberList = serverData.members
+        if(serverMemberList.includes(userId)){
+          const channelName = await getChannelName(channelId)
+       return res.json({ channelName:channelName });
+        }else{
+          res.json({ status: "userInValid" });
+        }
+      }else{
+        res.json({ status: "userInValid" });
+      }
+      
+    }
+  });
+
+  app.get("/v1/channelMemberList/:serverId/:channelId/:userId", checkJwt, async (req, res) => {
+    const userId = req.params.userId
+    const serverId = req.params.serverId
+    const channelId = req.params.channelId
+    if (req.validUser && (req.userId === userId) && serverId) {
+      const serverData = await getServerData(req.params.serverId)
+      if(serverData){
+        const serverMemberList = serverData.members
+        if(serverMemberList.includes(userId)){
+         const channelList = await validServerChannelList(serverId,userId)
+          if(channelList.includes(channelId)){
+            const usernameList = await getServerChannelMemberList(channelId)
+            
+            const usernames = await Promise.all( usernameList.map(async (userId)=>{
+          const username = await getUsername(userId)
+          return [userId,username]
+          }))
+          const usernameListData = Object.fromEntries(usernames);
+          return res.json({ usernameList:usernameListData });
+          }else{
+            res.json({ status:"noUsers" })
+          }
+         
+        }else{
+          res.json({ status: "userInValid" });
+        }
+      }else{
+        res.json({ status: "userInValid" });
+      }
       
     }
   });
@@ -277,13 +349,4 @@ console.log(defaultChannel)
     }
   });
 
-
-  app.post("/test",async (req, res) => {
-    res.json({"o":"k"})
-    })
-  app.get("/test",async (req, res) => {
-
-
-      res.json({"o":createCustomId().toString()})
-      })
 }

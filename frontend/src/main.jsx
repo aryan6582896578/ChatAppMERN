@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
           <Route path={`${import.meta.env.VITE_VERSION}/@me`} element={<AuthCheckMain />}>
             <Route path="chat" element={<ChatPage />} />
             <Route path="chat/:serverId/" element={<AuthCheckRoute/>} >
-             <Route path=":channelId" element={<MainChatPage />} />
+             <Route path=":channelId?" element={<MainChatPage />} />
             </Route>
           </Route>
 
