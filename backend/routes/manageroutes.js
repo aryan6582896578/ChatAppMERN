@@ -133,6 +133,21 @@ export default function runroutes(app,socket) {
       res.json({ serverData: serverData });
     }
   });
+
+  app.get("/v1/serverAdmin/:serverId", checkJwt, async (req, res) => {
+    const serverId = req.params.serverId
+    const userId = req.userId
+    if (req.validUser) {
+      const serverData = await getServerData(serverId);
+      const adminList = serverData.admins
+      if(adminList.includes(userId)){
+        res.json({ adminStatus: true });
+      }else{
+        res.json({ adminStatus: false });
+      }
+      
+    }
+  });
   app.post("/v1/me/createServer", checkJwt, async (req, res) => {
     if (req.validUser) {
       try {
@@ -171,7 +186,12 @@ export default function runroutes(app,socket) {
 
         await serverDataModel.findOneAndUpdate(
           { serverId: `${serverId}` },
-          { $push: { members: `${userId}` }}
+          { $push: { members: `${userId}` }},
+         
+        );
+        await serverDataModel.findOneAndUpdate(
+          { serverId: `${serverId}` },
+          { $push: { admins: `${userId}` }}
         );
 
         await serverChannelsDataModel.findOneAndUpdate(
@@ -290,7 +310,50 @@ export default function runroutes(app,socket) {
       
     }
   });
-  app.get("/v1/inviteCode/:cid", checkJwt, async (req, res) => {
+  app.post("/v1/me/createChannel/:serverId", checkJwt, async (req, res) => {
+    const userId = req.userId
+    const serverId = req.params.serverId
+    
+    const channelName = req.body.channel
+
+    if (req.validUser && userId && channelName && serverId) {
+      const serverData = await getServerData(serverId)
+      if(serverData){
+        const serverAdminList = serverData.admins
+        console.log(serverAdminList,userId)
+        if(serverAdminList.includes(userId)){
+          const channelId =createCustomId()
+          const date = new Date();
+          const currentDate = date.toUTCString()
+          await serverChannelsDataModel.create({
+            _id: `${channelId}`,
+            name:`${channelName}`,
+            createdDate: `${currentDate}`,
+            channelId:`${channelId}`,
+            serverId:`${serverId}`,
+           
+          })
+          await serverChannelsDataModel.findOneAndUpdate(
+            {channelId:`${channelId}`},
+            { $push: { members: `${userId}` } }
+          )
+          await serverDataModel.findOneAndUpdate(
+            {serverId:`${serverId}`},
+            { $push: { channels: `${channelId}` } }
+          )
+          res.json({status:"channelCreated",channelId:`${channelId}`})
+        }else{
+      res.json({status:"invalidUser"})
+    }
+      }else{
+      res.json({status:"invalidData"})
+    }
+    }else{
+      console.log("noo")
+      res.json({status:"invalidData"})
+    }
+  });
+  app.get("/v1/inviteCode/:serverId", checkJwt, async (req, res) => {
     if (req.validUser) {
       try {
         let serverInviteCode = await inviteDataModel.findOne({

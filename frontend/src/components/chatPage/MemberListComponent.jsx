@@ -23,6 +23,7 @@ export function MemberListComponent(){
       const channelMemberList = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/channelMemberList/${ parms.serverId}/${parms.channelId}/${userId}`,{
         withCredentials: true,
       });
+      
       setmembersId(Object.keys(channelMemberList.data.usernameList))
       setmembersUsername(Object.values(channelMemberList.data.usernameList))
     }

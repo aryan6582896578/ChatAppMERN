@@ -52,8 +52,9 @@ export function ChatBoxComponent() {
       
       <div className="min-h-[55px] flex absolute bottom-0 bg-primaryColor w-[100%] ">
         <div
-          contentEditable className="w-[100%] m-[5px] mb-[0xp] ml-[10px] outline-none bg-otherColor bg-opacity-[4%] text-[20px] pl-[10px] pt-[5px]"ref={inputRef}onKeyDown={handleKeyDown} spellCheck={true}onInput={(e) => {
+          contentEditable className="w-[100%] m-[5px] mb-[0xp] ml-[10px] outline-none bg-otherColor bg-opacity-[4%] text-[20px] pl-[10px] pt-[5px] rounded-[5px] text-otherColor text-opacity-[70%]"ref={inputRef}onKeyDown={handleKeyDown} spellCheck={true}  onInput={(e) => {
             setmessageData(e.target.innerText);
+            
           }}
         />
       </div>
