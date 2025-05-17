@@ -12,7 +12,7 @@ export function ServerSettingComponent() {
   const [inviteCode, setinviteCode] = useState(false);
   const [inviteCodeStatus,setinviteCodeStatus]= useState("Copy Code");
   async function createServerInvite() {
-      const getInviteCode = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/inviteCode/${parms.serverId}`,{
+      const getInviteCode = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/inviteCode/${parms.serverId}`,{
           withCredentials: true,
         })
         if(getInviteCode.data.status==="created"){
@@ -24,7 +24,7 @@ export function ServerSettingComponent() {
   }
   // const [buttonStatus,setbuttonStatus]=useState({bg:"otherColor" , opa:"100%"})
   async function checkAdmin(){
-     const adminStatus = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
+     const adminStatus = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
         withCredentials: true,
     })
     
@@ -40,7 +40,7 @@ export function ServerSettingComponent() {
   }
 
   function getServerData() {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/getServerData/${parms.serverId}`,{
+    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/getServerData/${parms.serverId}`,{
         withCredentials: true,
     }).then((data) => {
 

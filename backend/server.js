@@ -15,7 +15,8 @@ const httpServer = createServer(app);
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    // origin: "http://localhost:5173",
+    origin: `${process.env.FRONTEND_URL}`,
     credentials: true,
   })
 );
@@ -23,7 +24,8 @@ app.use(express.json({}), express.urlencoded({extended: true}), cookieParser());
 
 const socket = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    // origin: "http://localhost:5173",
+    origin: `${process.env.FRONTEND_URL}`,
     credentials: true,
   },
   method: ["GET", "PUT", "POST"],
@@ -44,6 +46,7 @@ async function runServer() {
     dbApp().then(async () => {
        httpServer.listen(process.env.SERVER_PORT, () => {
         console.log(`server running on http://localhost:${process.env.SERVER_PORT}`);
+        console.log(process.env.FRONTEND_URL)
       }), createDefaultData()   
     })  
   } catch (error) {

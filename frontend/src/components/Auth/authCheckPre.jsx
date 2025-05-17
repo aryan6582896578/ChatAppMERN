@@ -6,7 +6,7 @@ export default function AuthCheckPre() {
   const [userStatus, setuserStatus] = useState(false);
 
   async function verifyUser(){
-    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
       withCredentials: true,
     })
     if(userData.data.status === "userValid"){

@@ -22,14 +22,14 @@ export function ChatBoxComponent() {
     }
   };
   async function getUserData() {
-    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`,{
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{
         withCredentials: true,
       });
     const userId = userData.data.userId;
     return userId;
   }
     async function getMessage() {
-    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/messageData/${parms.serverId}/${parms.channelId}`,{
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/messageData/${parms.serverId}/${parms.channelId}`,{
         withCredentials: true,
       });
 
@@ -42,7 +42,7 @@ export function ChatBoxComponent() {
   async function getChannelData() {
     const userId = await getUserData();
     if(parms.channelId){
-      const channelNameData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/channelData/${ parms.serverId}/${parms.channelId}/${userId}`,{
+      const channelNameData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelData/${ parms.serverId}/${parms.channelId}/${userId}`,{
         withCredentials: true,
       });
       setchannelName(channelNameData.data.channelName)

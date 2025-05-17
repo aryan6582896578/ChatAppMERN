@@ -17,7 +17,7 @@ export function ServerListComponent() {
 
 
   function getUserData() {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userDataSeverList`, {
+    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/userDataSeverList`, {
         withCredentials: true,
       }).then((data) => {
         setserverList(data.data.serverList);
@@ -28,7 +28,7 @@ export function ServerListComponent() {
 
   async function postCreateServer(){
     if(createServerData.serverName){
-      axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
+      axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
         withCredentials: true
       }).then(async (data)=>{
         if(data.data.status==="CreatedServer"){
@@ -42,7 +42,7 @@ export function ServerListComponent() {
 
   async function postJoinServer(){
     if(joinServerData.serverInviteCode){
-      axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
+      axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
         withCredentials: true
       }).then(async (data)=>{
         if(data.data.status==="alreadyJoined"){

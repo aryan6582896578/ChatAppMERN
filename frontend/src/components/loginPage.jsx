@@ -20,7 +20,7 @@ export default function LoginPage() {
   }
 
   const sendData = async () => {
-    const url = `http://localhost:4500/${import.meta.env.VITE_VERSION}/loginUser`;
+    const url = `${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/loginUser`;
     try {
       const response = await fetch(url, {
         method: "POST",

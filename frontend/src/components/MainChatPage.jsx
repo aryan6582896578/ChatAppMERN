@@ -15,7 +15,7 @@ export default function MainChatPage() {
   const parms = useParams();
 
   async function getUserData(){
-    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
           withCredentials: true,
     })
      const userId = userData.data.userId
@@ -27,7 +27,7 @@ export default function MainChatPage() {
     async function getChannelData(){
       try {
         const userId = await getUserData();
-        const channelListData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/channelList/${parms.serverId}/${userId}`,{ 
+        const channelListData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelList/${parms.serverId}/${userId}`,{ 
         withCredentials: true 
       });
         const data = Object.keys(channelListData.data.channelList);

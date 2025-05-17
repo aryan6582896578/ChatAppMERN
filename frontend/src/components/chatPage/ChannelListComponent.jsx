@@ -14,7 +14,7 @@ export default function ChannelListComponent(){
 
     async function postCreateChannel(){
       if(createChannelName){
-        const createServerChannel = await axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createChannel/${parms.serverId}`,createChannelName,{
+        const createServerChannel = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/createChannel/${parms.serverId}`,createChannelName,{
         withCredentials: true
       })
       if(createServerChannel.data.status==="channelCreated"){
@@ -26,7 +26,7 @@ export default function ChannelListComponent(){
       }
     }
     async function getUserData(){
-        const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
+        const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
           withCredentials: true,
         })
         setserverId(parms.serverId)
@@ -37,7 +37,7 @@ export default function ChannelListComponent(){
     async function getChannelData() {
       const userId = await getUserData()
 
-        const channelList = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/channelList/${parms.serverId}/${userId}`,{
+        const channelList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelList/${parms.serverId}/${userId}`,{
             withCredentials: true,
           })
           
@@ -47,7 +47,7 @@ export default function ChannelListComponent(){
     }
     async function getServerData() {
     
-    const adminStatus = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
+    const adminStatus = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
         withCredentials: true,
     })
     

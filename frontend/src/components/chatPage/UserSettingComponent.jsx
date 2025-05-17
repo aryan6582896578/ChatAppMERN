@@ -11,7 +11,7 @@ export function UserSettingComponent() {
     navigate("/")
   }
   function getUserData() {
-    axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/username`, {
+    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/username`, {
         withCredentials: true,
       }).then((data) => {
         setusername(data.data.username);

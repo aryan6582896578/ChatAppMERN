@@ -19,7 +19,7 @@ export default function RegisterPage() {
   }
 
   const sendData = async () => {
-    const url = `http://localhost:4500/${import.meta.env.VITE_VERSION}/registerUser`
+    const url = `${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/registerUser`
     try {
       const response = await fetch(url, {
         method: "POST",

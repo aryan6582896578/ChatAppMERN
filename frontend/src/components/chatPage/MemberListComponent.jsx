@@ -9,7 +9,7 @@ export function MemberListComponent(){
   const [membersUsername, setmembersUsername] = useState([]);
 
     async function getUserData() {
-    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`,{
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{
         withCredentials: true,
       });
     
@@ -20,7 +20,7 @@ export function MemberListComponent(){
   async function getChannelData() {
     const userId = await getUserData();
     if(parms.channelId){
-      const channelMemberList = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/channelMemberList/${ parms.serverId}/${parms.channelId}/${userId}`,{
+      const channelMemberList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelMemberList/${ parms.serverId}/${parms.channelId}/${userId}`,{
         withCredentials: true,
       });
       

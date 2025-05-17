@@ -9,7 +9,7 @@ export default function AuthCheckMain() {
   const[update,setupdate]=useState(false)
 
   async function getUserData(){
-   const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
+   const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
     withCredentials: true,
   })
   const userId = await userData.data.userId
@@ -18,7 +18,7 @@ export default function AuthCheckMain() {
  async function permissionCheck(){
     const userId = await getUserData()
 
-    const serverData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/permissionCheckServer/${serverId}/${userId}`, {
+    const serverData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/permissionCheckServer/${serverId}/${userId}`, {
       withCredentials: true,
     })
     if(serverData.data.status === "userInValid"){
