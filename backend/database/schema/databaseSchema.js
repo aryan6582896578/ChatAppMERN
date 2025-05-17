@@ -7,7 +7,7 @@ const userData = mongoose.Schema({
  createdDate: { type:String,required: true },
  userid:{type:String,required:true},
  servers:{type:Array}
-});
+},{ timestamps: true });
 const userDataModel = mongoose.model("userdata", userData);
 
 const server = mongoose.Schema({
@@ -19,10 +19,8 @@ const server = mongoose.Schema({
     serverId:{type:String,required:true},
     members: [{type:Array}],
     channels :[{type:Array}]
-})
+},{ timestamps: true })
 const serverDataModel = mongoose.model("serverData", server);
-
-
 
 const serverChannels = mongoose.Schema({
         _id: {type:String,required: true},
@@ -31,17 +29,27 @@ const serverChannels = mongoose.Schema({
         channelId:{type:String,required:true},
         serverId:{type:String,required: true},
         members: [{type:Array}]
-    })
+    },{ timestamps: true })
 const serverChannelsDataModel = mongoose.model("serverChannelsData", serverChannels);
-
-
 
 const inviteData = mongoose.Schema({
     _id: {type:String,required: true},
     serverId:{type:String,required: true},
     inviteCode:{type:String,required: true},
     createdDate: { type:String,required: true },
-   });
-   const inviteDataModel = mongoose.model("inviteData", inviteData);
+   },{ timestamps: true });
+const inviteDataModel = mongoose.model("inviteData", inviteData);
 
-export { userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel };
+const messageData = mongoose.Schema({
+    _id: {type:String,required: true},
+    serverId: {type:String,required: true},
+    channelId: {type:String,required: true},
+    userId: {type:String,required: true},
+    displayDate:{type:String,required: true},
+    message:{type:String,required: true},
+    username:{type:String,required: true},
+},{ timestamps: true })
+const messageDataModel = mongoose.model("messageData", messageData);
+
+
+export { userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel,messageDataModel };

@@ -18,7 +18,6 @@ export default function MainChatPage() {
     const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/verify`, {
           withCredentials: true,
     })
-
      const userId = userData.data.userId
      return userId
   } 

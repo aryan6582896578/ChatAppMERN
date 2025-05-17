@@ -1,5 +1,5 @@
-import {userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel} from "../database/schema/databaseSchema.js";
-import {getServerData,validInviteCode,userDataSeverList,validServerChannelList,getChannelName,getServerChannelMemberList,getUsername,} from "../database/managedata.js";
+import {userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel, messageDataModel} from "../database/schema/databaseSchema.js";
+import {getServerData,validInviteCode,userDataSeverList,validServerChannelList,getChannelName,getServerChannelMemberList,getUsername, getServerChannelData,} from "../database/managedata.js";
 import {signJwt,verifyJwt,createPasswordHash,checkPasswordHash,} from "../database/managedata/authData.js";
 import { createCustomId } from "../database/managedata/customData.js";
 
@@ -286,7 +286,7 @@ export default function runroutes(app, socket) {
       const serverId = req.params.serverId;
       const channelId = req.params.channelId;
       if (req.validUser && req.userId === userId && serverId) {
-        const serverData = await getServerData(req.params.serverId);
+        const serverData = await getServerData(serverId);
         if (serverData) {
           const serverMemberList = serverData.members;
           if (serverMemberList.includes(userId)) {
@@ -439,4 +439,37 @@ export default function runroutes(app, socket) {
       }
     }
   });
+
+  app.get("/v1/messageData/:serverId/:channelId",checkJwt,async (req, res) => {
+      const userId = req.userId;
+      const serverId = req.params.serverId;
+      const channelId = req.params.channelId;
+      if (req.validUser && req.userId && serverId) {
+        const serverData = await getServerData(serverId);
+        if (serverData) {
+          const serverMemberList = serverData.members;
+          if (serverMemberList.includes(userId)) {
+            const channelData = await getServerChannelData(channelId)
+            if(channelData){
+              const channelMemberList = channelData.members
+              if(channelMemberList.includes(userId)){
+              const messageData = await messageDataModel.find({
+                channelId:channelId
+              })
+              res.json({message:messageData})
+            }else {
+            res.json({ status: "userInValid" });
+          }
+            }
+            
+            
+          } else {
+            res.json({ status: "userInValid" });
+          }
+        } else {
+          res.json({ status: "userInValid" });
+        }
+      }
+    }
+  );
 }

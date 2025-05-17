@@ -1,6 +1,7 @@
 import { getServerChannelData, getServerData } from "../database/managedata.js";
 import { verifyJwt } from "../database/managedata/authData.js";
 import { createCustomId } from "../database/managedata/customData.js";
+import { messageDataModel } from "../database/schema/databaseSchema.js";
 
 export default async function runsocket(io) {
   io.use(async (socket, next) => {
@@ -48,8 +49,21 @@ export default async function runsocket(io) {
           channelId:socket.channelId,
           username:socket.username
         }
+        try {
+          messageDataModel.create({
+            _id: messageId,
+            serverId: socket.serverId,
+            channelId: socket.channelId,
+            userId: socket.userId,
+            displayDate:data.date,
+            message:data.message,
+            username:socket.username
+          })
+          socket.server.to(`${socket.serverId}/${socket.channelId}`).emit(`${socket.serverId}/${socket.channelId}`, messageData); 
+        } catch (error) {
+          console.log("error sending || saving message")
+        }
         
-        socket.server.to(`${socket.serverId}/${socket.channelId}`).emit(`${socket.serverId}/${socket.channelId}`, messageData); 
       });
         
     }

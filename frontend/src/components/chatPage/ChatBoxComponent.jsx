@@ -9,6 +9,7 @@ export function ChatBoxComponent() {
   const [messageData, setmessageData] = useState("");
   const [channelName,setchannelName]=useState("");
   const [displayMessage,setdisplayMessage]= useState([]);
+  const [displayMessageDb,setdisplayMessageDb]= useState([]);
   const sendMessage = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -27,6 +28,16 @@ export function ChatBoxComponent() {
     const userId = userData.data.userId;
     return userId;
   }
+    async function getMessage() {
+    const userData = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/messageData/${parms.serverId}/${parms.channelId}`,{
+        withCredentials: true,
+      });
+
+    if(userData.data.message){
+          setdisplayMessageDb(a=>[...a,userData.data.message])
+    }
+
+  }
 
   async function getChannelData() {
     const userId = await getUserData();
@@ -39,6 +50,7 @@ export function ChatBoxComponent() {
   }
 
   useEffect(() => {
+    getMessage()
     getChannelData();
     function getJwtCookie(){
       const cookie = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
@@ -60,18 +72,30 @@ export function ChatBoxComponent() {
     return () => {
       socket.disconnect();
       setchannelName("")
+      setdisplayMessage([])
+      setdisplayMessageDb([])
     }
   }, [parms.serverId,parms.channelId])
 
  
 
   return (
-    <div className="w-[100%] bg-primaryColor flex flex-col relative ">
+    <div className="w-[100%] bg-primaryColor flex flex-col relative h-[100vh] ">
       <div className="w-[100%] min-h-[45px] border-solid border-b-[1px] border-secondaryColor font-medium text-[30px] pl-[20px] hover:text-otherColor duration-[0.5s]">
         <span>#</span> {channelName}
       </div>
-      <div className="h-[100%] mb-[55px]">
-        {displayMessage.map((data,x)=>{
+      
+      <div className=" mb-[55px] overflow-y-scroll">
+        {displayMessageDb[0]?.map((data,x)=>{
+          return( 
+            <div key={x} className="m-[5px] hover:bg-otherColor hover:bg-opacity-[5%] p-[5px] rounded-[5px] cursor-pointer">
+              
+              <div className="font-medium text-[20px]" >{displayMessageDb[0][x].username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{displayMessageDb[0][x].displayDate}</span></div>
+              <div className="text-otherColor text-opacity-[80%]">{displayMessageDb[0][x].message}</div>
+            </div>
+          )
+        })}
+        {displayMessage?.map((data,x)=>{
           return(
             <div key={x} className="m-[5px] hover:bg-otherColor hover:bg-opacity-[5%] p-[5px] rounded-[5px] cursor-pointer">
               <div className="font-medium text-[20px]" >{data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{data.date}</span></div>
@@ -81,6 +105,8 @@ export function ChatBoxComponent() {
         })}
 
       </div>
+     
+      
       
       <div className="min-h-[55px] flex absolute bottom-0 bg-primaryColor w-[100%] ">
         <div
