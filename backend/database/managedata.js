@@ -105,7 +105,6 @@ async function validInviteCode(serverId) {
     if(usedInviteCode){
         console.log("invite code existis")
     }else{
-    
     const date = new Date();
     const currentDate = date.toUTCString()
     await inviteDataModel.create({
@@ -120,4 +119,4 @@ async function validInviteCode(serverId) {
 }
 
 
-export {getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername}
+export {getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}

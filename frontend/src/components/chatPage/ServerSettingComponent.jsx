@@ -12,21 +12,15 @@ export function ServerSettingComponent() {
   const [inviteCode, setinviteCode] = useState(false);
   const [inviteCodeStatus,setinviteCodeStatus]= useState("Copy Code");
   async function createServerInvite() {
-
       const getInviteCode = await axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/inviteCode/${parms.serverId}`,{
           withCredentials: true,
         })
-        console.log(getInviteCode.data)
         if(getInviteCode.data.status==="created"){
-          setinviteCode(getInviteCode.data.inviteCode)
-          
+          setinviteCode(getInviteCode.data.inviteCode) 
         }else if(getInviteCode.data.status==="notAdmin" || getInviteCode.data.status==="invalidData" ){
           setserverSettingBoxDisplay(false)
           setserverSettingInviteBoxDisplay(false)
-        }
-    
-    
-        
+        }     
   }
   // const [buttonStatus,setbuttonStatus]=useState({bg:"otherColor" , opa:"100%"})
   async function checkAdmin(){

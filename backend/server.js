@@ -13,19 +13,19 @@ import createDefaultData from "./database/default/createdefault.js";
 const app = express();
 const httpServer = createServer(app);
 
-app.use(express.json({}), express.urlencoded({}), cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
+app.use(express.json({}), express.urlencoded({extended: true}), cookieParser());
+
 const socket = new Server(httpServer, {
   cors: {
     origin: "http://localhost:5173",
     credentials: true,
   },
-
   method: ["GET", "PUT", "POST"],
   transports: [
     "websocket",

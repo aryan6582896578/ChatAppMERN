@@ -10,7 +10,6 @@ export default function RegisterPage() {
   let navigate = useNavigate();
   async function registerUser() {
     setuserData({ username: "", password: "" });
-    console.log("yes dataset", userData.username);
     if (userData.username && userData.password) {
       setloadingPage(true)
       await sendData();

@@ -15,6 +15,7 @@ export function ServerListComponent() {
   const[joinServerData , setjoinServerData] =  useState({ serverInviteCode: "" });
   const[serverJoinError,setserverJoinError]=useState("");
 
+
   function getUserData() {
     axios.get(`http://localhost:4500/${import.meta.env.VITE_VERSION}/userDataSeverList`, {
         withCredentials: true,

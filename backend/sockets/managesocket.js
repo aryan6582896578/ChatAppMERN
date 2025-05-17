@@ -1,41 +1,58 @@
+import { getServerChannelData, getServerData } from "../database/managedata.js";
 import { verifyJwt } from "../database/managedata/authData.js";
+import { createCustomId } from "../database/managedata/customData.js";
 
-export default async function runsocket(socket) {
-  socket.use((socket, next) => {
-    const validToken = verifyJwt(socket.handshake.auth.jwt);
+export default async function runsocket(io) {
+  io.use(async (socket, next) => {
+    
+    const validToken = verifyJwt(socket.handshake.auth.jwtToken);
     try {
-      let usernamee = validToken.username;
+        const usernameValidToken = validToken.username;
+        const userIdValidToken = validToken.userId;
       if (validToken) {
-        (socket.validUser = true), (socket.username = usernamee);
-        socket.path = socket.handshake.auth.path;
+        const channelId = socket.handshake.auth.channelId;
+        if(channelId){
+          const channelData = await getServerChannelData(channelId)
+          const channelMemberList = channelData.members
+          if(channelMemberList.includes(userIdValidToken)){
+            socket.validUser = true;
+            socket.username = usernameValidToken;
+            socket.userId = userIdValidToken
+            socket.serverId = socket.handshake.auth.serverId;
+            socket.channelId = socket.handshake.auth.channelId;
+          }
+        }
+        
       } else {
         req.validUser = false;
       }
     } catch (error) {
       console.log("no jwt socket check");
     }
-
     next();
   });
 
-  socket.on("connection", (socket) => {
-    if (socket.validUser) {
-      console.log(`${socket.username} connected `);
-      
-      
-      socket.join(`${socket.path}`);
-      socket.on(`${socket.path}`, (data) => {
-        console.log(`${socket.username} connected to ${socket.path}`);
-        console.log(`Message received in room ${socket.path}:`,data,socket.username);
-        const chatData = {
-          username: socket.username,
-          message: data,
-          channelId: socket.path,
-        };
-        console.log(chatData);
-        socket.server.to(`${socket.path}`).emit(`${socket.path}`, chatData);
+  io.on("connection", (socket) => {
+    if(socket.validUser){
+      console.log(`${socket.username} online`)
+      socket.join(`${socket.serverId}/${socket.channelId}`)
+      socket.on(`${socket.serverId}/${socket.channelId}`, (data) => {
+        const messageId = String(createCustomId())
+        console.log(`---------\nmessage in \nserver: ${socket.serverId} \nchannel: ${socket.channelId} \nuser: ${socket.username} \nmessage: ${data.message}`)
+        const messageData = {
+          message:data.message,
+          date:data.date,
+          messageId:messageId,
+          userId:socket.userId,
+          serverId:socket.serverId,
+          channelId:socket.channelId,
+          username:socket.username
+        }
+        
+        socket.server.to(`${socket.serverId}/${socket.channelId}`).emit(`${socket.serverId}/${socket.channelId}`, messageData); 
       });
-      
+        
     }
-  });
+
+  })
 }

@@ -14,11 +14,9 @@ export default function ChannelListComponent(){
 
     async function postCreateChannel(){
       if(createChannelName){
-          console.log(parms.serverId)
         const createServerChannel = await axios.post(`http://localhost:4500/${import.meta.env.VITE_VERSION}/me/createChannel/${parms.serverId}`,createChannelName,{
         withCredentials: true
       })
-      console.log(createServerChannel.data.status)
       if(createServerChannel.data.status==="channelCreated"){
         setdisplayCreateChannelBox(false)
         navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${serverId}/${createServerChannel.data.channelId}`)
