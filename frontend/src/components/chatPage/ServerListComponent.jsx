@@ -46,9 +46,9 @@ export function ServerListComponent() {
       }).then(async (data)=>{
         if(data.data.status==="alreadyJoined"){
           setserverJoinBoxDisplay(false)
-          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
+          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
         }else if(data.data.status==="ServerJoined"){
-          await navigate(`/${import.meta.env.VITE_VERSION}/me/chat/${data.data.serverId}`);
+          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
         }else{
           setserverJoinError("*invalid code")
           
@@ -76,7 +76,7 @@ export function ServerListComponent() {
       </div>
 
       <div className="flex flex-col relative pt-[20px]">
-        {serverList.map((server, index) => (
+        {serverList?.map((server, index) => (
           <div key={index} className="m-auto">
             <button key={index} onClick={() => {
                 navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${server}`);
@@ -143,7 +143,7 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
          onChange={(e) => {
           setcreateServerData({...createServerData,serverName:e.target.value});
          }}
-          type="text" className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] text-[20px] font-medium" placeholder="server name"
+          type="text" maxLength={10} className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] text-[20px] font-medium" placeholder="server name"
         />
           </div>
           <div className="flex justify-evenly text-[20px]">

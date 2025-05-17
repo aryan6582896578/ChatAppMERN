@@ -43,7 +43,7 @@ export function ChatBoxComponent() {
 
   return (
     <div className="w-[100%] bg-primaryColor flex flex-col relative ">
-      <div className="w-[100%] min-h-[45px] border-solid border-b-[1px] border-secondaryColor font-medium text-[30px] pl-[20px] hover:text-otherColor">
+      <div className="w-[100%] min-h-[45px] border-solid border-b-[1px] border-secondaryColor font-medium text-[30px] pl-[20px] hover:text-otherColor duration-[0.5s]">
         <span>#</span> {channelName}
       </div>
       <div className="h-[100%] mb-[55px]">

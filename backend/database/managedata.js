@@ -1,10 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel } from "./schema/databaseSchema.js";
+import { createCustomId } from "./managedata/customData.js";
 
 async function userDataSeverList(username) {
     const userDataSeverList = await userDataModel.findOne({username:username})
-    return userDataSeverList.servers
+    if(userDataSeverList){
+        return userDataSeverList.servers
+    } 
 }
 
 
@@ -62,8 +65,11 @@ async function getServerChannelMemberList(channelId){
 }
 
 async function getUsername(memberIds) {
-    let getUsername = await userDataModel.findOne({userid:`${memberIds}`})
-    return(getUsername.username)
+    const getUsername = await userDataModel.findOne({userid:`${memberIds}`})
+    if(getUsername){
+        return(getUsername.username)
+    }
+    
 }
 
 async function getUserId(username) {
@@ -97,14 +103,16 @@ async function validInviteCode(serverId) {
       inviteCode: `${inviteCode}`,
     });
     if(usedInviteCode){
-        console.log("yes")
+        console.log("invite code existis")
     }else{
-        let createdId = createId();
-              await inviteDataModel.create({
+    
+    const date = new Date();
+    const currentDate = date.toUTCString()
+    await inviteDataModel.create({
       _id: `${inviteCode}`,
       serverId:`${serverId}`,
       inviteCode:`${inviteCode}`,
-      createdDate: `${createdId}`,
+      createdDate: `${currentDate}`,
     });
     return inviteCode
     }
