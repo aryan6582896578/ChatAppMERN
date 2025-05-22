@@ -7,7 +7,7 @@ export function UserSettingComponent() {
   const[username,setusername] = useState("someshitisseriouslywrong")
   const[userLogoutBoxDisplay,setuserLogoutBoxDisplay]=useState(false)
   function logoutUser(){
-    document.cookie = "tokenJwt="
+    document.cookie = "tokenJwt=;max-age=0; path=/;"
     navigate("/")
   }
   function getUserData() {

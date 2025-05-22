@@ -35,7 +35,7 @@ export default async function runsocket(io) {
 
   io.on("connection", (socket) => {
     if(socket.validUser){
-      console.log(`${socket.username} online`)
+      console.log(`${socket.username} is online`)
       socket.join(`${socket.serverId}/${socket.channelId}`)
       socket.on(`${socket.serverId}/${socket.channelId}`, (data) => {
         const messageId = String(createCustomId())

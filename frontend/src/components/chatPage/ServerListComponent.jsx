@@ -72,7 +72,7 @@ export function ServerListComponent() {
           onClick={() => {
             navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
           }}
-          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-cell hover:bg-text3Color  ml-auto mr-auto rounded-[10%] duration-500"
+          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-pointer hover:bg-text3Color  ml-auto mr-auto rounded-[10%] duration-500"
         />
       </div>
 

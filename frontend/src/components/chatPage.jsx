@@ -21,14 +21,25 @@ export default function ChatPage() {
   }, []);
 
   return (connectionStatus?
-    <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden">
+    <div className="bg-primaryColor min-h-screen w-[100%]  text-textColor flex  overflow-hidden">
       <ServerListComponent/>
 
-      <div className="flex min-w-[250px] flex-col bg-secondaryColor bg-opacity-[30%] hover:cursor-not-allowed">
- 
+      <div className="flex min-w-[250px] flex-col bg-secondaryColor bg-opacity-[30%]">
+        <input className="bg-primaryColor m-[10px] h-[35px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor hover:border-otherColor hover:border-opacity-[50%]" disabled placeholder="search (soon)"/>
         <UserSettingComponent />     
       </div>
 
+      <div className="flex w-[100%] flex-col bg-transparent bg-opacity-[30%] hover:cursor-not-allowed">
+        <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%]">
+          Friends (soon)
+        </div>      
+      </div>
+      <div className="flex min-w-[250px] flex-col bg-secondaryColor bg-opacity-[30%] hover:cursor-not-allowed">
+         <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%]">
+          Notifications (soon)
+          </div>
+          
+      </div>
 
 
     </div>:<LoadingPage someError={`server offline`} redirect={"/"}/>

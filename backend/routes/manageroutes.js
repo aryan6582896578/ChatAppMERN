@@ -440,10 +440,11 @@ export default function runroutes(app, socket) {
     }
   });
 
-  app.get("/v1/messageData/:serverId/:channelId",checkJwt,async (req, res) => {
+  app.get("/v1/messageData/:serverId/:channelId/:messageLength",checkJwt,async (req, res) => {
       const userId = req.userId;
       const serverId = req.params.serverId;
       const channelId = req.params.channelId;
+      const messageLength = req.params.messageLength
       if (req.validUser && req.userId && serverId) {
         const serverData = await getServerData(serverId);
         if (serverData) {
@@ -453,10 +454,32 @@ export default function runroutes(app, socket) {
             if(channelData){
               const channelMemberList = channelData.members
               if(channelMemberList.includes(userId)){
-              const messageData = await messageDataModel.find({
-                channelId:channelId
-              })
-              res.json({message:messageData})
+              // const messageData = await messageDataModel.find({
+              //   channelId:channelId
+              // }).limit(20)
+              const messageData = await messageDataModel.aggregate([
+                {
+                  $match:{
+                    channelId:channelId
+                  }, 
+                },{
+                  $sort:{
+                    createdAt:-1
+                  }
+                },{
+                  $limit:Number(messageLength)
+                },{
+                  $sort:{
+                    createdAt:1
+                  }
+                },
+              ])
+              const messageCount = await messageDataModel.aggregate([
+                {
+                  $count:channelId
+                }
+              ])
+              res.json({message:messageData,messageCountMax:messageCount[0][channelId]})
             }else {
             res.json({ status: "userInValid" });
           }

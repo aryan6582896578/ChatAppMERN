@@ -1,7 +1,18 @@
-html,body{
+::-webkit-scrollbar {
+  width: 5px;
+  scroll-behavior: smooth;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(238, 238, 238,50%);
+  border-radius: 10px;
+}
+/* html,body{
    overflow: hidden;
 
-}
+} */
 
 @tailwind base;
 @tailwind components;
