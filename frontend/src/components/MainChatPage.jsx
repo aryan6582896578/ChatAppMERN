@@ -55,7 +55,7 @@ export default function MainChatPage() {
 
 
   return  (
-    <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden">
+    <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden flex-shrink-1">
       <ServerListComponent/>
 
       <div className="flex min-w-[250px] flex-col bg-primaryColor ">

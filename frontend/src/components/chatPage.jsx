@@ -21,7 +21,9 @@ export default function ChatPage() {
   }, []);
 
   return (connectionStatus?
-    <div className="bg-primaryColor min-h-screen w-[100%]  text-textColor flex  overflow-hidden">
+    
+    <div className="bg-primaryColor min-h-screen w-[100%] flex-shrink-1 text-textColor flex  overflow-hidden">
+
       <ServerListComponent/>
 
       <div className="flex min-w-[250px] flex-col bg-secondaryColor bg-opacity-[30%]">

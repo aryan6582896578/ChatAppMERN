@@ -6,8 +6,10 @@ export function ChatBoxComponent() {
   const navigate = useNavigate();
   const parms = useParams();
   let date = new Date();
+
   const [messageData, setmessageData] = useState("");
   const [channelName,setchannelName]=useState("");
+  
   const [displayMessageSocket,setdisplayMessageSocket]= useState([]);
   const [displayMessageDb,setdisplayMessageDb]= useState([]);
 
@@ -15,17 +17,24 @@ export function ChatBoxComponent() {
   const getMaxMessageCount = useRef(21);
 
   const [topReached,settopReached]=useState(false)
+  const topChatDiv = useRef(null)
+  const bottomChatDiv = useRef(null)
+  const chatDiv = useRef(null)
 
   function scrollTopPage(){
-    if(topReached&&getMessageCount.current<getMaxMessageCount.current){
-       getMessageCount.current += 20;
-            getMessage()  
-            settopReached(false)
+    if(topReached && getMessageCount.current<getMaxMessageCount.current){
+       if(topChatDiv.current.scrollHeight===0){
+        chatDiv.current?.scroll({
+          top: 10,
+        })
+        getMessageCount.current += 20;
+         getMessage()  
+         settopReached(false)
+       }
     }
   }
   useEffect(() => {
-    scrollTopPage()
-    
+    scrollTopPage() 
   }, [topReached])
   
   async function getUserData() {
@@ -100,16 +109,17 @@ export function ChatBoxComponent() {
  
 
   return (
-    <div className="w-[100%] bg-primaryColor flex flex-col relative h-[100vh] " >
+    <div className="w-[100%] bg-primaryColor flex flex-col relative h-[100vh]" >
       <div className="w-[100%] min-h-[45px] border-solid border-b-[1px] border-secondaryColor font-medium text-[30px] pl-[20px] hover:text-otherColor duration-[0.5s]">
         <span>#</span> {channelName}
       </div>
       
       <div className=" mb-[55px] overflow-y-scroll overflow-x-hidden " onScroll={(e)=>{
-        if(e.target.scrollTop===0){
-          settopReached(true)              
-        }
-      }}>
+          if(e.target.scrollTop===0){
+            settopReached(true) 
+          }            
+        }} ref={chatDiv}>
+        <div ref={topChatDiv}></div>
         {displayMessageDb?.map((data,x)=>{
           return( 
             <div key={x} className="m-[5px] hover:bg-otherColor hover:bg-opacity-[5%] p-[5px] rounded-[5px] cursor-pointer" >            
@@ -127,6 +137,7 @@ export function ChatBoxComponent() {
           )
         })}
         <div />
+        <div ref={bottomChatDiv}></div>
       </div>
      
       <div className="min-h-[55px] flex absolute bottom-0 bg-primaryColor w-[100%] ">
@@ -135,6 +146,7 @@ export function ChatBoxComponent() {
             setmessageData(e.target.innerText);         
           }}
         />
+
       </div>
     </div>
   );
