@@ -15,6 +15,7 @@ export default function HomePage(){
     return(
         <div className="bg-primaryColor min-h-screen w-full  text-textColor overflow-hidden">
          <HomePageNavbar buttonStatus={buttonStatus} />
+        
             </div>
     )
 }
@@ -40,10 +41,13 @@ function HomePageNavbar({buttonStatus}){
             </div>
             {buttonStatus? <button onClick={()=>{
                 navigate(`${import.meta.env.VITE_VERSION}/@me/chat`)
-            }} className="absolute end-0 bg-primaryColor w-[100px] h-[50px] mt-[10px] mr-[10px] text-[20px] font-medium rounded-[15px] text-otherColor hover:text-textColor duration-[0.5s]  sm:w-[150px]" >Open Chat</button> 
+            }} className="absolute end-0 bg-primaryColor w-[120px] h-[50px] mt-[10px] mr-[10px] text-[20px] font-medium rounded-[15px] text-otherColor hover:text-textColor duration-[0.5s]  sm:w-[150px]" >Open Chat</button> 
             : <button onClick={()=>{
                 navigate(`${import.meta.env.VITE_VERSION}/login`)
-            }} className="absolute end-0 bg-primaryColor w-[100px] h-[50px] mt-[10px] mr-[10px] text-[20px] font-medium rounded-[15px] text-otherColor hover:text-textColor duration-[0.5s] sm:w-[150px]">Login</button>}
+          
+          }} className="absolute end-0 bg-primaryColor w-[100px] h-[50px] mt-[10px] mr-[10px] text-[20px] font-medium rounded-[15px] text-otherColor hover:text-textColor duration-[0.5s] sm:w-[150px]">Login</button>}
+       
+       
         </div>
     )
 }

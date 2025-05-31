@@ -25,7 +25,7 @@ export function UserSettingComponent() {
     
   }, [])
     return (
-      <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor z-100 absolute bottom-[0px] flex ">
+      <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor z-100 absolute bottom-[0px] hidden sm:flex">
         <div className="text-[25px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer"> {username}</div>
         <button className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-text3Color rounded-[0px] absolute end-0" onClick={()=>{
           setuserLogoutBoxDisplay(true)

@@ -64,7 +64,7 @@ export default function ChannelListComponent(){
     }, [parms.serverId,parms.channelId])
     
       return(
-          <div className="bg-primaryColor max-w-[250px] h-[100%] mb-[55px] mt-[45px] flex flex-col pt-[10px] relative">   
+          <div className="max-w-[250px] h-[100%] mb-[55px] mt-[45px] flex flex-col pt-[10px] relative">   
           <div className="text-[10px] font-bold ml-[5px] flex min-h-[20px] hover:underline hover:cursor-pointer text-otherColor text-opacity-[60%]">
             TEXT CHANNELS 
           {adminCheck?<button className="end-[0px] top-0 flex absolute font-bold text-[20px] hover:text-text1Color duration-[0.5s]" onClick={()=>{
@@ -77,7 +77,7 @@ export default function ChannelListComponent(){
                   return (
                     <button key={channelId[x]} className="flex text-[20px] m-[5px] rounded-[5px] mb-[5px] font-medium bg-otherColor bg-opacity-[4%] hover:text-otherColor duration-[0.5s] hover:bg-opacity-[5%]" onClick={()=>(
                      navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${serverId}/${channelId[x]}`)
-                    )}> <span className="ml-[10px] mr-[15px] text-otherColor text-opacity-[60%]">#</span>{channelName}</button>
+                    )}> <span className="ml-[10px] mr-[15px] text-otherColor text-opacity-[60%]">#</span>{channelName} </button>
                   )
                 })}
                 {displayCreateChannelBox? <CreateChannelBox setdisplayCreateChannelBox={setdisplayCreateChannelBox} postCreateChannel={postCreateChannel} setcreateChannelName={setcreateChannelName} createChannelName={createChannelName}/>:""}

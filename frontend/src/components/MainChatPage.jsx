@@ -8,9 +8,11 @@ import ChannelListComponent from "./chatPage/ChannelListComponent.jsx";
 import { useEffect, useState } from "react";
 import { NoChannelComponent } from "./chatPage/NoChannelComponent.jsx";
 import axios from "axios";
+import ChannelHeadComponent from "./chatPage/ChannelHeadComponent.jsx";
 export default function MainChatPage() {
 
   const [channelCheck,setchannelCheck]=useState(false)
+  const [memberListDisplay,setmemberListDisplay]=useState(true)
   const navigate = useNavigate();
   const parms = useParams();
 
@@ -55,20 +57,35 @@ export default function MainChatPage() {
 
 
   return  (
-    <div className="bg-primaryColor min-h-screen w-full  text-textColor flex  overflow-hidden flex-shrink-1">
-      <ServerListComponent/>
+    <div className="bg-primaryColor min-h-screen w-full text-textColor flex overflow-hidden">
+
+      <div className="flex">
+        <ServerListComponent/>
+      </div>
 
       <div className="flex min-w-[250px] flex-col bg-primaryColor ">
         <ServerSettingComponent/>
-       {channelCheck?<ChannelListComponent/>:""} 
+          {channelCheck?<ChannelListComponent/>:""} 
         <UserSettingComponent />     
       </div>
      
-     {channelCheck?"":<NoChannelComponent/>} 
-     
-     {channelCheck?<ChatBoxComponent />:""} 
-     {channelCheck?<MemberListComponent/>:""} 
+     <div className="flex flex-col bg-pink-400 w-[100%] max-h-screen">
+      {channelCheck?"":<NoChannelComponent/>} 
 
+      <div className=" bg-yellow-500">
+        <div>
+          {channelCheck?<ChannelHeadComponent setmemberListDisplay={setmemberListDisplay} memberListDisplay={memberListDisplay}/>:""}
+        </div>
+      </div>
+
+      <div className="h-[100%] overflow-hidden">     
+          <div className="flex overflow-hidden h-[100%]">
+            {channelCheck?<ChatBoxComponent />:""} 
+            {channelCheck? (memberListDisplay?<MemberListComponent/>:""):""}             
+          </div>                    
+      </div>
+     </div>
+     
     </div>
   ) 
 }
