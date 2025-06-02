@@ -1,75 +1,91 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { useState,useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
 import axios from "axios";
 export function ServerListComponent() {
   const navigate = useNavigate();
   const parms = useParams()
   const [serverList, setserverList] = useState([]);
-
+  const[username,setusername]=useState("");
   const [serverBoxDisplay ,setserverBoxDisplay] = useState(false);
 
   const [serverCreateBoxDisplay,setserverCreateBoxDisplay] = useState(false);
   const [createServerData, setcreateServerData] = useState({ serverName: "" });
+  const [createServerError,setcreateServerError]=useState("");
 
   const [serverJoinBoxDisplay,setserverJoinBoxDisplay]=useState(false);
   const[joinServerData , setjoinServerData] =  useState({ serverInviteCode: "" });
   const[serverJoinError,setserverJoinError]=useState("");
 
 
-  function getUserData() {
-    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/userDataSeverList`, {
+  async function getUserData() {
+    try {
+      const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/userDataSeverList`, {
         withCredentials: true,
-      }).then((data) => {
-        setserverList(data.data.serverList);
-      }).catch(function (error) {
-        console.log(error.toJSON() , "userdata fetch serverlistcomponent");
-      });
+      })
+      if(userData){
+        setserverList(userData.data.serverList);
+        setusername(userData.data.username);    
+      }
+    } catch (error) {
+      console.log(error,"error get server list");
+    }
+
   }
 
   async function postCreateServer(){
     if(createServerData.serverName){
-      axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
-        withCredentials: true
-      }).then(async (data)=>{
-        if(data.data.status==="CreatedServer"){
+      try {
+        const createServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
+          withCredentials: true
+        })
+        if(createServer.data.status==="CreatedServer"){
           setserverCreateBoxDisplay(false);
           setcreateServerData("")
-          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
-        }
-      })
+          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${createServer.data.serverId}`);
+        }        
+      } catch (error) {
+        console.log(error,"error post create server");
+      }
+    }else{
+      setcreateServerError("*Server name cannot be empty");
     }
   }
 
   async function postJoinServer(){
     if(joinServerData.serverInviteCode){
-      axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
+      try {
+        const joinServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
         withCredentials: true
-      }).then(async (data)=>{
-        if(data.data.status==="alreadyJoined"){
-          setserverJoinBoxDisplay(false)
-          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
-        }else if(data.data.status==="ServerJoined"){
-          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
-        }else{
-          setserverJoinError("*invalid code")
-          
-        }
       })
+      if(joinServer.data.status==="alreadyJoined"){
+        setserverJoinBoxDisplay(false);
+        await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
+      }else if(data.data.status==="ServerJoined"){
+        await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
+      }else{
+        setserverJoinError("*invalid code");
+      }
+      } catch (error) {
+        console.log("error post server join");
+      }
+      
     }
   }
   useEffect(() => {
     getUserData();
-    setserverBoxDisplay(false);
-    setserverCreateBoxDisplay(false);
-    setserverJoinBoxDisplay(false);
+
+    return ()=>{
+      setserverBoxDisplay(false);
+      setserverCreateBoxDisplay(false);
+      setserverJoinBoxDisplay(false);
+    }
   },[parms.serverId,parms.channelId]);
 
   return (
     <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative border-solid border-r-[1px] border-secondaryColor ">
 
       <div className="flex">
-        <button
-          onClick={() => {
+        <button onClick={() => {
             navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
           }}
           className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-pointer hover:bg-otherColor  ml-auto mr-auto rounded-[10%] duration-500"
@@ -87,108 +103,169 @@ export function ServerListComponent() {
           </div>
         ))}
 
-        <button
-          onClick={() => {
+        <button onClick={() => {
             setserverBoxDisplay(true);
           }}
           className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor duration-[0.5s] ">
           +
         </button>
-        
+
+        <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">     
+        <button className="flex ml-auto mr-auto hover:bg-black rounded-[100px] border-solid border-transparent border-[1px] hover:border-black" >
+          <img src="/github-mark-white.svg" className="max-h-[40px] " />
+        </button>
+        </a>
       </div>
 
-  {serverBoxDisplay?<ServerBoxDisplay  setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setserverJoinBoxDisplay={setserverJoinBoxDisplay}/>:"" }
-  {serverCreateBoxDisplay ? <ServerCreateBoxDisplay setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setcreateServerData={setcreateServerData} createServerData={createServerData} postCreateServer={postCreateServer}/> :"" }
-  {serverJoinBoxDisplay ?<ServerJoinBoxDisplay setserverJoinBoxDisplay={setserverJoinBoxDisplay} setserverBoxDisplay={setserverBoxDisplay} setjoinServerData={setjoinServerData}  joinServerData={joinServerData} serverJoinError={serverJoinError} postJoinServer={postJoinServer}/>:""}
-    </div>
-    
+      {serverBoxDisplay?<ServerBoxDisplay  setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setserverJoinBoxDisplay={setserverJoinBoxDisplay} username={username}/>:"" }
+      {serverCreateBoxDisplay ? <ServerCreateBoxDisplay setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setcreateServerData={setcreateServerData} createServerData={createServerData} postCreateServer={postCreateServer} createServerError={createServerError}/> :"" }
+      {serverJoinBoxDisplay ?<ServerJoinBoxDisplay setserverJoinBoxDisplay={setserverJoinBoxDisplay} setserverBoxDisplay={setserverBoxDisplay} setjoinServerData={setjoinServerData}  joinServerData={joinServerData} serverJoinError={serverJoinError} postJoinServer={postJoinServer}/>:""}
+    </div>  
   );
 }
 
-function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setserverJoinBoxDisplay}){
+function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setserverJoinBoxDisplay,username}){
 
     return(
-        <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
-            <div className="flex align-middle justify-center mb-[10px] pt-[10px]"> 
-                <div className="text-[40px]">Server</div>
-                <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color duration-[0.5s]" onClick={() => {
-                    setserverBoxDisplay(false);
+        <div className="fixed w-[100%] h-[100%] bg-secondaryColor top-[0px] bg-opacity-[95%]">
+
+          <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+            <div className="flex">
+              <div className="mt-[10px] ml-[10px]">
+                <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+                  <img src="/github-mark-white.svg" className="h-[50%] "/>
+                </a>
+              </div>
+              <div>
+                <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+                  setserverBoxDisplay(false);
                 }}/>
+              </div>
+            </div>   
+          </div>
+
+          <div className="flex h-[100%] w-[100%] flex-col md:w-[400px] md:ml-auto md:mr-auto">
+
+           <div className="text-[35px] overflow-hidden break-words ">
+            <div className="text-otherColor font-bold text-center">
+              Hello <span className="font-semibold text-textColor animate-pulse">{username}</span>
             </div>
-            <div className="flex justify-evenly text-[20px]">
-                <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{ 
+           </div>
+
+            <div className=" flex flex-col h-[100%]">
+              <div className="ml-auto mr-auto mt-[50px]">
+                <button className=" bg-textColor text-white w-[200px] h-[45px] rounded-[10px] duration-[0.5s] text-[20px] font-semibold hover:bg-opacity-[60%]" onClick={()=>{ 
                   setserverBoxDisplay(false) ,
                   setserverCreateBoxDisplay(true)
                   }}>Create Server</button>
-                <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{
+              </div>
+              <div className=" ml-auto mr-auto mt-[40px]">
+                  <button className=" bg-textColor text-white w-[200px] h-[45px] rounded-[10px] duration-[0.5s] text-[20px] font-semibold hover:bg-opacity-[60%]" onClick={()=>{
                   setserverBoxDisplay(false) ,
                   setserverJoinBoxDisplay(true)
                 }} >Join Server</button>
+              </div>
             </div>
+          </div>
         </div>
     )
 }
 
-function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer}){
+function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer,createServerError}){
 
   return(
-      <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
-          <div className="flex align-middle justify-center mb-[10px] pt-[10px]"> 
-              <div className="text-[40px]">Create Server</div>
-              <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color duration-[0.5s]" onClick={() => {
-                  setserverCreateBoxDisplay(false);
+      <div className="fixed w-[100%] h-[100%] bg-secondaryColor top-[0px] bg-opacity-[95%]">
+        <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+          <div className="flex">
+            <div className="mt-[10px] ml-[10px]">
+              <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+                <img src="/github-mark-white.svg" className="h-[50%] "/>
+              </a>
+            </div>
+            <div>
+              <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+                setserverCreateBoxDisplay(false);
               }}/>
+            </div>
+          </div>   
+        </div>
+
+        <div className=" w-[100%] h-[100%] md:w-[400px] md:ml-auto md:mr-auto">
+          <div className="text-[35px] text-otherColor font-semibold text-center">
+              Create Server
           </div>
-          <div className="flex justify-center pb-[20px]">
-          <input
-         onChange={(e) => {
-          setcreateServerData({...createServerData,serverName:e.target.value});
-         }}
-          type="text" maxLength={10} className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] text-[20px] font-medium" placeholder="server name"
-        />
+          <div>
+            <div className="flex flex-col mt-[10px]">
+              <div className="w-[90%] ml-auto mr-auto text-text3Color">
+                {createServerError}
+              </div>
+              <input onChange={(e) => { setcreateServerData({...createServerData,serverName:e.target.value});}}
+                type="text" maxLength={15} className="bg-textColor w-[90%] bg-opacity-[50%] rounded-[10px] h-[50px] outline-none  text-otherColor p-[10px] text-[20px] font-semibold ml-auto mr-auto" placeholder="server name"
+              />
+            </div>
           </div>
-          <div className="flex justify-evenly text-[20px]">
-              <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 hover:border-red-500 duration-[0.5s] font-medium" onClick={()=>(
+
+          <div className="h-[100%] mt-[20px] text-otherColor text-[18px] w-[90%] ml-auto mr-auto relative">
+            <button className="w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-text3Color hover:border-text3Color duration-[0.5s] font-medium " onClick={()=>(
                 setserverCreateBoxDisplay(false),
                 setserverBoxDisplay(true)
               )}>Go back</button>
-              <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{
+            <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium absolute end-0" onClick={()=>{
                 postCreateServer()
               }}>Create Server</button>
-
           </div>
+
+        </div>
+
       </div>
   )
 }
 
 function ServerJoinBoxDisplay({setserverJoinBoxDisplay,setserverBoxDisplay ,setjoinServerData,joinServerData ,serverJoinError,postJoinServer}){
   return(
-    <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
-    <div className="flex align-middle justify-center mb-[10px] pt-[10px]"> 
-        <div className="text-[40px]">Join Server</div>
-        <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color duration-[0.5s]" onClick={() => {
-            setserverJoinBoxDisplay(false)
-        }}/>
-    </div>
-    <div className="flex align-middle justify-center text-text3Color">{serverJoinError}</div>
-    <div className="flex justify-center pb-[20px]">
-    <input
-   onChange={(e) => {
-    setjoinServerData({...joinServerData,serverInviteCode:e.target.value});
-   }}
-    type="text" className="bg-textColor w-[400px] bg-opacity-40 rounded-[5px] h-[50px] outline-none mt-[10px] text-otherColor p-[10px] font-medium text-[20px]" placeholder="Invite Code" maxLength={8}
-  />
-    </div>
-    <div className="flex justify-evenly text-[20px]">
-        <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 hover:border-red-500 duration-[0.5s] font-medium" onClick={()=>(
-          setserverJoinBoxDisplay(false),
-          setserverBoxDisplay(true)
-        )}>Go back</button>
-        <button className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium" onClick={()=>{
-          postJoinServer()
-        }}>Join Server</button>
-
-    </div>
-</div>
+    <div className="fixed w-[100%] h-[100%] bg-secondaryColor top-[0px] bg-opacity-[95%]">
+      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+        <div className="flex">
+          <div className="mt-[10px] ml-[10px]">
+            <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+              <img src="/github-mark-white.svg" className="h-[50%] "/>
+            </a>
+          </div>
+          <div>
+            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+            setserverJoinBoxDisplay(false);
+            }}/>
+          </div>
+        </div>   
+      </div>
+    
+      <div className=" w-[100%] h-[100%] md:w-[400px] md:ml-auto md:mr-auto">
+        <div className="text-[35px] text-otherColor font-semibold text-center">
+              Join Server
+        </div>
+        <div>
+          <div className=" flex flex-col mt-[10px]  text-otherColor h-[100%] w-[100%] ">
+            <div className="w-[90%] ml-auto mr-auto text-text3Color">
+              {serverJoinError}
+            </div>
+            <input onChange={(e) => {setjoinServerData({...joinServerData,serverInviteCode:e.target.value});}}
+              type="text" className="bg-textColor w-[90%] bg-opacity-[50%] rounded-[10px] h-[50px] outline-none  text-otherColor p-[10px] text-[20px] font-semibold ml-auto mr-auto" placeholder="Invite Code" maxLength={8}
+            />
+            
+            <div className="flex w-[90%] ml-auto mr-auto mt-[20px] relative">
+              <button className="w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-text3Color hover:border-text3Color duration-[0.5s] font-medium" onClick={()=>(
+                setserverJoinBoxDisplay(false),
+                setserverBoxDisplay(true)
+              )}>Go back</button>
+              <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium absolute end-0" onClick={()=>{
+                postJoinServer()
+              }}>Join Server</button>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    
+    
   )
 }

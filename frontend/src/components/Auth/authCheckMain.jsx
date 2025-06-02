@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import axios from "axios";
 import LoadingPage from "../loadingPage";
+import ServerError from "./ServerErrorPage";
 export default function AuthCheckMain() {
   const navigate = useNavigate();
   const [userStatus, setuserStatus] = useState(false);
@@ -24,6 +25,6 @@ export default function AuthCheckMain() {
   if(userStatus){
     return <Outlet />;
   }else{
-    return <LoadingPage someError={"we are checking"}/>
+    return <ServerError/>
     }
 }

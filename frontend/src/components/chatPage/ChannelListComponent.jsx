@@ -60,8 +60,14 @@ export default function ChannelListComponent(){
     useEffect(() => {
       getServerData()
       getChannelData()
-      
+      return () => {
+        setserverId("")
+        setchannelId([])
+        setchannelName([])
+      }
     }, [parms.serverId,parms.channelId])
+
+
     
       return(
           <div className="max-w-[250px] h-[100%] mb-[55px] mt-[45px] flex flex-col pt-[10px] relative">   

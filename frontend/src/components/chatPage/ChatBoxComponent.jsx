@@ -62,8 +62,11 @@ export function ChatBoxComponent() {
       const messageData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/messageData/${parms.serverId}/${parms.channelId}/${getMessageCount.current}`,{
         withCredentials: true,
       });
-      setdisplayMessageDb(messageData.data.message)
-      getMaxMessageCount.current = messageData.data.messageCountMax
+      if(messageData){
+        setdisplayMessageDb(messageData.data.message)
+        getMaxMessageCount.current = messageData.data.messageCountMax
+      }
+
   }
 
   async function sendMessage(e) {
@@ -159,7 +162,7 @@ export function ChatBoxComponent() {
               <div contentEditable className="w-[100%] m-[5px] mb-[0xp] ml-[10px] outline-none bg-otherColor bg-opacity-[4%] text-[20px] pl-[10px] pt-[5px] rounded-[5px] text-otherColor text-opacity-[70%]"  onKeyDown={sendMessage} spellCheck={true}  onInput={(e) => {
                     setmessageData(e.target.innerText);         
               }}/>
-            {scrollDown?<button className=" bg-purple-500 h-[60%] mt-auto mb-auto w-[5px] rounded-[10px]" onClick={scrollBottom}/>:""}  
+            {scrollDown?<button className=" bg-purple-500 h-[70%] mt-auto mb-auto w-[5px] rounded-[10px] hover:bg-purple-600 mr-[5px] ml-[5px]" onClick={scrollBottom}/>:""}  
         </div>
       
       </div>

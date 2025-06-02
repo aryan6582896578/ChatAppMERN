@@ -1,4 +1,4 @@
-import { UserSettingComponent } from "./chatPage/UserSettingComponent.jsx";
+import { UserProfileComponent } from "./chatPage/UserProfileComponent.jsx";
 import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
 import { MemberListComponent } from "./chatPage/MemberListComponent.jsx";
 import { ServerSettingComponent } from "./chatPage/ServerSettingComponent.jsx";
@@ -66,13 +66,13 @@ export default function MainChatPage() {
       <div className="flex min-w-[250px] flex-col bg-primaryColor ">
         <ServerSettingComponent/>
           {channelCheck?<ChannelListComponent/>:""} 
-        <UserSettingComponent />     
+        <UserProfileComponent />     
       </div>
      
-     <div className="flex flex-col bg-pink-400 w-[100%] max-h-screen">
+     <div className="flex flex-col w-[100%] max-h-screen">
       {channelCheck?"":<NoChannelComponent/>} 
 
-      <div className=" bg-yellow-500">
+      <div>
         <div>
           {channelCheck?<ChannelHeadComponent setmemberListDisplay={setmemberListDisplay} memberListDisplay={memberListDisplay}/>:""}
         </div>

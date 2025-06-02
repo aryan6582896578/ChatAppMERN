@@ -35,8 +35,7 @@ function HomePageNavbar({buttonStatus}){
             <div className="hidden sm:block duration-[0.5s]">
                 
                 <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-                
-                    <img src=".../../github-mark-white.svg" className="h-[70%] end-[180px] top-[10px] absolute"/>
+                    <img src="/github-mark-white.svg" className="h-[70%] end-[180px] top-[10px] absolute"/>
                 </a>
             </div>
             {buttonStatus? <button onClick={()=>{

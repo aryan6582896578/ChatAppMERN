@@ -1,6 +1,7 @@
 import {useNavigate } from "react-router";
 export default function ServerError(){
     const navigate = useNavigate()
+    document.title =`Error | ${import.meta.env.VITE_NAME}`
     return(
         <div className="bg-primaryColor w-screen min-h-screen flex flex-col text-otherColor overflow-hidden">
             <div className="bg-secondaryColor h-[70px] w-[100%] relative flex border-b-otherColor border-opacity-[80%] border-b-[1px]">
@@ -9,7 +10,7 @@ export default function ServerError(){
                     <div className="text-[25px] font-medium mt-auto mb-auto ml-[10px] hover:text-textColor">{`${import.meta.env.VITE_NAME}`}</div>
                 </div>
                 <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-                    <img src="../../../github-mark-white.svg" className="h-[70%] end-[10px] top-[10px] absolute"/>
+                    <img src="/github-mark-white.svg" className="h-[70%] end-[10px] top-[10px] absolute"/>
                 </a>
             </div>
             <div className="mt-[180px] sm:mt-[150px]">

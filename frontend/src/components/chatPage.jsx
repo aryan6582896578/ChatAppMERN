@@ -3,16 +3,19 @@ import { Link, useNavigate } from "react-router";
 import axios from "axios";
 import LoadingPage from "./loadingPage.jsx";
 import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
-import { UserSettingComponent } from "./chatPage/UserSettingComponent.jsx";
+import { UserProfileComponent } from "./chatPage/UserProfileComponent.jsx";
+import {UserSettingComponent} from "./chatPage/UserSettingComponent.jsx";
 
 export default function ChatPage() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const [connectionStatus,setconnectionStatus] = useState(false);
   
   const[dmListDisplay,setdmListDisplay]=useState("flex")
   const[friendListDisplay,setfriendListDisplay]=useState("hidden")
   const[notificationListDisplay,setnotificationListDisplay]=useState("hidden")
-
+  const[serverListDisplay,setserverListDisplay]=useState("flex")
+  const[userSettingDisplay,setuserSettingDisplay]=useState("hidden")
+  const[userSettingDisplayCheck,setuserSettingDisplayCheck]=useState(false)
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/username`, {
         withCredentials: true,
@@ -24,14 +27,17 @@ export default function ChatPage() {
       
   }, []);
 
+  document.title =`@me | ${import.meta.env.VITE_NAME}`
   return (connectionStatus?
     
     <div className="bg-primaryColor w-[100%] text-textColor flex flex-col overflow-hidden h-screen">
       <div className="flex min-h-[100%]">
-        <ServerListComponent/>
-
-        <div className={`w-[100%] ${dmListDisplay} min-h-[90%] sm:max-w-[250px]`}>
-          <DmListComponent/>
+        <div className={`${serverListDisplay} flex`}>
+          <ServerListComponent/>
+        </div>
+        
+        <div className={`w-[100%] ${dmListDisplay} min-h-[90%] sm:max-w-[250px] bg-yellow-50`}>
+          <DmListComponent setserverListDisplay={setserverListDisplay}/>
         </div>
         <div className={`${friendListDisplay} sm:block w-[100%]`}>
         <FriendListComponent/>
@@ -40,28 +46,31 @@ export default function ChatPage() {
         <div className={`${notificationListDisplay} sm:block w-[100%] min-h-[100%] sm:w-[300px]`}>
           <NotificationListComponent/>
         </div>
+        <div className={`${userSettingDisplay} sm:hidden w-[100%] min-h-[100%] sm:w-[300px]`}>
+          {userSettingDisplayCheck?<UserSettingComponent/>:""}
+        </div>
       </div>
       
-      <BottomBarComponent setdmListDisplay={setdmListDisplay} setfriendListDisplay={setfriendListDisplay} setnotificationListDisplay={setnotificationListDisplay} />
+      <BottomBarComponent setdmListDisplay={setdmListDisplay} setfriendListDisplay={setfriendListDisplay} setnotificationListDisplay={setnotificationListDisplay} setserverListDisplay={setserverListDisplay} setuserSettingDisplay={setuserSettingDisplay} setuserSettingDisplayCheck={setuserSettingDisplayCheck}/>
 
     </div>:<LoadingPage someError={`server offline`} redirect={"/"}/>
   );
 }
 
-function DmListComponent(){
+function DmListComponent({setserverListDisplay}){
   return(
-      <div className="flex overflow-hidden flex-col bg-secondaryColor w-[100%] ">
-        <input className="bg-primaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor hover:border-otherColor hover:border-opacity-[50%] " disabled placeholder="search (soon)"/>
-        <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px]"> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quos error dolor quae minima eaque quaerat alias nulla, hic omnis reiciendis. Veritatis doloremque nostrum, repudiandae quae tempore molestiae maxime beatae architecto.</span>
-        <UserSettingComponent />     
+      <div className="flex overflow-hidden flex-col bg-primaryColor w-[100%] ">
+        <input className="bg-secondaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor " disabled placeholder="search (soon)"/>
+        <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px]"> </span>
+        <UserProfileComponent setserverListDisplay={setserverListDisplay} />     
       </div>
   )
 }
 
 function FriendListComponent(){
   return(
-    <div className="flex w-[100%] flex-col bg-transparent bg-opacity-[30%] hover:cursor-not-allowed">
-      <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%]">
+    <div className="flex w-[100%] flex-col bg-primaryColor hover:cursor-not-allowed h-[100%] border-l-secondaryColor sm:border-l-[1px]">
+      <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%] ">
         Friends (soon)
       </div>      
     </div>
@@ -70,7 +79,7 @@ function FriendListComponent(){
 
 function NotificationListComponent(){
   return(
-    <div className="flex w-[100%] flex-col bg-secondaryColor hover:cursor-not-allowed">
+    <div className="flex w-[100%] flex-col bg-primaryColor hover:cursor-not-allowed h-[100%] border-l-secondaryColor sm:border-l-[1px] ">
       <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%]">
         Notifications (soon)
       </div>   
@@ -78,27 +87,27 @@ function NotificationListComponent(){
   )
 }
 
-function BottomBarComponent({setdmListDisplay,setfriendListDisplay,setnotificationListDisplay}){
+function BottomBarComponent({setdmListDisplay,setfriendListDisplay,setnotificationListDisplay,setserverListDisplay,setuserSettingDisplay,setuserSettingDisplayCheck}){
   return(
-    <div className="bg-primaryColor font-medium min-h-[50px] min-w-[100%] fixed bottom-0 sm:hidden flex justify-evenly">
-      <div className="w-[80%] flex ">
-          <button className="bg-secondaryColor w-[80%] h-[30px] rounded-[5px] mr-auto ml-auto mt-auto mb-auto hover:text-otherColor hover:text-opacity-[80%]" onClick={()=>{setdmListDisplay("flex"),setfriendListDisplay("hidden"),setnotificationListDisplay("hidden")}}>
-            dmlist
+    <div className="bg-primaryColor font-medium min-h-[50px] min-w-[100%] fixed bottom-0 sm:hidden flex justify-evenly ">
+      <div className="w-[80%] flex opacity-[80%]">
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("flex"),setfriendListDisplay("hidden"),setnotificationListDisplay("hidden"),setserverListDisplay("flex"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(false)}}>
+            <img src="/userSearch.png"/>
           </button>
         </div>
-        <div className="w-[100%] flex">
-          <button className="bg-secondaryColor w-[80%] h-[30px] rounded-[5px] mr-auto ml-auto mt-auto mb-auto hover:text-otherColor hover:text-opacity-[80%]" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("flex"),setnotificationListDisplay("hidden")}}>
-            friendlist
+        <div className="w-[100%] flex opacity-[80%]">
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("flex"),setnotificationListDisplay("hidden"),setserverListDisplay("flex"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(false)}}>
+            <img src="/userAdd.png" />
           </button>
         </div>
-        <div className="w-[100%] flex">
-          <button className="bg-secondaryColor w-[100%] h-[30px] rounded-[5px] mr-auto ml-auto mt-auto mb-auto hover:text-otherColor hover:text-opacity-[80%]"onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("hidden"),setnotificationListDisplay("flex")}}>
-            notification
+        <div className="w-[100%] flex opacity-[80%]">
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("hidden"),setnotificationListDisplay("flex"),setserverListDisplay("hidden"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(false)}}>
+            <img src="/notification.png" />
           </button>
         </div>
-        <div className="w-[100%] flex">
-          <button className="bg-secondaryColor w-[80%] h-[30px] rounded-[5px] mr-auto ml-auto mt-auto mb-auto hover:text-otherColor hover:text-opacity-[80%]">
-            setting
+        <div className="w-[100%] flex opacity-[80%]">
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("hidden"),setnotificationListDisplay("hidden"),setserverListDisplay("hidden"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(true)}}>
+            <img src="/settings.png" />
           </button>
       </div>
     </div>

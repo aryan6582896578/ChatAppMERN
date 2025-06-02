@@ -1,52 +1,66 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
-export function UserSettingComponent() {
-  const navigate = useNavigate();
-  
-  const[username,setusername] = useState("someshitisseriouslywrong")
-  const[userLogoutBoxDisplay,setuserLogoutBoxDisplay]=useState(false)
-  function logoutUser(){
-    document.cookie = "tokenJwt=;max-age=0; path=/;"
-    navigate("/")
-  }
-  function getUserData() {
-    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/username`, {
-        withCredentials: true,
-      }).then((data) => {
-        setusername(data.data.username);
-      }).catch(function (error) {
-        console.log(error.toJSON());
-      });
-  }
-  useEffect(() => {
-    
-    getUserData()
-    
-  }, [])
+
+export function UserSettingComponent({setuserLogoutBoxDisplay}){
+    const navigate = useNavigate();
+    const[username,setusername]=useState("");
+    async function getUserData() {
+        try {
+        const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
+            withCredentials: true,
+        })
+        if(userData){
+            setusername(userData.data.username);    
+        }
+        } catch (error) {
+        console.log(error,"error get server list");
+        }
+    }
+    function logoutUser(){
+        document.cookie = "tokenJwt=;max-age=0; path=/;"
+        navigate("/")
+    }
+    useEffect(() => {
+      getUserData()
+    }, [])
+    document.title =`Settings | ${import.meta.env.VITE_NAME}`
     return (
-      <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor z-100 absolute bottom-[0px] hidden sm:flex">
-        <div className="text-[25px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer"> {username}</div>
-        <button className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-text3Color rounded-[0px] absolute end-0" onClick={()=>{
-          setuserLogoutBoxDisplay(true)
-        }}/>
-
-   {userLogoutBoxDisplay?      <div className="w-[500px] h-[90px] bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
-        <div className="flex align-middle justify-center mb-[10px] pt-[10px]">
-          <button className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]"
-            onClick={() => {
-              setuserLogoutBoxDisplay(false)
-            }}
-          />
+      <div className="w-[100%] h-[100%] fixed top-[0px] left-0 z-[1]">
+        <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px] relative ">
+          <div className="flex">
+            <div className="text-[30px] text-otherColor font-semibold ml-[10px] mt-[10px]">
+              User Setting
+            </div>
+            <div className="mt-[10px] ml-[10px] absolute end-[10px] md:end-[25px]">
+              <a href="https://github.com/aryan6582896578/ChatAppMERN"target="_blank">
+                <img src="/github-mark-white.svg" className="h-[50px] " />
+              </a>
+              
+            </div>
+            
+            <div className="absolute end-[10px] top-[15px] hidden md:flex">
+                <button className="min-w-[5px] min-h-[40px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]"onClick={() => {
+                setuserLogoutBoxDisplay(false)
+              }}
+            />
+            </div>
+          </div>
+          
         </div>
-     
-      <div className="flex justify-evenly text-[20px]">
-       <button className="bg-red-500 font-medium text-[25px] w-[50%] h-[50px] text-otherColor hover:bg-red-500 hover:bg-opacity-[80%] mt-auto mb-auto rounded-[5px] mr-[10px]" onClick={()=>{
-        logoutUser()
-       }}>logout</button>
-      </div>
-    </div>:""}
-
+        <div className="w-[100%] h-[100%] ">
+          <div className="text-[35px] overflow-hidden break-words ">
+            <div className="text-otherColor font-bold text-center">
+              Hello <span className="font-semibold text-textColor animate-pulse">{username}</span>
+            </div>
+          </div>
+          <div className="flex justify-evenly">
+            <button className="bg-red-500 font-medium text-[25px] w-[250px] h-[50px]  text-otherColor hover:bg-red-500 hover:bg-opacity-[80%] mt-auto mb-auto rounded-[5px] mr-[10px]" onClick={()=>{
+            logoutUser()
+          }}>logout</button>
+          </div>
+          
+        </div>
       </div>
     );
-  }
+}

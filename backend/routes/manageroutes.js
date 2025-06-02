@@ -126,7 +126,7 @@ export default function runroutes(app, socket) {
   app.get("/v1/userDataSeverList", checkJwt, async (req, res) => {
     if (req.validUser) {
       const userDataSevers = await userDataSeverList(req.username);
-      res.json({ serverList: userDataSevers });
+      res.json({ serverList: userDataSevers , username:req.username});
     }
   });
 
@@ -476,10 +476,10 @@ export default function runroutes(app, socket) {
               ])
               const messageCount = await messageDataModel.aggregate([
                 {
-                  $count:channelId
+                  $count:channelId || 0
                 }
               ])
-              res.json({message:messageData,messageCountMax:messageCount[0][channelId]})
+              res.json({message:messageData,messageCountMax:messageCount[0]?.[channelId]})
             }else {
             res.json({ status: "userInValid" });
           }
@@ -495,4 +495,12 @@ export default function runroutes(app, socket) {
       }
     }
   );
+
+
+  app.post("/v1/me/userProfile", checkJwt, async (req, res) => {
+    if (req.validUser) {
+        console.log("ff")
+        console.log(req.body.image)
+    }
+  });
 }
