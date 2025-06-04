@@ -75,15 +75,15 @@ export default function LoginPage() {
                   {displayError ? displayError : ""}
                 </span>
               </div>
-              <input type="text" onChange={(e) => setuserData({ ...userData, username: e.target.value })} value={userData.username} className="p-[5px] outline-none bg-primaryColor text-otherColor rounded-[5px] mb-[5px]"/>
+              <input type="text" maxLength={15} onChange={(e) => setuserData({ ...userData, username: e.target.value })} value={userData.username} className="p-[5px] outline-none bg-primaryColor text-otherColor rounded-[5px] mb-[5px]"/>
 
               <div className="text-[13px] mb-[5px] font-semibold text-otherColor text-opacity-[80%]">
                 PASSWORD
                 <span className="text-text3Color font-semibold ml-[2px]">*</span>
               </div>
               <div className="relative">
-                <input type={displayPassword ? "text" : "password"} onChange={(e) =>setuserData({ ...userData, password: e.target.value })} value={userData.password} className="p-[5px] outline-none bg-primaryColor text-otherColor w-full rounded-[5px]"/>
-                <button onMouseEnter={changedisplayPassword} onMouseLeave={changedisplayPassword} className="absolute right-[5px] top-[5px] p-0" >
+                <input type={displayPassword ? "text" : "password"} maxLength={30} onChange={(e) =>setuserData({ ...userData, password: e.target.value })} value={userData.password} className="p-[5px] outline-none bg-primaryColor text-otherColor w-full rounded-[5px]"/>
+                <button onMouseEnter={changedisplayPassword}  onMouseLeave={changedisplayPassword} className="absolute right-[5px] top-[5px] p-0" >
                   <div className="bg-text3Color hover:bg-otherColor min-w-[5px] min-h-[25px] duration-[0.5s]"></div>
                 </button>
               </div> {/*  add password regex */}

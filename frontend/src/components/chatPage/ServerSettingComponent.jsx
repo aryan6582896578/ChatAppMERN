@@ -22,15 +22,12 @@ export function ServerSettingComponent() {
           setserverSettingInviteBoxDisplay(false)
         }     
   }
-  // const [buttonStatus,setbuttonStatus]=useState({bg:"otherColor" , opa:"100%"})
   async function checkAdmin(){
      const adminStatus = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
         withCredentials: true,
     })
     
     if(adminStatus.data.adminStatus===true){
-      // setbuttonStatus({...buttonStatus,bg:"text3Color"})
-      // setbuttonStatus({...buttonStatus,opa:"50%"})
       setadminCheck(true)
       return true
     }else{
@@ -60,9 +57,9 @@ export function ServerSettingComponent() {
     }
   },[parms.serverId,parms.channelId]);
   
-  
+  document.title =`${serverData} | ${import.meta.env.VITE_NAME}`
   return (
-    <div className=" min-w-[250px] max-h-[45px] min-h-[45px] bg-primaryColor z-100 absolute  flex ">
+    <div className="sm:w-[250px] h-[45px] bg-primaryColor relative flex overflow-hidden flex-col ">
       <div className="text-[20px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer duration-[0.5s]">
         {serverData}
       </div>
@@ -71,11 +68,6 @@ export function ServerSettingComponent() {
         }}
       />: <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor hover:bg-otherColor hover:bg-opacity-[50%] rounded-[10%] hover:cursor-pointer duration-[0.5s]`}
       />}
-      {/* <button
-        className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor hover:bg-${buttonStatus.bg}  bg-opacity-${buttonStatus.opa} rounded-[10%]  hover:cursor-pointer duration-[0.5s]`}onClick={() => {
-          setserverSettingBoxDisplay(true);
-        }}
-      /> */}
       {serverSettingBoxDisplay ? (<ServerSettingBoxDisplay setserverSettingBoxDisplay={setserverSettingBoxDisplay} setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} createServerInvite={createServerInvite}/>) : ("")}
       {serverSettingInviteBoxDisplay ? (<ServerSettingInviteBoxDisplay setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} inviteCode={inviteCode} inviteCodeStatus={inviteCodeStatus} setinviteCodeStatus={setinviteCodeStatus}/>) : ("")}
     </div>
@@ -84,28 +76,44 @@ export function ServerSettingComponent() {
 
 function ServerSettingBoxDisplay({setserverSettingBoxDisplay,setserverSettingInviteBoxDisplay,createServerInvite}) {
   return (
-    <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
-      <div className="flex align-middle justify-center mb-[10px] pt-[10px]">
-        <div className="text-[40px]">Server Setting</div>
-        <button
-          className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]"
-          onClick={() => {
-            setserverSettingBoxDisplay(false);
-          }}
-        />
+    <div className="fixed w-[100%] h-screen bg-primaryColor top-[0px] bg-opacity-[99%] z-[1000] end-0">
+      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+        <div className="flex">
+          <div className="mt-[10px] ml-[10px]">
+            <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+              <img src="/github-mark-white.svg" className="h-[50%] "/>
+            </a>
+          </div>
+          <div>
+            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+              setserverSettingBoxDisplay(false);
+              }}/>
+          </div>
+        </div>   
       </div>
-      <div className="flex justify-evenly text-[20px]">
-        <button
-          className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]"
-          onClick={() => {
-            setserverSettingBoxDisplay(false),
-              setserverSettingInviteBoxDisplay(true);
-              createServerInvite()
-          }}
-        >
-          Invite Code
-        </button>
-      </div>
+          <div className="flex h-[100%] w-[100%] flex-col md:w-[400px] md:ml-auto md:mr-auto">
+
+           <div className="text-[35px] overflow-hidden break-words h-[fit]">
+            <div className="text-otherColor font-bold text-center">
+              Invite Code
+            </div>
+           </div>
+
+            <div className=" flex flex-col h-[100%]">
+              <div className="ml-auto mr-auto mt-[10px]">
+                <button
+                  className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]"
+                  onClick={() => {
+                    setserverSettingBoxDisplay(false),
+                      setserverSettingInviteBoxDisplay(true);
+                      createServerInvite()
+                  }}>
+                  Invite Code
+                </button>
+              </div>
+
+            </div>
+          </div>
     </div>
   );
 }
@@ -115,18 +123,28 @@ function ServerSettingInviteBoxDisplay({ setserverSettingInviteBoxDisplay ,invit
   const [opacity,setopacity]=useState("")
   const [ border,setborder]=useState("textColor")
   return (
-    <div className="w-[500px]  bg-textColor bg-opacity-[33%] left-[30%] top-[30%] fixed z-10 text-otherColor rounded-[10px] ">
-      <div className="flex align-middle justify-center mb-[10px] pt-[10px]">
-        <div className="text-[40px]">Server Setting</div>
-        <button
-          className="end-2 top-2 absolute min-w-[5px] min-h-[30px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s]"
-          onClick={() => {
-            setserverSettingInviteBoxDisplay(false);
-          }}
-        />
+    <div className="fixed w-[100%] h-screen bg-primaryColor top-[0px] bg-opacity-[99%] z-[1000] end-0">
+      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+        <div className="flex">
+          <div className="mt-[10px] ml-[10px]">
+            <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+              <img src="/github-mark-white.svg" className="h-[50%] "/>
+            </a>
+          </div>
+          <div>
+            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+              setserverSettingInviteBoxDisplay(false);
+              }}/>
+          </div>
+        </div>   
       </div>
-        <div className="flex justify-evenly">
-            <div className="w-[50%] h-[40px] bg-textColor bg-opacity-30 text-otherColor font-semibold text-[20px] text-center mb-[20px] p-[5px]">{inviteCode}</div>
+           <div className="text-[35px] overflow-hidden break-words h-[fit]">
+            <div className="text-otherColor font-bold text-center">
+              Invite Code
+            </div>
+           </div>
+        <div className="flex justify-evenly ">
+            <div className="w-[90%] rounded-[10px] h-[40px] bg-textColor bg-opacity-40 text-otherColor font-semibold text-[20px] text-center mb-[20px] p-[5px]">{inviteCode}</div>
         </div>
       <div className="flex justify-evenly text-[20px]">
         <button

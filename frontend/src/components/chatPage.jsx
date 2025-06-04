@@ -16,14 +16,21 @@ export default function ChatPage() {
   const[serverListDisplay,setserverListDisplay]=useState("flex")
   const[userSettingDisplay,setuserSettingDisplay]=useState("hidden")
   const[userSettingDisplayCheck,setuserSettingDisplayCheck]=useState(false)
+
+  async function getUserData() {
+        try {
+        const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
+            withCredentials: true,
+        })
+        if(userData){
+            setconnectionStatus(true)   
+        }
+        } catch (error) {
+        console.log(error,"error get server list");
+        }
+    }
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/username`, {
-        withCredentials: true,
-      }).then((data) => {
-        setconnectionStatus(true)
-      }).catch(function (error) {
-        console.log(error);
-      });
+    getUserData()
       
   }, []);
 
@@ -36,7 +43,7 @@ export default function ChatPage() {
           <ServerListComponent/>
         </div>
         
-        <div className={`w-[100%] ${dmListDisplay} min-h-[90%] sm:max-w-[250px] bg-yellow-50`}>
+        <div className={`w-[100%] ${dmListDisplay} min-h-[90%] sm:max-w-[250px]`}>
           <DmListComponent setserverListDisplay={setserverListDisplay}/>
         </div>
         <div className={`${friendListDisplay} sm:block w-[100%]`}>
@@ -46,7 +53,7 @@ export default function ChatPage() {
         <div className={`${notificationListDisplay} sm:block w-[100%] min-h-[100%] sm:w-[300px]`}>
           <NotificationListComponent/>
         </div>
-        <div className={`${userSettingDisplay} sm:hidden w-[100%] min-h-[100%] sm:w-[300px]`}>
+        <div className={`${userSettingDisplay} sm:hidden w-[100%] min-h-[100%] sm:w-[300px] bg-yellow-50`}>
           {userSettingDisplayCheck?<UserSettingComponent/>:""}
         </div>
       </div>
@@ -61,7 +68,7 @@ function DmListComponent({setserverListDisplay}){
   return(
       <div className="flex overflow-hidden flex-col bg-primaryColor w-[100%] ">
         <input className="bg-secondaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor " disabled placeholder="search (soon)"/>
-        <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px]"> </span>
+        <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px] h-[100%]"> </span>
         <UserProfileComponent setserverListDisplay={setserverListDisplay} />     
       </div>
   )
@@ -89,19 +96,19 @@ function NotificationListComponent(){
 
 function BottomBarComponent({setdmListDisplay,setfriendListDisplay,setnotificationListDisplay,setserverListDisplay,setuserSettingDisplay,setuserSettingDisplayCheck}){
   return(
-    <div className="bg-primaryColor font-medium min-h-[50px] min-w-[100%] fixed bottom-0 sm:hidden flex justify-evenly ">
+    <div className="bg-primaryColor font-medium min-h-[50px] min-w-[100%] fixed bottom-0 sm:hidden flex justify-evenly z-[50]">
       <div className="w-[80%] flex opacity-[80%]">
-          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("flex"),setfriendListDisplay("hidden"),setnotificationListDisplay("hidden"),setserverListDisplay("flex"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(false)}}>
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("flex"),setfriendListDisplay("hidden"),setnotificationListDisplay("hidden"),setserverListDisplay("flex"),setuserSettingDisplay("hidden"),setuserSettingDisplayCheck(false)}}>
             <img src="/userSearch.png"/>
           </button>
         </div>
         <div className="w-[100%] flex opacity-[80%]">
-          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("flex"),setnotificationListDisplay("hidden"),setserverListDisplay("flex"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(false)}}>
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("flex"),setnotificationListDisplay("hidden"),setserverListDisplay("flex"),setuserSettingDisplay("hidden"),setuserSettingDisplayCheck(false)}}>
             <img src="/userAdd.png" />
           </button>
         </div>
         <div className="w-[100%] flex opacity-[80%]">
-          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("hidden"),setnotificationListDisplay("flex"),setserverListDisplay("hidden"),setuserSettingDisplay("flex"),setuserSettingDisplayCheck(false)}}>
+          <button className="w-[fit] mr-auto ml-auto mt-auto mb-auto" onClick={()=>{setdmListDisplay("hidden") ,setfriendListDisplay("hidden"),setnotificationListDisplay("flex"),setserverListDisplay("hidden"),setuserSettingDisplay("hidden"),setuserSettingDisplayCheck(false)}}>
             <img src="/notification.png" />
           </button>
         </div>

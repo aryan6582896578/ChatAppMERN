@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
-export function MemberListComponent(){
+export function MemberListComponent({memberListSMDisplay}){
   const navigate = useNavigate();
   const parms = useParams();
 
@@ -37,7 +37,7 @@ export function MemberListComponent(){
   }, [parms.serverId,parms.channelId])
   
     return(
-        <div className="bg-primaryColor min-w-[250px] border-solid border-l-[1px] border-secondaryColor ">
+        <div className={`bg-primaryColor  min-w-[150px] max-w-[150px] sm:max-w-[250px] sm:min-w-[250px] border-solid border-l-[1px] border-secondaryColor ${memberListSMDisplay} sm:block h-[100%] `}>
           <div className="flex flex-col ">
             <div className="text-[20px] font-medium text-center pb-[10px] mt-[10px] ">
               MEMBERS

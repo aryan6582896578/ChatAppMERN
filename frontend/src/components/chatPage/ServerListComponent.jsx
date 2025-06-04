@@ -82,7 +82,7 @@ export function ServerListComponent() {
   },[parms.serverId,parms.channelId]);
 
   return (
-    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative border-solid border-r-[1px] border-secondaryColor ">
+    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative border-solid border-r-[1px] border-secondaryColor z-[10]">
 
       <div className="flex">
         <button onClick={() => {
@@ -127,7 +127,7 @@ export function ServerListComponent() {
 function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setserverJoinBoxDisplay,username}){
 
     return(
-        <div className="fixed w-[100%] h-[100%] bg-secondaryColor top-[0px] bg-opacity-[95%]">
+        <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
 
           <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
             <div className="flex">
@@ -146,7 +146,7 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
 
           <div className="flex h-[100%] w-[100%] flex-col md:w-[400px] md:ml-auto md:mr-auto">
 
-           <div className="text-[35px] overflow-hidden break-words ">
+           <div className="text-[35px] overflow-hidden break-words h-[200px]">
             <div className="text-otherColor font-bold text-center">
               Hello <span className="font-semibold text-textColor animate-pulse">{username}</span>
             </div>
@@ -174,7 +174,7 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
 function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer,createServerError}){
 
   return(
-      <div className="fixed w-[100%] h-[100%] bg-secondaryColor top-[0px] bg-opacity-[95%]">
+      <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
         <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
           <div className="flex">
             <div className="mt-[10px] ml-[10px]">
@@ -223,7 +223,7 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
 
 function ServerJoinBoxDisplay({setserverJoinBoxDisplay,setserverBoxDisplay ,setjoinServerData,joinServerData ,serverJoinError,postJoinServer}){
   return(
-    <div className="fixed w-[100%] h-[100%] bg-secondaryColor top-[0px] bg-opacity-[95%]">
+    <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
       <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
         <div className="flex">
           <div className="mt-[10px] ml-[10px]">

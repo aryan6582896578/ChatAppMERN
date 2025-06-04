@@ -39,54 +39,57 @@ export default function runroutes(app, socket) {
   app.post("/v1/registeruser", checkJwt, async (req, res) => {
     const usernameRegister = req.body.username;
     const passwordRegister = req.body.password;
+    if(usernameRegister.length<=15 && passwordRegister.length<=30){
+      if (usernameRegister && passwordRegister) {
+        const date = new Date();
+        const currentDate = date.toUTCString();
+        const userID = createCustomId().toString();
+        const defaultServer = "7326033090969600000";
+        const hashedhPassword = await createPasswordHash(passwordRegister);
+        try {
+          await userDataModel.create({
+            _id: `${usernameRegister}`,
+            username: `${usernameRegister}`,
+            password: `${hashedhPassword}`,
+            createdDate: `${currentDate}`,
+            userid: `${userID}`,
+          });
 
-    if (usernameRegister && passwordRegister) {
-      const date = new Date();
-      const currentDate = date.toUTCString();
-      const userID = createCustomId().toString();
-      const defaultServer = "7326033090969600000";
-      const hashedhPassword = await createPasswordHash(passwordRegister);
-      try {
-        await userDataModel.create({
-          _id: `${usernameRegister}`,
-          username: `${usernameRegister}`,
-          password: `${hashedhPassword}`,
-          createdDate: `${currentDate}`,
-          userid: `${userID}`,
-        });
+          await userDataModel.findOneAndUpdate(
+            { userid: `${userID}` },
+            { $push: { servers: `${defaultServer}` } }
+          );
 
-        await userDataModel.findOneAndUpdate(
-          { userid: `${userID}` },
-          { $push: { servers: `${defaultServer}` } }
-        );
+          await serverDataModel.findOneAndUpdate(
+            { serverId: `${defaultServer}` },
+            { $push: { members: `${userID}` } }
+          );
 
-        await serverDataModel.findOneAndUpdate(
-          { serverId: `${defaultServer}` },
-          { $push: { members: `${userID}` } }
-        );
+          await serverChannelsDataModel.findOneAndUpdate(
+            { serverId: `${defaultServer}` },
+            { $push: { members: `${userID}` } }
+          );
 
-        await serverChannelsDataModel.findOneAndUpdate(
-          { serverId: `${defaultServer}` },
-          { $push: { members: `${userID}` } }
-        );
+          const createToken = signJwt(usernameRegister, userID);
+          const userCreated = await userDataModel.findOne({
+            userid: `${userID}`,
+          });
 
-        const createToken = signJwt(usernameRegister, userID);
-        const userCreated = await userDataModel.findOne({
-          userid: `${userID}`,
-        });
-
-        console.log(userCreated, "new user created");
-        res.cookie("tokenJwt", createToken, {
-          maxAge: 15 * 24 * 60 * 60 * 1000,
-        });
-        res.json({ status: "userCreated" });
-      } catch (error) {
-        res.json({ status: "userExists" });
-        console.log(error, "some err");
+          console.log(userCreated, "new user created");
+          res.cookie("tokenJwt", createToken, {
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+          });
+          res.json({ status: "userCreated" });
+        } catch (error) {
+          res.json({ status: "userExists" });
+          console.log(error, "some err");
+        }
+      } else {
+        res.json({ status: "missingUsernamePassword" });
       }
-    } else {
-      res.json({ status: "missingUsernamePassword" });
-    }
+  }else{
+    res.json({ status: "username length should less than 15 and password less than 30" });
+  }
   });
 
   app.post("/v1/loginUser", async (req, res) => {
@@ -97,30 +100,34 @@ export default function runroutes(app, socket) {
     if (validToken) {
       res.json({ status: "userValid" });
     } else {
-      if (usernameLogin && passwordLogin) {
-        const getUserdata = await userDataModel.findOne({ _id: usernameLogin });
-        if (getUserdata) {
-          const userID = getUserdata.userid;
-          const checkHash = await checkPasswordHash(passwordLogin,getUserdata.password);
-          try {
-            if (getUserdata && checkHash === true) {
-              const createToken = signJwt(usernameLogin, userID);
-              res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000});
-              res.json({ status: "userValid" });
-            } else {
+      if(usernameLogin.length<=15 && passwordLogin.length<=30){
+        if (usernameLogin && passwordLogin) {
+          const getUserdata = await userDataModel.findOne({ _id: usernameLogin });
+          if (getUserdata) {
+            const userID = getUserdata.userid;
+            const checkHash = await checkPasswordHash(passwordLogin,getUserdata.password);
+            try {
+              if (getUserdata && checkHash === true) {
+                const createToken = signJwt(usernameLogin, userID);
+                res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000});
+                res.json({ status: "userValid" });
+              } else {
+                res.json({ status: "userInValid" });
+              }
+            } catch (error) {
               res.json({ status: "userInValid" });
+              console.log(error, "some err");
             }
-          } catch (error) {
+          } else {
             res.json({ status: "userInValid" });
-            console.log(error, "some err");
           }
         } else {
-          res.json({ status: "userInValid" });
+          res.json({ status: "missingUsernamePassword" });
         }
-      } else {
-        res.json({ status: "missingUsernamePassword" });
-      }
-    }
+    }else{
+    res.json({ status: "username length should less than 15 and password less than 30" });
+  }
+  }
   });
 
   app.get("/v1/userDataSeverList", checkJwt, async (req, res) => {

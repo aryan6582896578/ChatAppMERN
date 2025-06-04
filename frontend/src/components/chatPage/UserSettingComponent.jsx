@@ -26,7 +26,7 @@ export function UserSettingComponent({setuserLogoutBoxDisplay}){
     }, [])
     document.title =`Settings | ${import.meta.env.VITE_NAME}`
     return (
-      <div className="w-[100%] h-[100%] fixed top-[0px] left-0 z-[1]">
+      <div className="w-[100%] h-[100%] fixed top-[0px] left-0 bg-primaryColor z-[10]">
         <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px] relative ">
           <div className="flex">
             <div className="text-[30px] text-otherColor font-semibold ml-[10px] mt-[10px]">

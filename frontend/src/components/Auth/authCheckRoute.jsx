@@ -43,8 +43,4 @@ export default function AuthCheckMain() {
       <Outlet/>
     )
   }
-    // return (
-    //   <Outlet/>
-    // )
-
 }
