@@ -34,3 +34,7 @@ to remove files from github after adding to gitignore
 git rm -r --cached crypt
 
 custom id https://discord.com/developers/docs/reference#snowflakes
+
+
+
+https://cloudinary.com/blog/guest_post/how-to-parse-media-files-with-multer

@@ -7,6 +7,7 @@ export function ServerListComponent() {
   const [serverList, setserverList] = useState([]);
   const[username,setusername]=useState("");
   const [serverBoxDisplay ,setserverBoxDisplay] = useState(false);
+  const [disableServerCreateButton,setdisableServerCreateButton] =useState("")
 
   const [serverCreateBoxDisplay,setserverCreateBoxDisplay] = useState(false);
   const [createServerData, setcreateServerData] = useState({ serverName: "" });
@@ -75,6 +76,7 @@ export function ServerListComponent() {
     getUserData();
 
     return ()=>{
+      setcreateServerData({ serverName: "" })
       setserverBoxDisplay(false);
       setserverCreateBoxDisplay(false);
       setserverJoinBoxDisplay(false);
@@ -110,15 +112,15 @@ export function ServerListComponent() {
           +
         </button>
 
-        <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">     
+        {/* <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">     
         <button className="flex ml-auto mr-auto hover:bg-black rounded-[100px] border-solid border-transparent border-[1px] hover:border-black" >
           <img src="/github-mark-white.svg" className="max-h-[40px] " />
         </button>
-        </a>
+        </a> */}
       </div>
 
       {serverBoxDisplay?<ServerBoxDisplay  setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setserverJoinBoxDisplay={setserverJoinBoxDisplay} username={username}/>:"" }
-      {serverCreateBoxDisplay ? <ServerCreateBoxDisplay setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setcreateServerData={setcreateServerData} createServerData={createServerData} postCreateServer={postCreateServer} createServerError={createServerError}/> :"" }
+      {serverCreateBoxDisplay ? <ServerCreateBoxDisplay setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setcreateServerData={setcreateServerData} createServerData={createServerData} postCreateServer={postCreateServer} createServerError={createServerError} disableServerCreateButton={disableServerCreateButton} setdisableServerCreateButton={setdisableServerCreateButton}/> :"" }
       {serverJoinBoxDisplay ?<ServerJoinBoxDisplay setserverJoinBoxDisplay={setserverJoinBoxDisplay} setserverBoxDisplay={setserverBoxDisplay} setjoinServerData={setjoinServerData}  joinServerData={joinServerData} serverJoinError={serverJoinError} postJoinServer={postJoinServer}/>:""}
     </div>  
   );
@@ -132,9 +134,6 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
           <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
             <div className="flex">
               <div className="mt-[10px] ml-[10px]">
-                <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-                  <img src="/github-mark-white.svg" className="h-[50%] "/>
-                </a>
               </div>
               <div>
                 <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
@@ -171,7 +170,7 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
     )
 }
 
-function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer,createServerError}){
+function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer,createServerError,disableServerCreateButton,setdisableServerCreateButton}){
 
   return(
       <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
@@ -206,10 +205,11 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
           </div>
 
           <div className="h-[100%] mt-[20px] text-otherColor text-[18px] w-[90%] ml-auto mr-auto relative">
-            <button className="w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-text3Color hover:border-text3Color duration-[0.5s] font-medium " onClick={()=>(
-                setserverCreateBoxDisplay(false),
+            <button className={`w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-text3Color hover:border-text3Color duration-[0.5s] font-medium ${disableServerCreateButton}`} onClick={()=>{
+              setdisableServerCreateButton("disabled")
+                setserverCreateBoxDisplay(false)
                 setserverBoxDisplay(true)
-              )}>Go back</button>
+            }}>Go back</button>
             <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium absolute end-0" onClick={()=>{
                 postCreateServer()
               }}>Create Server</button>

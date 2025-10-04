@@ -4,7 +4,7 @@ import axios from "axios";
 export function ServerSettingComponent() {
   const navigate = useNavigate();
   const parms = useParams();
-  const [serverData, setserverData] = useState("");
+  const [serverData, setserverData] = useState("Loading...");
   const [serverSettingBoxDisplay, setserverSettingBoxDisplay] = useState(false);
   const [serverSettingInviteBoxDisplay, setserverSettingInviteBoxDisplay] =useState(false);
   const [ adminCheck , setadminCheck] = useState(false)

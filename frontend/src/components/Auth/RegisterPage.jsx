@@ -13,22 +13,24 @@ export default function RegisterPage() {
   async function registerCheck() {
     setuserData({ username: "", password: "" });
     if (userData.username && userData.password) {
-      setloadingPage(true)
+      setloadingPage(true);
       try {
         const registerData = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/registeruser`,userData,{
         withCredentials: true,
         });
       if (registerData.data.status === "userCreated") {
+        setloadingPage(false);
         navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
       } else {
         setloadingPage(false);
-        setdisplayError("Username Unavailable")
+        setdisplayError("Username Unavailable");
       }
       } catch (error) {
         console.error("api error", error);
       }
     } else {
       console.log("no data");
+      setdisplayError("username or password cannot be empty");
     }
   }
   
@@ -41,7 +43,7 @@ export default function RegisterPage() {
   }
 
   useEffect(() => {
-    document.title =`Register | ${import.meta.env.VITE_NAME}`
+    document.title =`Register | ${import.meta.env.VITE_NAME}`;
   }, [])
   
 
@@ -57,9 +59,9 @@ export default function RegisterPage() {
                   <div className={`min-h-[70%] mb-auto mt-auto min-w-[5px] bg-textColor ml-[5px] rounded-[10%]`}></div>
                   <div className="text-[25px] font-medium mt-auto mb-auto ml-[10px] hover:text-textColor text-white">{`${import.meta.env.VITE_NAME}`}</div>
               </div>
-              <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+              {/* <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
                     <img src="../../../github-mark-white.svg" className="h-[70%] end-[10px] top-[10px] absolute"/>
-              </a>
+              </a> */}
           </div>
 
           <div className="flex flex-col bg-secondaryColor mt-[60px] ml-[5%] mr-[5%] h-fit rounded-[5px] sm:w-[450px] sm:ml-auto sm:mr-auto">

@@ -6,7 +6,7 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
     const parms = useParams();
     const[serverId,setserverId]=useState("")
     const [channelId, setchannelId] = useState([]);
-    const [channelName, setchannelName] = useState([]);
+    const [channelName, setchannelName] = useState(["Loading..."]);
     
     const [displayCreateChannelBox,setdisplayCreateChannelBox]=useState(false)
     const [createChannelName,setcreateChannelName] = useState({channel:""})
@@ -59,6 +59,7 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
       getServerData()
       getChannelData()
       return () => {
+        setcreateChannelName("")
         setserverId("")
         setchannelId([])
         setchannelName([])
@@ -79,7 +80,7 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
           </div>
                 {channelName.map((channelName,x)=>{
                   return (
-                    <button key={channelId[x]} className="flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] font-medium bg-otherColor bg-opacity-[5%] hover:text-otherColor duration-[0.5s] hover:bg-opacity-[5%] overflow-clip " onClick={()=>{
+                    <button key={x} className="flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] font-medium bg-otherColor bg-opacity-[5%] hover:text-otherColor duration-[0.5s] hover:bg-opacity-[5%] overflow-clip " onClick={()=>{
                      navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${serverId}/${channelId[x]}`)
                      setchatBoxDisplay("flex")
                      setserverListDisplay("hidden")

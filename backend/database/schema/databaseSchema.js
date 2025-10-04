@@ -6,7 +6,8 @@ const userData = mongoose.Schema({
  password:{type:String,required: true},
  createdDate: { type:String,required: true },
  userid:{type:String,required:true},
- servers:{type:Array}
+ servers:{type:Array},
+ userprofileurl:{type:String}
 },{ timestamps: true });
 const userDataModel = mongoose.model("userdata", userData);
 

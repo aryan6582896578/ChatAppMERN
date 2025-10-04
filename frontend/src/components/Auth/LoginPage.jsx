@@ -20,9 +20,12 @@ export default function LoginPage() {
         withCredentials: true,
         });
       if (loginData.data.status === "userValid") {
+        setuserData({ username: "", password: "" })
+        setloadingPage(false);
         navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
       } else {
         setloadingPage(false);
+        setuserData({ username: "", password: "" })
         setdisplayError("username or password is invalid");
       }
     } catch (error) {
@@ -30,6 +33,7 @@ export default function LoginPage() {
     }
     } else {
       console.log("no data");
+      setdisplayError("username or password cannot be empty");
     }
     
   } 
@@ -59,9 +63,9 @@ export default function LoginPage() {
                   <div className={`min-h-[70%] mb-auto mt-auto min-w-[5px] bg-textColor ml-[5px] rounded-[10%]`}></div>
                   <div className="text-[25px] font-medium mt-auto mb-auto ml-[10px] hover:text-textColor text-white">{`${import.meta.env.VITE_NAME}`}</div>
               </div>
-              <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
+              {/* <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
                     <img src="../../../github-mark-white.svg" className="h-[70%] end-[10px] top-[10px] absolute"/>
-              </a>
+              </a> */}
           </div>
           
           <div className="flex flex-col bg-secondaryColor mt-[60px] ml-[5%] mr-[5%] h-fit rounded-[5px] sm:w-[450px] sm:ml-auto sm:mr-auto">

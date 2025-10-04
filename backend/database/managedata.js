@@ -118,5 +118,17 @@ async function validInviteCode(serverId) {
   }
 }
 
+async function getUserData(username) {
+    const userData = await userDataModel.findOne({username:username})
+    if(userData){
+        const userinfo = {
+            // username:userData.username,
+            userprofileurl:userData.userprofileurl || " "
+        }
+        return userinfo
 
-export {getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}
+    }
+    
+}
+
+export {getUserData,getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}

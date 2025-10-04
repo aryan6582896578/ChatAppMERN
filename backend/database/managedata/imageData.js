@@ -1,4 +1,4 @@
-
+import cloudinary from "cloudinary"
   cloudinary.config({ 
         cloud_name: 'dz9lsudey', 
         api_key: '938643821263414', 
@@ -16,6 +16,9 @@
 //        });
     
 //     console.log(uploadResult);
-export default async function uploadImage(){
-
+export default async function uploadImage(imageData){
+  const image = await cloudinary.uploader.upload(imageData, { 
+  resource_type: "auto",})
+  console.log(image)
+  return image
 }

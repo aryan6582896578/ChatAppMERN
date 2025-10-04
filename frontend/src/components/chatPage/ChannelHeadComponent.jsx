@@ -4,7 +4,7 @@ import axios from "axios";
 import memberListIcon from "/memberList.png?url"
 export default function ChannelHeadComponent({setmemberListDisplay,memberListDisplay,setmemberListSMDisplay,setserverListDisplay,setchannelListDisplay,setchatBoxDisplay,setuserSettingDisplay,setbottomBarDisplay}){
     const parms = useParams();
-    const [channelName,setchannelName]=useState("");
+    const [channelName,setchannelName]=useState("Loading...");
 
     async function getUserData() {
         const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{

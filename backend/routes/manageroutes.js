@@ -1,9 +1,10 @@
 import {userDataModel,serverDataModel,inviteDataModel,serverChannelsDataModel, messageDataModel} from "../database/schema/databaseSchema.js";
-import {getServerData,validInviteCode,userDataSeverList,validServerChannelList,getChannelName,getServerChannelMemberList,getUsername, getServerChannelData,} from "../database/managedata.js";
+import {getServerData,validInviteCode,userDataSeverList,validServerChannelList,getChannelName,getServerChannelMemberList,getUsername, getServerChannelData, getUserData,} from "../database/managedata.js";
 import {signJwt,verifyJwt,createPasswordHash,checkPasswordHash,} from "../database/managedata/authData.js";
 import { createCustomId } from "../database/managedata/customData.js";
+import uploadImage from "../database/managedata/imageData.js";
 
-export default function runroutes(app, socket) {
+export default function runroutes(app, socket,upload) {
   function checkJwt(req, res, next) {
     try {
       const validToken = verifyJwt(req.cookies.tokenJwt);
@@ -22,9 +23,44 @@ export default function runroutes(app, socket) {
     next();
   }
 
+app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
+    async function runMiddleware(req, res, fn) {
+      return new Promise((resolve, reject) => {
+        fn(req, res, (result) => {
+          if (result instanceof Error) {
+            return reject(result);
+          }
+          return resolve(result);
+        });
+      });
+    }
+    if (req.validUser) {
+      const myUploadMiddleware = upload.single("img");       
+        try {
+          await runMiddleware(req, res, myUploadMiddleware);
+          const b64 = Buffer.from(req.file.buffer).toString("base64");
+          let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+          const cldRes = await uploadImage(dataURI);
+          console.log(cldRes)
+          
+          await userDataModel.findOneAndUpdate({
+            userid:`${req.userId}`
+          },{
+            userprofileurl:`${cldRes.url}`
+          })
+          res.json({status:"updated"});
+  } catch (error) {
+    console.log(error);
+    res.send({
+      message: error.message,
+    });
+  }
+
+    }})
   app.get("/v1/verify", checkJwt, async (req, res) => {
     if (req.validUser) {
-      res.json({ status: "userValid",username: req.username,userId: req.userId});
+      let userData = await getUserData(req.username);
+      res.json({ status: "userValid",username: req.username,userId: req.userId , userprofileurl:userData.userprofileurl});
     } else {
       res.clearCookie("tokenJwt");
       res.json({ status: "userInvalid" });
@@ -53,6 +89,7 @@ export default function runroutes(app, socket) {
             password: `${hashedhPassword}`,
             createdDate: `${currentDate}`,
             userid: `${userID}`,
+            userprofileurl: "https://res.cloudinary.com/dz9lsudey/image/upload/v1759405162/default_pfp_aflbjz.png",
           });
 
           await userDataModel.findOneAndUpdate(

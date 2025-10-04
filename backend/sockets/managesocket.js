@@ -47,7 +47,8 @@ export default async function runsocket(io) {
           userId:socket.userId,
           serverId:socket.serverId,
           channelId:socket.channelId,
-          username:socket.username
+          username:socket.username,
+          userprofileurl:data.userprofileurl
         }
         try {
           messageDataModel.create({

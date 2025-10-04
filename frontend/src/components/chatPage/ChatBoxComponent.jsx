@@ -24,6 +24,8 @@ export function ChatBoxComponent() {
   const chatDivTop = useRef(null)
 
   const[scrollDown,setscrollDown]=useState(true);
+
+  const[userProfileInfo,setuserProfileInfo] = useState({username:"someshitisseriouslywrong",userprofileurl:null})
   function scrollBottom(){
     if (chatDiv.current) {
       chatDiv.current.scrollTop = chatDiv.current.scrollHeight;
@@ -75,7 +77,8 @@ export function ChatBoxComponent() {
       e.target.innerText=""
       const userMessage ={
         message:messageData,
-        date:date.toUTCString()
+        date:date.toUTCString(),
+        userprofileurl:userProfileInfo.userprofileurl
       }
       socket.emit(`${parms.serverId}/${parms.channelId}`, userMessage)
     }
@@ -101,7 +104,8 @@ export function ChatBoxComponent() {
     const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{
         withCredentials: true,
       });
-    
+    //console.log(userData.data)
+    setuserProfileInfo({...userProfileInfo,userprofileurl:userData.data.userprofileurl})
     const userId = userData.data.userId;
     suId(userData.data.userId)
     return userId;
@@ -113,6 +117,7 @@ export function ChatBoxComponent() {
     setSocketData()
     socket.connect()
     socket.on(`${parms.serverId}/${parms.channelId}`,async (messageData)=>{
+      console.log(messageData)
       setdisplayMessageSocket(a=>[...a,messageData])    
     })
     
@@ -143,8 +148,24 @@ export function ChatBoxComponent() {
            {displayMessageSocket?.map((data,x)=>{
                 return(
                   <div key={x} className="m-[5px] hover:bg-otherColor hover:bg-opacity-[5%] p-[5px] rounded-[5px] cursor-pointer ">
-                    <div className="font-medium text-[20px]" >{data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{data.date}</span></div>
-                    <div className="text-otherColor text-opacity-[80%]">{data.message}</div>
+ 
+                    {/* <div className="font-medium text-[20px] flex" >
+                       <img src={data.userprofileurl} className="w-[40px] h-[40px] rounded-[100%] mr-[10px] " alt="pfp"/>
+                      {data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{data.date}</span></div>
+                    <div className="text-otherColor text-opacity-[80%]">{data.message}</div> */}
+
+                    <div className="flex w-[100%] h-[70px]">
+                      <div className="">
+                        <img src={data.userprofileurl} className="w-[40px] h-[40px] rounded-[100%] m-[5px] flex " alt="pfp"/>
+                      </div>
+                      <div className="w-[100%]">
+                        <div className="font-medium text-[20px] flex ml-[5px]" >
+                          {data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px] mt-[10px]">{data.date}</span>
+                        </div>
+                        <div className="text-otherColor text-opacity-[80%] mt-[5px]">{data.message}</div>
+                      </div>
+                    </div>
+                    
                   </div>
                 )
               })} 

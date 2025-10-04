@@ -4,7 +4,7 @@ import axios from "axios";
 import LoadingPage from "./loadingPage.jsx";
 import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
 import { UserProfileComponent } from "./chatPage/UserProfileComponent.jsx";
-import {UserSettingComponent} from "./chatPage/UserSettingComponent.jsx";
+import { SettingComponent } from "./chatPage/SettingComponent.jsx";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export default function ChatPage() {
           <NotificationListComponent/>
         </div>
         <div className={`${userSettingDisplay} sm:hidden w-[100%] min-h-[100%] sm:w-[300px] bg-yellow-50`}>
-          {userSettingDisplayCheck?<UserSettingComponent/>:""}
+          {userSettingDisplayCheck?<SettingComponent/>:""}
         </div>
       </div>
       

@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { NoChannelComponent } from "./chatPage/NoChannelComponent.jsx";
 import axios from "axios";
 import ChannelHeadComponent from "./chatPage/ChannelHeadComponent.jsx";
-import { UserSettingComponent } from "./chatPage/UserSettingComponent.jsx";
+import { SettingComponent } from "./chatPage/SettingComponent.jsx";
 export default function MainChatPage() {
 
   const [channelCheck,setchannelCheck]=useState(false)
@@ -65,30 +65,30 @@ export default function MainChatPage() {
 
 
   return  (
-      <div className="bg-black max-h-screen flex text-otherColor max-w-full overflow-hidden">
-        <div className="bg-blue-950 ">
+      <div className="bg-primaryColor max-h-screen flex text-otherColor max-w-full overflow-hidden">
+        <div className="">
          <div className={`${serverListDisplay} sm:flex`}>
            <ServerListComponent/>
          </div>
         </div>
-        <div className={`${channelListDisplay} sm:flex bg-blue-800 flex-col overflow-hidden flex-1 sm:flex-none`}> 
+        <div className={`${channelListDisplay} sm:flex flex-col overflow-hidden flex-1 sm:flex-none`}> 
             <ServerSettingComponent/>
             {channelCheck?<ChannelListComponent setchatBoxDisplay={setchatBoxDisplay} setserverListDisplay={setserverListDisplay} setchannelListDisplay={setchannelListDisplay} setbottomBarDisplay={setbottomBarDisplay}/>:""} 
             <UserProfileComponent /> 
         </div>
-        <div className={`${chatBoxDisplay} sm:flex  flex-1 min-w-0 bg-blue-600 flex flex-col overflow-hidden min-h-screen`}>
+        <div className={`${chatBoxDisplay} sm:flex  flex-1 min-w-0 flex flex-col overflow-hidden min-h-screen`}>
            {channelCheck?"":<NoChannelComponent/>} 
           <div className="">
             {channelCheck?<ChannelHeadComponent setmemberListDisplay={setmemberListDisplay} memberListDisplay={memberListDisplay}  setmemberListSMDisplay={setmemberListSMDisplay} setchannelListDisplay={setchannelListDisplay} setchatBoxDisplay={setchatBoxDisplay} setserverListDisplay={setserverListDisplay} setuserSettingDisplay={setuserSettingDisplay} setbottomBarDisplay={setbottomBarDisplay}/>:""} 
           </div>
-          <div className="bg-pink-500 flex flex-1 overflow-hidden ">
+          <div className=" flex flex-1 overflow-hidden ">
                  {channelCheck?<ChatBoxComponent  />:""} 
                  {channelCheck? (memberListDisplay?<MemberListComponent memberListSMDisplay={memberListSMDisplay}/>:""):""}
           </div>
         </div>
 
           <div className={`${userSettingDisplay} sm:hidden w-[100%] min-h-[100%] sm:w-[300px]`}>
-         <UserSettingComponent/>
+         <SettingComponent/>
         </div> 
        {bottomBarDisplay? <BottomBarComponent setchannelListDisplay={setchannelListDisplay} setchatBoxDisplay={setchatBoxDisplay} setserverListDisplay={setserverListDisplay} setuserSettingDisplay={setuserSettingDisplay} setbottomBarDisplay={setbottomBarDisplay}/>:""}
 

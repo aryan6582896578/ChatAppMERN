@@ -13,13 +13,21 @@ import createDefaultData from "./database/default/createdefault.js";
 const app = express();
 const httpServer = createServer(app);
 
+
+
+import multer from "multer";
+import manageroutesimages from "./routes/managerouteimages.js";
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
+
+
 app.use(
   cors({
     origin: `${process.env.FRONTEND_URL}`,
     credentials: true,
   })
 );
-app.use(express.json({}), express.urlencoded({extended: true}), cookieParser());
+app.use(express.json({}), express.urlencoded({extended: true,limit: '10mb'}),cookieParser());
 
 const socket = new Server(httpServer, {
   cors: {
@@ -36,7 +44,9 @@ const socket = new Server(httpServer, {
     "polling",
   ],
 });
-runroutes(app,socket)
+
+runroutes(app,socket,upload)
+//manageroutesimages(app,upload)
 runsocket(socket)
 
 async function runServer() {
