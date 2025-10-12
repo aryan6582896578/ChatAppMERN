@@ -1,4 +1,4 @@
-import { UserProfileComponent } from "./chatPage/UserProfileComponent.jsx";
+import { UserProfileComponent } from "./UserProfileComponent.jsx";
 import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
 import { MemberListComponent } from "./chatPage/MemberListComponent.jsx";
 import { ServerSettingComponent } from "./chatPage/ServerSettingComponent.jsx";
@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { NoChannelComponent } from "./chatPage/NoChannelComponent.jsx";
 import axios from "axios";
 import ChannelHeadComponent from "./chatPage/ChannelHeadComponent.jsx";
-import { SettingComponent } from "./chatPage/SettingComponent.jsx";
+import { SettingComponent } from "./SettingComponent.jsx";
 export default function MainChatPage() {
 
   const [channelCheck,setchannelCheck]=useState(false)
@@ -24,20 +24,12 @@ export default function MainChatPage() {
   const navigate = useNavigate();
   const parms = useParams();
 
-  async function getUserData(){
-    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
-          withCredentials: true,
-    })
-     const userId = userData.data.userId
-     return userId
-  } 
+
   useEffect(()=>{
-   
-    
     async function getChannelData(){
       try {
-        const userId = await getUserData();
-        const channelListData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelList/${parms.serverId}/${userId}`,{ 
+
+        const channelListData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/channelList`,{ 
         withCredentials: true 
       });
         const data = Object.keys(channelListData.data.channelList);
@@ -46,12 +38,12 @@ export default function MainChatPage() {
             if(data.includes(parms.channelId)){
               setchannelCheck(true);
             }else{
-              navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${parms.serverId}`)
+              navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`)
             }
           } else {
             setchannelCheck(false);
             if (data[0]) {
-              navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${parms.serverId}/${data[0]}`);
+              navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}/${data[0]}`);
             }
           } 
       } catch (error) {
@@ -72,7 +64,7 @@ export default function MainChatPage() {
          </div>
         </div>
         <div className={`${channelListDisplay} sm:flex flex-col overflow-hidden flex-1 sm:flex-none`}> 
-            <ServerSettingComponent/>
+            <ServerSettingComponent />
             {channelCheck?<ChannelListComponent setchatBoxDisplay={setchatBoxDisplay} setserverListDisplay={setserverListDisplay} setchannelListDisplay={setchannelListDisplay} setbottomBarDisplay={setbottomBarDisplay}/>:""} 
             <UserProfileComponent /> 
         </div>

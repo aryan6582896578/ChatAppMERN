@@ -25,29 +25,17 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
       }
       }
     }
-    async function getUserData(){
-        const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
-          withCredentials: true,
-        })
-        setserverId(parms.serverId)
-        const userId = userData.data.userId
-        return userId
-      }
-
     async function getChannelData() {
-      const userId = await getUserData()
-
-        const channelList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelList/${parms.serverId}/${userId}`,{
+        const channelList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/channelList`,{
             withCredentials: true,
-          })
-          
+          })  
           setchannelId(Object.keys(channelList.data.channelList))
           setchannelName(Object.values(channelList.data.channelList))
           
     }
     async function getServerData() {
     
-    const adminStatus = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
+    const adminStatus = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/serverInfo`,{
         withCredentials: true,
     })
     
@@ -70,7 +58,7 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
     
       return(
           <div className=" sm:w-[250px] h-[100%]  flex flex-col pt-[10px] relative bg-primaryColor">   
-          <div className=" text-[10px] font-bold ml-[5px] flex min-h-[20px] hover:underline hover:cursor-pointer text-otherColor text-opacity-[60%]">
+          <div className=" text-[10px] font-bold ml-[5px] flex min-h-[20px] hover:underline hover:cursor-pointer text-otherColor/60">
             TEXT CHANNELS 
           {adminCheck?<button className="end-[0px] top-0 flex absolute font-bold text-[20px] hover:text-text1Color duration-[0.5s]" onClick={()=>{
               setdisplayCreateChannelBox(true)
@@ -80,7 +68,7 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
           </div>
                 {channelName.map((channelName,x)=>{
                   return (
-                    <button key={x} className="flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] font-medium bg-otherColor bg-opacity-[5%] hover:text-otherColor duration-[0.5s] hover:bg-opacity-[5%] overflow-clip " onClick={()=>{
+                    <button key={x} className="flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] font-medium bg-otherColor/5 hover:text-otherColor duration-[0.5s] hover:bg-otherColor/5 overflow-clip " onClick={()=>{
                      navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${serverId}/${channelId[x]}`)
                      setchatBoxDisplay("flex")
                      setserverListDisplay("hidden")
@@ -101,11 +89,6 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
         <div className="w-[100%] h-[100%] fixed top-[0px] left-0 bg-primaryColor z-[10]">
           <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
             <div className="flex">
-              <div className="mt-[10px] ml-[10px]">
-                <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-                  <img src="/github-mark-white.svg" className="h-[50%] "/>
-                </a>
-              </div>
               <div>
                 <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
                   setdisplayCreateChannelBox(false)

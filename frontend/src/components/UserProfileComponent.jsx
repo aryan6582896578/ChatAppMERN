@@ -5,20 +5,23 @@ import { SettingComponent } from "./SettingComponent";
 export function UserProfileComponent() {
   const navigate = useNavigate();
   
-  const[userProfileInfo,setuserProfileInfo] = useState({username:"someshitisseriouslywrong",userprofileurl:null})
+  const[userProfileInfo,setuserProfileInfo] = useState({username:null,userprofileurl:null})
   const[settingDisplay,setsettingDisplay]=useState(false)
 
   async function getUserData() {
-    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`, {
         withCredentials: true,
       })
-      setuserProfileInfo({...userProfileInfo, username:userData.data.username,userprofileurl: userData.data.userprofileurl})
+      
+    setuserProfileInfo({...userProfileInfo, username:userData.data.username,userprofileurl: userData.data.userprofileurl})
   }
   useEffect(() => {
     
-    getUserData()
+    if(userProfileInfo.username===null){
+          getUserData();
+    }
     
-  }, [setsettingDisplay,settingDisplay])
+  }, [])
  
     return (
       <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor hidden sm:flex border-solid border-t-[1px] border-secondaryColor relative">

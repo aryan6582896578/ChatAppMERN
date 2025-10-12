@@ -131,4 +131,12 @@ async function getUserData(username) {
     
 }
 
-export {getUserData,getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}
+async function getServerPermission(serverId) {
+    const serverPermission= await serverDataModel.findOne({serverId:serverId})
+    return serverPermission
+}
+async function updateServerPermission(serverId,) {
+    
+}
+
+export {getServerPermission,getUserData,getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}

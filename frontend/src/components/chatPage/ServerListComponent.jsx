@@ -36,13 +36,13 @@ export function ServerListComponent() {
   async function postCreateServer(){
     if(createServerData.serverName){
       try {
-        const createServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/createServer`,createServerData,{
+        const createServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/createServer`,createServerData,{
           withCredentials: true
         })
         if(createServer.data.status==="CreatedServer"){
           setserverCreateBoxDisplay(false);
           setcreateServerData("")
-          await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${createServer.data.serverId}`);
+          await navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${createServer.data.serverId}`);
         }        
       } catch (error) {
         console.log(error,"error post create server");
@@ -88,7 +88,7 @@ export function ServerListComponent() {
 
       <div className="flex">
         <button onClick={() => {
-            navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
+            navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`);
           }}
           className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-pointer hover:bg-otherColor  ml-auto mr-auto rounded-[10%] duration-500"
         />
@@ -98,9 +98,9 @@ export function ServerListComponent() {
         {serverList?.map((server, index) => (
           <div key={index} className="m-auto">
             <button key={index} onClick={() => {
-                navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${server}`);
+                navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${server}`);
               }}
-              className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor duration-[0.5s]"
+              className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px] text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor/50  hover:text-otherColor/90 duration-[0.5s] cursor-pointer"
             >{index}</button>
           </div>
         ))}
@@ -108,19 +108,14 @@ export function ServerListComponent() {
         <button onClick={() => {
             setserverBoxDisplay(true);
           }}
-          className="text-[20px] bg-secondaryColor bg-opacity-30 border-transparent border-solid border-[2px] text-otherColor w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor  hover:text-otherColor duration-[0.5s] ">
+          className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px] text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-otherColor/50  hover:text-otherColor/90 duration-[0.5s] cursor-pointer ">
           +
         </button>
 
-        {/* <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">     
-        <button className="flex ml-auto mr-auto hover:bg-black rounded-[100px] border-solid border-transparent border-[1px] hover:border-black" >
-          <img src="/github-mark-white.svg" className="max-h-[40px] " />
-        </button>
-        </a> */}
       </div>
 
       {serverBoxDisplay?<ServerBoxDisplay  setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setserverJoinBoxDisplay={setserverJoinBoxDisplay} username={username}/>:"" }
-      {serverCreateBoxDisplay ? <ServerCreateBoxDisplay setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setcreateServerData={setcreateServerData} createServerData={createServerData} postCreateServer={postCreateServer} createServerError={createServerError} disableServerCreateButton={disableServerCreateButton} setdisableServerCreateButton={setdisableServerCreateButton}/> :"" }
+      {serverCreateBoxDisplay ? <ServerCreateBoxDisplay setserverBoxDisplay={setserverBoxDisplay} setserverCreateBoxDisplay={setserverCreateBoxDisplay} setcreateServerData={setcreateServerData} createServerData={createServerData} postCreateServer={postCreateServer} createServerError={createServerError} disableServerCreateButton={disableServerCreateButton} setdisableServerCreateButton={setdisableServerCreateButton} username={username}/> :"" }
       {serverJoinBoxDisplay ?<ServerJoinBoxDisplay setserverJoinBoxDisplay={setserverJoinBoxDisplay} setserverBoxDisplay={setserverBoxDisplay} setjoinServerData={setjoinServerData}  joinServerData={joinServerData} serverJoinError={serverJoinError} postJoinServer={postJoinServer}/>:""}
     </div>  
   );
@@ -129,14 +124,14 @@ export function ServerListComponent() {
 function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setserverJoinBoxDisplay,username}){
 
     return(
-        <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
+        <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] ">
 
-          <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+          <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor/80 border-b-[1px]">
             <div className="flex">
               <div className="mt-[10px] ml-[10px]">
               </div>
               <div>
-                <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+                <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-red-600 duration-[0.5s] cursor-pointer" onClick={() => {
                   setserverBoxDisplay(false);
                 }}/>
               </div>
@@ -153,13 +148,13 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
 
             <div className=" flex flex-col h-[100%]">
               <div className="ml-auto mr-auto mt-[50px]">
-                <button className=" bg-textColor text-white w-[200px] h-[45px] rounded-[10px] duration-[0.5s] text-[20px] font-semibold hover:bg-opacity-[60%]" onClick={()=>{ 
+                <button className=" bg-textColor/90 text-otherColor w-[200px] h-[45px] rounded-[10px] duration-[0.5s] text-[20px] font-semibold hover:bg-textColor/70 cursor-pointer hover:text-otherColor/80" onClick={()=>{ 
                   setserverBoxDisplay(false) ,
                   setserverCreateBoxDisplay(true)
                   }}>Create Server</button>
               </div>
               <div className=" ml-auto mr-auto mt-[40px]">
-                  <button className=" bg-textColor text-white w-[200px] h-[45px] rounded-[10px] duration-[0.5s] text-[20px] font-semibold hover:bg-opacity-[60%]" onClick={()=>{
+                  <button className=" bg-textColor/90 text-otherColor w-[200px] h-[45px] rounded-[10px] duration-[0.5s] text-[20px] font-semibold hover:bg-textColor/70 cursor-pointer hover:text-otherColor/80" onClick={()=>{
                   setserverBoxDisplay(false) ,
                   setserverJoinBoxDisplay(true)
                 }} >Join Server</button>
@@ -170,19 +165,14 @@ function ServerBoxDisplay({setserverBoxDisplay ,setserverCreateBoxDisplay ,setse
     )
 }
 
-function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer,createServerError,disableServerCreateButton,setdisableServerCreateButton}){
+function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,setcreateServerData ,createServerData ,postCreateServer,createServerError,disableServerCreateButton,setdisableServerCreateButton,username}){
 
   return(
-      <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
-        <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+      <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] ">
+        <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor/80 border-b-[1px]">
           <div className="flex">
-            <div className="mt-[10px] ml-[10px]">
-              <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-                <img src="/github-mark-white.svg" className="h-[50%] "/>
-              </a>
-            </div>
             <div>
-              <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+              <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-red-600 cursor-pointer duration-[0.5s]" onClick={() => {
                 setserverCreateBoxDisplay(false);
               }}/>
             </div>
@@ -199,18 +189,18 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
                 {createServerError}
               </div>
               <input onChange={(e) => { setcreateServerData({...createServerData,serverName:e.target.value});}}
-                type="text" maxLength={15} className="bg-textColor w-[90%] bg-opacity-[50%] rounded-[10px] h-[50px] outline-none  text-otherColor p-[10px] text-[20px] font-semibold ml-auto mr-auto" placeholder="server name"
+                type="text" maxLength={15} className="bg-textColor/50 w-[90%]  rounded-[10px] h-[50px] outline-none  text-otherColor/90 p-[10px] text-[20px] font-semibold ml-auto mr-auto" placeholder={`${username}'s server`}
               />
             </div>
           </div>
 
           <div className="h-[100%] mt-[20px] text-otherColor text-[18px] w-[90%] ml-auto mr-auto relative">
-            <button className={`w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-text3Color hover:border-text3Color duration-[0.5s] font-medium ${disableServerCreateButton}`} onClick={()=>{
+            <button className={`w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-600 cursor-pointer duration-[0.5s] font-medium ${disableServerCreateButton}`} onClick={()=>{
               setdisableServerCreateButton("disabled")
                 setserverCreateBoxDisplay(false)
                 setserverBoxDisplay(true)
             }}>Go back</button>
-            <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium absolute end-0" onClick={()=>{
+            <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-textColor/80 cursor-pointer  duration-[0.5s] font-medium absolute end-0" onClick={()=>{
                 postCreateServer()
               }}>Create Server</button>
           </div>
@@ -223,16 +213,11 @@ function ServerCreateBoxDisplay({setserverBoxDisplay,setserverCreateBoxDisplay ,
 
 function ServerJoinBoxDisplay({setserverJoinBoxDisplay,setserverBoxDisplay ,setjoinServerData,joinServerData ,serverJoinError,postJoinServer}){
   return(
-    <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px] bg-opacity-[99%]">
-      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
+    <div className="fixed w-[100%] h-[100%] bg-primaryColor top-[0px]">
+      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor/80 border-b-[1px]">
         <div className="flex">
-          <div className="mt-[10px] ml-[10px]">
-            <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-              <img src="/github-mark-white.svg" className="h-[50%] "/>
-            </a>
-          </div>
           <div>
-            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
+            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-red-600 cursor-pointer duration-[0.5s]" onClick={() => {
             setserverJoinBoxDisplay(false);
             }}/>
           </div>
@@ -249,15 +234,15 @@ function ServerJoinBoxDisplay({setserverJoinBoxDisplay,setserverBoxDisplay ,setj
               {serverJoinError}
             </div>
             <input onChange={(e) => {setjoinServerData({...joinServerData,serverInviteCode:e.target.value});}}
-              type="text" className="bg-textColor w-[90%] bg-opacity-[50%] rounded-[10px] h-[50px] outline-none  text-otherColor p-[10px] text-[20px] font-semibold ml-auto mr-auto" placeholder="Invite Code" maxLength={8}
+              type="text" className="bg-textColor/50 w-[90%] rounded-[10px] h-[50px] outline-none  text-otherColor p-[10px] text-[20px] font-semibold ml-auto mr-auto" placeholder="Invite Code" maxLength={8}
             />
             
             <div className="flex w-[90%] ml-auto mr-auto mt-[20px] relative">
-              <button className="w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-text3Color hover:border-text3Color duration-[0.5s] font-medium" onClick={()=>(
+              <button className="w-[150px] h-[40px] p-[auto]  bg-red-500 rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-600 cursor-pointer duration-[0.5s] font-medium" onClick={()=>(
                 setserverJoinBoxDisplay(false),
                 setserverBoxDisplay(true)
               )}>Go back</button>
-              <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor duration-[0.5s] font-medium absolute end-0" onClick={()=>{
+              <button className="w-[150px] h-[40px] p-[auto]  bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-textColor/80 cursor-pointer duration-[0.5s] font-medium absolute end-0" onClick={()=>{
                 postJoinServer()
               }}>Join Server</button>
             </div>

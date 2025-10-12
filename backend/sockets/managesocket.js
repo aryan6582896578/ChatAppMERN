@@ -34,7 +34,12 @@ export default async function runsocket(io) {
   });
 
   io.on("connection", (socket) => {
+
     if(socket.validUser){
+      // socket.emit("hello", "world");
+      socket.on("hello", (arg) => {
+    console.log(arg,"manage socket read it"); // world
+  });
       console.log(`${socket.username} is online`)
       socket.join(`${socket.serverId}/${socket.channelId}`)
       socket.on(`${socket.serverId}/${socket.channelId}`, (data) => {
@@ -48,7 +53,8 @@ export default async function runsocket(io) {
           serverId:socket.serverId,
           channelId:socket.channelId,
           username:socket.username,
-          userprofileurl:data.userprofileurl
+          userprofileurl:data
+          .userprofileurl
         }
         try {
           messageDataModel.create({

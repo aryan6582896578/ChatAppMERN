@@ -101,10 +101,9 @@ export function ChatBoxComponent() {
   }
   
   async function getUserData() {
-    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`,{
         withCredentials: true,
       });
-    //console.log(userData.data)
     setuserProfileInfo({...userProfileInfo,userprofileurl:userData.data.userprofileurl})
     const userId = userData.data.userId;
     suId(userData.data.userId)
@@ -120,7 +119,6 @@ export function ChatBoxComponent() {
       console.log(messageData)
       setdisplayMessageSocket(a=>[...a,messageData])    
     })
-    
     return () => {
       socket.disconnect();
       setdisplayMessageSocket([])
@@ -136,7 +134,7 @@ export function ChatBoxComponent() {
           
           {displayMessageDb?.map((data,x)=>{
                 return( 
-                  <div key={x} className="m-[5px] hover:bg-otherColor hover:bg-opacity-[5%] p-[5px] rounded-[5px] cursor-pointer" >
+                  <div key={x} className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer" >
                                 
                     <div className="font-medium text-[20px]" >{displayMessageDb[x].username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{displayMessageDb[x].displayDate}</span></div>
                     <div className="text-otherColor text-opacity-[80%] break-before-column">{displayMessageDb[x].message}</div>
@@ -147,7 +145,7 @@ export function ChatBoxComponent() {
           
            {displayMessageSocket?.map((data,x)=>{
                 return(
-                  <div key={x} className="m-[5px] hover:bg-otherColor hover:bg-opacity-[5%] p-[5px] rounded-[5px] cursor-pointer ">
+                  <div key={x} className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer ">
  
                     {/* <div className="font-medium text-[20px] flex" >
                        <img src={data.userprofileurl} className="w-[40px] h-[40px] rounded-[100%] mr-[10px] " alt="pfp"/>
@@ -160,9 +158,9 @@ export function ChatBoxComponent() {
                       </div>
                       <div className="w-[100%]">
                         <div className="font-medium text-[20px] flex ml-[5px]" >
-                          {data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px] mt-[10px]">{data.date}</span>
+                          {data.username}<span className="text-otherColor/50 font-normal text-[10px]  ml-[10px] mt-[10px]">{data.date}</span>
                         </div>
-                        <div className="text-otherColor text-opacity-[80%] mt-[5px]">{data.message}</div>
+                        <div className="text-otherColor mt-[5px]">{data.message}</div>
                       </div>
                     </div>
                     
@@ -175,7 +173,7 @@ export function ChatBoxComponent() {
         </div>
 
         <div className="min-h-[55px] overflow-hidden bg-primaryColor flex">
-        <div contentEditable className="bg-otherColor w-[100%] h-[70%] ml-[10px] mt-auto mb-auto rounded-[5px] bg-opacity-[9%] outline-none p-[5px]"  onKeyDown={sendMessage} spellCheck={true}  onInput={(e) => {
+        <div contentEditable className="w-[100%] h-[70%] ml-[10px] mt-auto mb-auto rounded-[5px] bg-otherColor/9 outline-none p-[5px]"  onKeyDown={sendMessage} spellCheck={true}  onInput={(e) => {
                     setmessageData(e.target.innerText);         
               }}/>
         {scrollDown?<button className=" bg-purple-500 h-[70%] mt-auto mb-auto w-[5px] rounded-[10px] hover:bg-purple-600 mr-[5px] ml-[5px]" onClick={scrollBottom}/>:""}  

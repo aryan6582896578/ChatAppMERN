@@ -8,13 +8,13 @@ export default function AuthCheckMain() {
   const [userStatus, setuserStatus] = useState(false);
 
   async function verifyUser(){
-    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`, {
       withCredentials: true,
     })
     if(userData.data.status === "userValid"){
       setuserStatus(true);
     }else{
-      navigate(`/${import.meta.env.VITE_VERSION}/login`);
+      navigate(`/${import.meta.env.VITE_VERSION_LIVE}/login`);
     }
   }
 

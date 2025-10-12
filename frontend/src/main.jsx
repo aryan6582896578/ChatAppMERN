@@ -1,7 +1,6 @@
 import { createRoot, ReactDOM } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./index.css";
-import App from "./App.jsx";
 import LoginPage from "./components/Auth/LoginPage.jsx";
 import RegisterPage from "./components/Auth/RegisterPage.jsx";
 import ChatPage from "./components/chatPage.jsx";
@@ -10,6 +9,7 @@ import AuthCheckMain from "./components/Auth/authCheckMain.jsx";
 import AuthCheckRoute from "./components/Auth/authCheckRoute.jsx";
 import ErrorPage from "./components/errorPage.jsx";
 import MainChatPage from "./components/MainChatPage.jsx";
+import HomePage from "./components/HomePage.jsx";
 
 
 let container = null;
@@ -21,15 +21,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
       <BrowserRouter>
         <Routes>
 
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="*" element={<ErrorPage />} />
 
-          <Route path={`${import.meta.env.VITE_VERSION}`} element={<AuthCheckPre />}>
+          <Route path={`${import.meta.env.VITE_VERSION_LIVE}`} element={<AuthCheckPre />}>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
           </Route>
 
-          <Route path={`${import.meta.env.VITE_VERSION}/@me`} element={<AuthCheckMain />}>
+          <Route path={`${import.meta.env.VITE_VERSION_LIVE}/@me`} element={<AuthCheckMain />}>
             <Route path="chat" element={<ChatPage />} />
             <Route path="chat/:serverId/" element={<AuthCheckRoute/>} >
              <Route path=":channelId?" element={<MainChatPage />} />
@@ -41,22 +41,3 @@ document.addEventListener("DOMContentLoaded", function (event) {
     );
   }
 });
-
-// const root = document.getElementById("root");
-// createRoot(root).render(
-//   <BrowserRouter>
-
-//     <Routes>
-//           <Route path="/" element={<App />} />
-//           <Route path={`${import.meta.env.VITE_VERSION}`} element={<AuthCheckPre />}>
-//                 <Route path="login" element={<LoginPage />} />
-//                 <Route path="register" element={<RegisterPage />} />
-//           </Route>
-//           <Route path={`${import.meta.env.VITE_VERSION}/me`}element={<AuthCheckMain />}>
-//                 <Route path="chat" element={<ChatPage />} />
-//           </Route>
-//           <Route path="*" element={<ErrorPage />} />
-
-//     </Routes>
-//     </BrowserRouter>
-// )

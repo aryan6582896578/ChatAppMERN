@@ -9,9 +9,6 @@ export default function ServerError(){
                     <div className={`min-h-[70%] mb-auto mt-auto min-w-[5px] bg-textColor ml-[5px] rounded-[10%]`}></div>
                     <div className="text-[25px] font-medium mt-auto mb-auto ml-[10px] hover:text-textColor">{`${import.meta.env.VITE_NAME}`}</div>
                 </div>
-                <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-                    <img src="/github-mark-white.svg" className="h-[70%] end-[10px] top-[10px] absolute"/>
-                </a>
             </div>
             <div className="mt-[180px] sm:mt-[150px]">
                 <div className="text-center text-[20px] font-medium opacity-[90%] sm:text-[30px] select-none">We Are Checking</div>

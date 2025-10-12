@@ -1,176 +1,208 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { data, Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
+import { socket } from "../managesocket";
 export function ServerSettingComponent() {
   const navigate = useNavigate();
   const parms = useParams();
-  const [serverData, setserverData] = useState("Loading...");
-  const [serverSettingBoxDisplay, setserverSettingBoxDisplay] = useState(false);
-  const [serverSettingInviteBoxDisplay, setserverSettingInviteBoxDisplay] =useState(false);
+  const [serverInfo, setserverInfo] = useState({serverName:"Loading...",serverInviteCode:false});
+  const [serverSettingDisplay, setserverSettingDisplay] = useState(false);
   const [ adminCheck , setadminCheck] = useState(false)
 
-  const [inviteCode, setinviteCode] = useState(false);
-  const [inviteCodeStatus,setinviteCodeStatus]= useState("Copy Code");
   async function createServerInvite() {
       const getInviteCode = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/inviteCode/${parms.serverId}`,{
           withCredentials: true,
         })
         if(getInviteCode.data.status==="created"){
-          setinviteCode(getInviteCode.data.inviteCode) 
+          setserverInfo({...serverInfo,serverInviteCode:getInviteCode.data.inviteCode}) 
         }else if(getInviteCode.data.status==="notAdmin" || getInviteCode.data.status==="invalidData" ){
-          setserverSettingBoxDisplay(false)
-          setserverSettingInviteBoxDisplay(false)
+          setserverSettingDisplay(false)
         }     
   }
-  async function checkAdmin(){
-     const adminStatus = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/serverAdmin/${parms.serverId}`,{
+
+  async function getServerData() {
+    const serverData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/serverInfo`,{
         withCredentials: true,
     })
     
-    if(adminStatus.data.adminStatus===true){
+    if(serverData.data.serverName){
+      console.log(serverData.data.serverName)
+      setserverInfo({...serverInfo,serverName:serverData.data.serverName})
+    }
+    if(serverData.data.adminStatus===true){
       setadminCheck(true)
-      return true
-    }else{
-      setadminCheck(false)
-      return false
     }
+
+  }
+  function getJwtCookie(){  
+      const cookie = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
+      if(cookie){
+        return cookie[1]
+      }
   }
 
-  function getServerData() {
-    axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/getServerData/${parms.serverId}`,{
-        withCredentials: true,
-    }).then((data) => {
-
-        setserverData(data.data.serverData.name);
-      }).catch(function (error) {
-        console.log(error);
-      });
+  function setSocketData(){
+      const jwtToken = getJwtCookie()
+      const serverId = parms.serverId
+      const channelId = parms.channelId
+      socket.auth = {jwtToken,serverId,channelId}
   }
+
+  const[updateFromServer,setupdateFromServer]=useState("");
   useEffect(() => {
-    createServerInvite()
-    checkAdmin()
     getServerData();
-    setserverSettingBoxDisplay(false);
-    setserverSettingInviteBoxDisplay(false);
+    setserverSettingDisplay(false);
+    setSocketData();
+    socket.connect();
+    socket.on(`${parms.serverId}`, (data) => {
+      console.log(data);
+      setupdateFromServer(data)
+    });
     return ()=>{
-      setinviteCodeStatus("Copy Code")
+      getServerData();
+      socket.disconnect();
     }
-  },[parms.serverId,parms.channelId]);
+  },[parms.serverId,updateFromServer]);
   
-  document.title =`${serverData} | ${import.meta.env.VITE_NAME}`
+  document.title =`${serverInfo.serverName} | ${import.meta.env.VITE_NAME}`
   return (
     <div className="sm:w-[250px] h-[45px] bg-primaryColor relative flex overflow-hidden flex-col ">
       <div className="text-[20px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer duration-[0.5s]">
-        {serverData}
+        {serverInfo.serverName}
       </div>
-          {adminCheck? <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor hover:bg-text3Color rounded-[10%]  hover:cursor-pointer duration-[0.5s]`}onClick={() => {
-          setserverSettingBoxDisplay(true);
-        }}
-      />: <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor hover:bg-otherColor hover:bg-opacity-[50%] rounded-[10%] hover:cursor-pointer duration-[0.5s]`}
-      />}
-      {serverSettingBoxDisplay ? (<ServerSettingBoxDisplay setserverSettingBoxDisplay={setserverSettingBoxDisplay} setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} createServerInvite={createServerInvite}/>) : ("")}
-      {serverSettingInviteBoxDisplay ? (<ServerSettingInviteBoxDisplay setserverSettingInviteBoxDisplay={setserverSettingInviteBoxDisplay} inviteCode={inviteCode} inviteCodeStatus={inviteCodeStatus} setinviteCodeStatus={setinviteCodeStatus}/>) : ("")}
+      <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor  ${adminCheck?"hover:bg-red-500":"hover:bg-otherColor hover:bg-opacity-[50%]"}  rounded-[10%] hover:cursor-pointer duration-[0.5s]`} onClick={()=>{
+        {adminCheck?setserverSettingDisplay(true):""}
+      }}/>
+      {serverSettingDisplay ? (<ServerSettingDisplay setserverSettingDisplay={setserverSettingDisplay} createServerInvite={createServerInvite} serverInfo={serverInfo} />) : ("")}
+      
     </div>
   );
 }
 
-function ServerSettingBoxDisplay({setserverSettingBoxDisplay,setserverSettingInviteBoxDisplay,createServerInvite}) {
+function ServerSettingDisplay({setserverSettingDisplay,createServerInvite,serverInfo}) {
+  const [serverProfileDisplay,setserverProfileDisplay]=useState({display:true})
+  const [inviteCodeDisplay,setinviteCodeDisplay]=useState({display:false})
+
   return (
     <div className="fixed w-[100%] h-screen bg-primaryColor top-[0px] bg-opacity-[99%] z-[1000] end-0">
-      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
-        <div className="flex">
-          <div className="mt-[10px] ml-[10px]">
-            <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-              <img src="/github-mark-white.svg" className="h-[50%] "/>
-            </a>
+      
+      <div className="bg-primaryColor h-[70px] w-[100%] flex border-b-[1px] border-b-otherColor border-opacity-[70%]">
+        <div className="flex w-[100%] ">
+          <div className="font-bold w-[100%] text-[30px] mt-auto mb-auto justify-center flex ">
+            <span className="opacity-[80%] hover:opacity-[100%] hover:cursor-pointer ">{serverInfo.serverName}'s Server</span>
+            
           </div>
-          <div>
-            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
-              setserverSettingBoxDisplay(false);
-              }}/>
-          </div>
+          <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-600 rounded-[10px] hover:bg-textColor duration-[0.4s]" onClick={() => {
+            setserverSettingDisplay(false);
+          }}/>    
         </div>   
       </div>
-          <div className="flex h-[100%] w-[100%] flex-col md:w-[400px] md:ml-auto md:mr-auto">
-
-           <div className="text-[35px] overflow-hidden break-words h-[fit]">
-            <div className="text-otherColor font-bold text-center">
-              Invite Code
-            </div>
-           </div>
-
-            <div className=" flex flex-col h-[100%]">
-              <div className="ml-auto mr-auto mt-[10px]">
-                <button
-                  className="w-[150px] h-fit p-[10px] mb-[20px] bg-textColor rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-20 hover:border-textColor transition-[1s]"
-                  onClick={() => {
-                    setserverSettingBoxDisplay(false),
-                      setserverSettingInviteBoxDisplay(true);
-                      createServerInvite()
-                  }}>
-                  Invite Code
-                </button>
-              </div>
-
-            </div>
-          </div>
-    </div>
-  );
-}
-
-function ServerSettingInviteBoxDisplay({ setserverSettingInviteBoxDisplay ,inviteCode ,inviteCodeStatus,setinviteCodeStatus}) {
-  const [color,setcolor]=useState("textColor")
-  const [opacity,setopacity]=useState("")
-  const [ border,setborder]=useState("textColor")
-  return (
-    <div className="fixed w-[100%] h-screen bg-primaryColor top-[0px] bg-opacity-[99%] z-[1000] end-0">
-      <div className="bg-secondaryColor h-[70px] w-[100%]  border-b-otherColor border-opacity-[80%] border-b-[1px]">
-        <div className="flex">
-          <div className="mt-[10px] ml-[10px]">
-            <a href="https://github.com/aryan6582896578/ChatAppMERN" target="_blank">
-              <img src="/github-mark-white.svg" className="h-[50%] "/>
-            </a>
-          </div>
-          <div>
-            <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-500 rounded-[10px] hover:bg-text3Color duration-[0.5s]" onClick={() => {
-              setserverSettingInviteBoxDisplay(false);
-              }}/>
-          </div>
-        </div>   
-      </div>
-           <div className="text-[35px] overflow-hidden break-words h-[fit]">
-            <div className="text-otherColor font-bold text-center">
-              Invite Code
-            </div>
-           </div>
-        <div className="flex justify-evenly ">
-            <div className="w-[90%] rounded-[10px] h-[40px] bg-textColor bg-opacity-40 text-otherColor font-semibold text-[20px] text-center mb-[20px] p-[5px]">{inviteCode}</div>
+      
+      <div className="bg-black flex w-[100%] h-[100%]">
+        <div className="bg-primaryColor w-[10%] h-[100%] flex flex-col pt-[20px]">
+          <button className={` ml-auto mr-auto p-[5px] pr-[15px] rounded-[3px] font-bold pl-[15px] text-[15px] mb-[5px] ${serverProfileDisplay.display?"bg-secondaryColor":""}`} onClick={()=>{
+            setserverProfileDisplay({...serverProfileDisplay,display:true})
+            setinviteCodeDisplay({...inviteCodeDisplay,display:false})
+          }}>Server Profile
+          </button>
+          <button className={` ml-auto mr-auto p-[5px] pr-[15px] rounded-[3px] font-bold pl-[15px] text-[15px] mb-[5px] ${inviteCodeDisplay.display?"bg-secondaryColor":""}`} onClick={()=>{
+            setserverProfileDisplay({...serverProfileDisplay,display:false})
+            setinviteCodeDisplay({...inviteCodeDisplay,display:true})
+            {serverInfo.serverInviteCode?"":createServerInvite()}   
+          }}>
+            Invite Codes
+          </button>
         </div>
-      <div className="flex justify-evenly text-[20px]">
-        <button
-          className={`w-[150px] h-fit p-[10px] mb-[20px] bg-text3Color rounded-[10px] border-solid border-[3px] border-transparent hover:bg-red-500 transition-[1s]`}
-          onClick={() => {
-            setserverSettingInviteBoxDisplay(false);
-          }}
-        >
-          Cancel
-        </button>
-        <button
-          className={`w-[150px] h-fit p-[10px] mb-[20px] bg-${color} ${opacity} rounded-[10px] border-solid border-[3px] border-transparent hover:bg-opacity-50 hover:border-${border} transition-[1s]`}
-          onClick={() => {
-            navigator.clipboard.writeText(inviteCode)
-            setserverSettingInviteBoxDisplay(true);
-            setcolor("otherColor")
-            setopacity("bg-opacity-50")
-            setborder("transparent")
-            setinviteCodeStatus("Copied")
-          }}
-        >
-          {inviteCodeStatus}
-        </button>
+        <div className=" w-[90%] bg-secondaryColor flex flex-col">
+          <div className="h-[100%]">
+            
+          {serverProfileDisplay.display?<ServerProfileSSC serverInfo={serverInfo} setserverSettingDisplay={setserverSettingDisplay}/>:""} 
+          {inviteCodeDisplay.display?<InviteCodeSSC serverInfo={serverInfo}/>:""}
+          </div>
+        </div>
+
       </div>
+      
+
     </div>
   );
 }
+
+function ServerProfileSSC({serverInfo,setserverSettingDisplay}){
+  const [serverNameChange,setserverNameChange]=useState(false)
+  const[serverName,setServerName]=useState(serverInfo.serverName);
+  const sendUpdatedName = {"name":serverName}
+  const parms = useParams();
+  const[loading,setloading]=useState(false)
+    async function updateServer(){
+    const updateServerName = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/updateServerName/${parms.serverId}`,sendUpdatedName,{
+          withCredentials: true,
+        })
+    if(updateServerName.status==="updated"){
+      setServerName(updateServerName.name)
+      setserverNameChange(false)
+    }else{
+      setserverSettingDisplay(false)
+    }
+    }
+  return(
+    <div className="w-[100%] h-[100%]">
+      <div className="m-[20px]">
+      <input className="rounded-[3px] bg-primaryColor w-[200px] h-[30px] p-[5px] text-otherColor font-medium outline-none hover:cursor-pointer" disabled={loading?true:false}  defaultValue={serverName} onChange={(e)=>{
+        setServerName(e.target.value)
+        setserverNameChange(true)
+      }}/>
+      <button className={`ml-[5px] w-[100px] font-medium ${serverNameChange?"bg-red-500":"bg-textColor"} h-[30px] rounded-[3px] `} onClick={()=>{
+        setloading(true)
+        updateServer()
+      }}>{serverNameChange?"SAVE":"EDIT"}</button>
+      </div>
+
+    </div>
+  )
+}
+
+function InviteCodeSSC({serverInfo}){
+   const parms = useParams();
+  const[copyCode,setcopyCode]=useState(false)
+  const[saveButton,setsaveButton]=useState(false)
+  async function updateServerPermission(){
+    const updatePermission = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/updateServerPermission/${parms.serverId}/inviteCodeEveryone`,"hm cannot send without body",{
+          withCredentials: true,
+        })
+
+
+  }
+
+  return(
+    <div>
+      <div className=" flex p-[10px]">
+        <div className="bg-primaryColor text-otherColor w-[150px] rounded-[3px] text-center text-[20px] font-semibold h-[35px] hover:cursor-pointer"onClick={()=>{
+          navigator.clipboard.writeText(serverInfo.serverInviteCode)
+          setcopyCode(true)
+        }}>
+          {serverInfo.serverInviteCode}
+        </div>
+        <button className={`ml-[5px] w-[80px] font-medium  ${copyCode?"bg-otherColor bg-opacity-50":"bg-textColor"} h-[35px] rounded-[3px]`} onClick={()=>{
+          navigator.clipboard.writeText(serverInfo.serverInviteCode)
+          setcopyCode(true)
+        }}>{copyCode?"Copied":"Copy"}</button>
+        
+      </div>
+      <div className="flex p-[10px]">
+        <div className="bg-primaryColor p-[5px] rounded-[3px]">
+          @everyone to create invite code
+          <input disabled type="checkbox" className="w-[50px]" onChange={()=>{
+            setsaveButton(true)
+          }}/>
+        </div>
+        <button disabled className={`ml-[5px] w-[80px] font-medium  ${saveButton?"bg-red-500":"bg-textColor"} h-[35px] rounded-[3px]`} onClick={()=>{
+          updateServerPermission()
+        }}>Save</button>
+      </div>
+    </div>
+  )
+}
+
 
 

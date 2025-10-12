@@ -19,7 +19,8 @@ const server = mongoose.Schema({
     ownerId:{type:String},
     serverId:{type:String,required:true},
     members: [{type:Array}],
-    channels :[{type:Array}]
+    channels :[{type:Array}],
+    permissions:[{type:Array}],
 },{ timestamps: true })
 const serverDataModel = mongoose.model("serverData", server);
 
@@ -31,6 +32,7 @@ const serverChannels = mongoose.Schema({
         serverId:{type:String,required: true},
         members: [{type:Array}]
     },{ timestamps: true })
+    
 const serverChannelsDataModel = mongoose.model("serverChannelsData", serverChannels);
 
 const inviteData = mongoose.Schema({

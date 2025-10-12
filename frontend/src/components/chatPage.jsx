@@ -1,15 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import axios from "axios";
-import LoadingPage from "./loadingPage.jsx";
 import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
-import { UserProfileComponent } from "./chatPage/UserProfileComponent.jsx";
-import { SettingComponent } from "./chatPage/SettingComponent.jsx";
+import { UserProfileComponent } from "./UserProfileComponent.jsx";
+import { SettingComponent } from "./SettingComponent.jsx";
 
 export default function ChatPage() {
-  const navigate = useNavigate();
-  const [connectionStatus,setconnectionStatus] = useState(false);
-  
   const[dmListDisplay,setdmListDisplay]=useState("flex")
   const[friendListDisplay,setfriendListDisplay]=useState("hidden")
   const[notificationListDisplay,setnotificationListDisplay]=useState("hidden")
@@ -17,25 +12,8 @@ export default function ChatPage() {
   const[userSettingDisplay,setuserSettingDisplay]=useState("hidden")
   const[userSettingDisplayCheck,setuserSettingDisplayCheck]=useState(false)
 
-  async function getUserData() {
-        try {
-        const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`, {
-            withCredentials: true,
-        })
-        if(userData){
-            setconnectionStatus(true)   
-        }
-        } catch (error) {
-        console.log(error,"error get server list");
-        }
-    }
-  useEffect(() => {
-    getUserData()
-      
-  }, []);
-
-  document.title =`@me | ${import.meta.env.VITE_NAME}`
-  return (connectionStatus?
+  document.title =`Chat | ${import.meta.env.VITE_NAME}`
+  return (
     
     <div className="bg-primaryColor w-[100%] text-textColor flex flex-col overflow-hidden h-screen">
       <div className="flex min-h-[100%]">
@@ -60,14 +38,14 @@ export default function ChatPage() {
       
       <BottomBarComponent setdmListDisplay={setdmListDisplay} setfriendListDisplay={setfriendListDisplay} setnotificationListDisplay={setnotificationListDisplay} setserverListDisplay={setserverListDisplay} setuserSettingDisplay={setuserSettingDisplay} setuserSettingDisplayCheck={setuserSettingDisplayCheck}/>
 
-    </div>:<LoadingPage someError={`server offline`} redirect={"/"}/>
+    </div>
   );
 }
 
 function DmListComponent({setserverListDisplay}){
   return(
       <div className="flex overflow-hidden flex-col bg-primaryColor w-[100%] ">
-        <input className="bg-secondaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor " disabled placeholder="search (soon)"/>
+        <input className="bg-secondaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor text-otherColor/80 " disabled placeholder="search (soon)"/>
         <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px] h-[100%]"> </span>
         <UserProfileComponent setserverListDisplay={setserverListDisplay} />     
       </div>
@@ -77,7 +55,7 @@ function DmListComponent({setserverListDisplay}){
 function FriendListComponent(){
   return(
     <div className="flex w-[100%] flex-col bg-primaryColor hover:cursor-not-allowed h-[100%] border-l-secondaryColor sm:border-l-[1px]">
-      <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%] ">
+      <div className="text-[25px] ml-[10px] text-otherColor/50">
         Friends (soon)
       </div>      
     </div>
@@ -87,7 +65,7 @@ function FriendListComponent(){
 function NotificationListComponent(){
   return(
     <div className="flex w-[100%] flex-col bg-primaryColor hover:cursor-not-allowed h-[100%] border-l-secondaryColor sm:border-l-[1px] ">
-      <div className="text-[25px] ml-[10px] text-otherColor text-opacity-[50%]">
+      <div className="text-[25px] ml-[10px] text-otherColor/50">
         Notifications (soon)
       </div>   
     </div>

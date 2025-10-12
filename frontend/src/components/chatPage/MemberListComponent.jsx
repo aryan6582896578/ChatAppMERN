@@ -8,19 +8,10 @@ export function MemberListComponent({memberListSMDisplay}){
   const [membersId, setmembersId] = useState([]);
   const [membersUsername, setmembersUsername] = useState([]);
 
-    async function getUserData() {
-    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{
-        withCredentials: true,
-      });
-    
-    const userId = userData.data.userId;
-    return userId;
-  }
 
-  async function getChannelData() {
-    const userId = await getUserData();
+  async function getMemberList() {
     if(parms.channelId){
-      const channelMemberList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/channelMemberList/${ parms.serverId}/${parms.channelId}/${userId}`,{
+      const channelMemberList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${ parms.serverId}/${parms.channelId}/channelMemberList`,{
         withCredentials: true,
       });
       
@@ -32,7 +23,7 @@ export function MemberListComponent({memberListSMDisplay}){
   
   useEffect(() => {
     
-    getChannelData()
+    getMemberList()
     
   }, [parms.serverId,parms.channelId])
   

@@ -14,7 +14,7 @@ export function verifyJwt(token) {
     const verifyJwtToken = jwt.verify(token, process.env.privateKey);
     return verifyJwtToken;
   } catch (error) {
-    console.log("invalid jwt");
+    console.log("invalid jwt",token);
   }
 }
 

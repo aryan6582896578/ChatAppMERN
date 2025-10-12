@@ -10,16 +10,15 @@ export default function AuthCheckPre() {
 
   async function verifyUser() {
     try {
-      const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/verify`,{
+      const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`,{
           withCredentials: true,
         });
       if(userData){
         setserverStatus(true);
       }
       if (userData.data.status === "userValid") {
-        
         setuserStatus(true);
-        navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`);
+        navigate(`/${import.meta.env.VITE_SERVERURL}/@me/chat`);
       }
     } catch (error) {
       console.log("Server Error");
