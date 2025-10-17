@@ -4,6 +4,6 @@ import user from "./v2/user.js"
 export function routesv2(app,socket,upload){
 
     app.use('/v2/@me',user(app,socket,upload))
-    app.use('/v2',auth(app))
-    app.use('/v2/s',serverV2(app))
+    app.use('/v2',auth(app,socket,upload))
+    app.use('/v2/s',serverV2(app,socket,upload))
 }

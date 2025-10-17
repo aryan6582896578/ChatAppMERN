@@ -1,15 +1,15 @@
-import { UserProfileComponent } from "./UserProfileComponent.jsx";
-import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
-import { MemberListComponent } from "./chatPage/MemberListComponent.jsx";
-import { ServerSettingComponent } from "./chatPage/ServerSettingComponent.jsx";
-import { ChatBoxComponent } from "./chatPage/ChatBoxComponent.jsx";
+import { UserProfileComponent } from "../userComponents/UserProfileComponent.jsx";
+import { ServerListComponent } from "../userComponents/ServerListComponent.jsx";
+import { MemberListComponent } from "./MemberListComponent.jsx";
+import { ServerSettingComponent } from "./ServerSettingComponent.jsx";
+import { ChatBoxComponent } from "./ChatBoxComponent.jsx";
 import { useParams ,useNavigate  } from "react-router";
-import ChannelListComponent from "./chatPage/ChannelListComponent.jsx";
+import ChannelListComponent from "./ChannelListComponent.jsx";
 import { useEffect, useState } from "react";
-import { NoChannelComponent } from "./chatPage/NoChannelComponent.jsx";
+import { NoChannelComponent } from "../otherComponents/NoChannelComponent.jsx";
 import axios from "axios";
-import ChannelHeadComponent from "./chatPage/ChannelHeadComponent.jsx";
-import { SettingComponent } from "./SettingComponent.jsx";
+import ChannelHeadComponent from "./ChannelHeadComponent.jsx";
+import { SettingComponent } from "../userComponents/SettingComponent.jsx";
 export default function MainChatPage() {
 
   const [channelCheck,setchannelCheck]=useState(false)

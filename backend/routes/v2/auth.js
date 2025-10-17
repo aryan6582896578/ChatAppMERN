@@ -3,9 +3,9 @@ import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../d
 import { getUserData } from "../../database/managedata.js";
 import { serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
-export const router = express.Router({ mergeParams: true })
+const router = express.Router({ mergeParams: true })
 
-export default function auth(){
+export default function auth(app,socket,upload){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt);
@@ -156,7 +156,7 @@ export default function auth(){
 //   }
 
   
-  
+  return router
 }
 
 

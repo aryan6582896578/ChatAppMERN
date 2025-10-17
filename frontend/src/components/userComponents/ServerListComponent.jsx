@@ -20,7 +20,7 @@ export function ServerListComponent() {
 
   async function getUserData() {
     try {
-      const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/userDataSeverList`, {
+      const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/serverList`, {
         withCredentials: true,
       })
       if(userData){
@@ -55,7 +55,7 @@ export function ServerListComponent() {
   async function postJoinServer(){
     if(joinServerData.serverInviteCode){
       try {
-        const joinServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/joinServer`,joinServerData,{
+        const joinServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/joinServer`,joinServerData,{
         withCredentials: true
       })
       if(joinServer.data.status==="alreadyJoined"){

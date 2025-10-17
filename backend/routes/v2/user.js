@@ -1,11 +1,11 @@
 import express from "express";
 import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../database/managedata/authData.js";
-import { getUserData } from "../../database/managedata.js";
-import { serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
+import { getUserData, userDataSeverList } from "../../database/managedata.js";
+import { inviteDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
-export const router = express.Router({ mergeParams: true })
+const router = express.Router({ mergeParams: true })
 
-export default function user(){
+export default function user(app,socket,upload){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt);
@@ -91,7 +91,60 @@ export default function user(){
       }
     }
   });
-  
+  router.get("/serverList", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      const userDataSevers = await userDataSeverList(req.username);
+      res.json({ serverList: userDataSevers , username:req.username});
+    }
+  });
+router.post("/joinServer", checkJwt, async (req, res) => {
+    if (req.validUser) {
+      const serverInviteCodeJoin = req.body.serverInviteCode;
+      try {
+        const serverInviteCode = await inviteDataModel.findOne({
+          inviteCode: `${serverInviteCodeJoin}`,
+        });
+        if (serverInviteCode) {
+          const getUserid = req.userId;
+
+          const userInServerCheck = await userDataModel.findOne({
+            userid: `${getUserid}`,
+          });
+
+          if (userInServerCheck.servers.includes(serverInviteCode.serverId)) {
+            res.json({
+              status: "alreadyJoined",
+              serverId: `${serverInviteCode.serverId}`,
+            });
+          } else {
+            const channelList = await serverDataModel.findOne({
+              serverId: serverInviteCode.serverId,
+            });
+            await userDataModel.findOneAndUpdate(
+              { userid: `${getUserid}` },
+              { $push: { servers: `${serverInviteCode.serverId}` } }
+            );
+            await serverDataModel.findOneAndUpdate(
+              { serverId: `${serverInviteCode.serverId}` },
+              { $push: { members: `${getUserid}` } }
+            );
+            const channelListId = channelList.channels;
+            channelListId.map(async (x) => {
+              await serverChannelsDataModel.findOneAndUpdate(
+                { channelId: `${x}` },
+                { $push: { members: `${getUserid}` } }
+              );
+            });
+            res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
+          }
+        } else {
+          res.json({ status: "invalidCode" });
+        }
+      } catch (error) {
+        console.log(error, "error in joining server ");
+      }
+    }
+  });
   return router
 }
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useEffectEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 export default function ChannelListComponent({setchatBoxDisplay,setserverListDisplay,setchannelListDisplay,setbottomBarDisplay}){
@@ -14,14 +14,14 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
 
     async function postCreateChannel(){
       if(createChannelName){
-        const createServerChannel = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/createChannel/${parms.serverId}`,createChannelName,{
+        const createServerChannel = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/createChannel`,createChannelName,{
         withCredentials: true
       })
       if(createServerChannel.data.status==="channelCreated"){
         setdisplayCreateChannelBox(false)
-        navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${serverId}/${createServerChannel.data.channelId}`)
+        navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${serverId}/${createServerChannel.data.channelId}`)
       }else if(createServerChannel.data.status==="invalidUser" || createServerChannel.data.status==="invalidData"){
-        navigate(`/${import.meta.env.VITE_VERSION}/@me/chat`)
+        navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`)
       }
       }
     }
@@ -44,6 +44,7 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
     }
   }
     useEffect(() => {
+      setserverId(parms.serverId)
       getServerData()
       getChannelData()
       return () => {
@@ -52,10 +53,8 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
         setchannelId([])
         setchannelName([])
       }
-    }, [parms.serverId,parms.channelId])
-
-
-    
+    }, [parms.serverId])
+      
       return(
           <div className=" sm:w-[250px] h-[100%]  flex flex-col pt-[10px] relative bg-primaryColor">   
           <div className=" text-[10px] font-bold ml-[5px] flex min-h-[20px] hover:underline hover:cursor-pointer text-otherColor/60">
@@ -68,13 +67,13 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
           </div>
                 {channelName.map((channelName,x)=>{
                   return (
-                    <button key={x} className="flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] font-medium bg-otherColor/5 hover:text-otherColor duration-[0.5s] hover:bg-otherColor/5 overflow-clip " onClick={()=>{
-                     navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${serverId}/${channelId[x]}`)
+                    <button key={x} className={`flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] p-[5px] pl-0 pr-0 font-medium text-otherColor/90 ${channelId[x]===parms.channelId?"bg-otherColor/5":""} hover:text-otherColor  hover:bg-otherColor/5 overflow-clip cursor-pointer`} onClick={()=>{
+                     navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${serverId}/${channelId[x]}`)
                      setchatBoxDisplay("flex")
                      setserverListDisplay("hidden")
                      setchannelListDisplay("hidden")
                      setbottomBarDisplay(false)
-                    }}> <span className="ml-[10px] mr-[10px] text-otherColor text-opacity-[60%]">#</span>{channelName} </button>
+                    }}> <span className="ml-[10px] mr-[10px] text-otherColor/60 ">#</span>{channelName} </button>
                   )
                 })}
                 {displayCreateChannelBox? <CreateChannelBox setdisplayCreateChannelBox={setdisplayCreateChannelBox} postCreateChannel={postCreateChannel} setcreateChannelName={setcreateChannelName} createChannelName={createChannelName}/>:""}

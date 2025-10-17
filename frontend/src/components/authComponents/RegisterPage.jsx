@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {useNavigate } from "react-router";
-import LoadingPage from "../loadingPage";
+import LoadingPage from "../otherComponents/loadingPage";
 import axios from "axios";
 
 export default function RegisterPage() {

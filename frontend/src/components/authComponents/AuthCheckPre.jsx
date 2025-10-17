@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router";
 import axios from "axios";
-import ServerError from "./ServerErrorPage";
+import ServerErrorPage from "../otherComponents/ServerErrorPage";
 
 export default function AuthCheckPre() {
   const navigate = useNavigate();
@@ -35,6 +35,6 @@ export default function AuthCheckPre() {
       return <Outlet />;
     }
   } else {
-    return <ServerError />;
+    return <ServerErrorPage />;
   }
 }

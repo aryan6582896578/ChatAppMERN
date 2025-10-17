@@ -10,7 +10,7 @@ export function ServerSettingComponent() {
   const [ adminCheck , setadminCheck] = useState(false)
 
   async function createServerInvite() {
-      const getInviteCode = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/inviteCode/${parms.serverId}`,{
+      const getInviteCode = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/inviteCode`,{
           withCredentials: true,
         })
         if(getInviteCode.data.status==="created"){
@@ -26,7 +26,6 @@ export function ServerSettingComponent() {
     })
     
     if(serverData.data.serverName){
-      console.log(serverData.data.serverName)
       setserverInfo({...serverInfo,serverName:serverData.data.serverName})
     }
     if(serverData.data.adminStatus===true){
@@ -70,7 +69,7 @@ export function ServerSettingComponent() {
       <div className="text-[20px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer duration-[0.5s]">
         {serverInfo.serverName}
       </div>
-      <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor  ${adminCheck?"hover:bg-red-500":"hover:bg-otherColor hover:bg-opacity-[50%]"}  rounded-[10%] hover:cursor-pointer duration-[0.5s]`} onClick={()=>{
+      <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor  ${adminCheck?"hover:bg-red-500":"hover:bg-otherColor/50"}  rounded-[10%] hover:cursor-pointer duration-[0.5s]`} onClick={()=>{
         {adminCheck?setserverSettingDisplay(true):""}
       }}/>
       {serverSettingDisplay ? (<ServerSettingDisplay setserverSettingDisplay={setserverSettingDisplay} createServerInvite={createServerInvite} serverInfo={serverInfo} />) : ("")}
@@ -183,7 +182,7 @@ function InviteCodeSSC({serverInfo}){
         }}>
           {serverInfo.serverInviteCode}
         </div>
-        <button className={`ml-[5px] w-[80px] font-medium  ${copyCode?"bg-otherColor bg-opacity-50":"bg-textColor"} h-[35px] rounded-[3px]`} onClick={()=>{
+        <button className={`ml-[5px] w-[80px] font-medium  ${copyCode?"bg-otherColor/50":"bg-textColor"} h-[35px] rounded-[3px]`} onClick={()=>{
           navigator.clipboard.writeText(serverInfo.serverInviteCode)
           setcopyCode(true)
         }}>{copyCode?"Copied":"Copy"}</button>

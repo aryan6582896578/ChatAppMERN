@@ -106,12 +106,12 @@ app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
   // }
   // });
 
-  app.get("/v1/userDataSeverList", checkJwt, async (req, res) => {
-    if (req.validUser) {
-      const userDataSevers = await userDataSeverList(req.username);
-      res.json({ serverList: userDataSevers , username:req.username});
-    }
-  });
+  // app.get("/v1/userDataSeverList", checkJwt, async (req, res) => {
+  //   if (req.validUser) {
+  //     const userDataSevers = await userDataSeverList(req.username);
+  //     res.json({ serverList: userDataSevers , username:req.username});
+  //   }
+  // });
 
   // app.get("/v1/getServerData/:id", checkJwt, async (req, res) => {
   //   if (req.validUser) {
@@ -264,164 +264,165 @@ app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
   //   }
   // );
 
-  app.get("/v1/channelMemberList/:serverId/:channelId/:userId",checkJwt,async (req, res) => {
-      const userId = req.params.userId;
-      const serverId = req.params.serverId;
-      const channelId = req.params.channelId;
-      if (req.validUser && req.userId === userId && serverId) {
-        const serverData = await getServerData(serverId);
-        if (serverData) {
-          const serverMemberList = serverData.members;
-          if (serverMemberList.includes(userId)) {
-            const channelList = await validServerChannelList(serverId, userId);
-            if (channelList.includes(channelId)) {
-              const usernameList = await getServerChannelMemberList(channelId);
+  // app.get("/v1/channelMemberList/:serverId/:channelId/:userId",checkJwt,async (req, res) => {
+  //     const userId = req.params.userId;
+  //     const serverId = req.params.serverId;
+  //     const channelId = req.params.channelId;
+  //     if (req.validUser && req.userId === userId && serverId) {
+  //       const serverData = await getServerData(serverId);
+  //       if (serverData) {
+  //         const serverMemberList = serverData.members;
+  //         if (serverMemberList.includes(userId)) {
+  //           const channelList = await validServerChannelList(serverId, userId);
+  //           if (channelList.includes(channelId)) {
+  //             const usernameList = await getServerChannelMemberList(channelId);
 
-              const usernames = await Promise.all(
-                usernameList.map(async (userId) => {
-                  const username = await getUsername(userId);
-                  return [userId, username];
-                })
-              );
-              const usernameListData = Object.fromEntries(usernames);
-              return res.json({ usernameList: usernameListData });
-            } else {
-              res.json({ status: "noUsers" });
-            }
-          } else {
-            res.json({ status: "userInValid" });
-          }
-        } else {
-          res.json({ status: "userInValid" });
-        }
-      }
-    }
-  );
+  //             const usernames = await Promise.all(
+  //               usernameList.map(async (userId) => {
+  //                 const username = await getUsername(userId);
+  //                 return [userId, username];
+  //               })
+  //             );
+  //             const usernameListData = Object.fromEntries(usernames);
+  //             return res.json({ usernameList: usernameListData });
+  //           } else {
+  //             res.json({ status: "noUsers" });
+  //           }
+  //         } else {
+  //           res.json({ status: "userInValid" });
+  //         }
+  //       } else {
+  //         res.json({ status: "userInValid" });
+  //       }
+  //     }
+  //   }
+  // );
 
-  app.post("/v1/me/createChannel/:serverId", checkJwt, async (req, res) => {
-    const userId = req.userId;
-    const serverId = req.params.serverId;
-    const channelName = req.body.channel;
-    if (req.validUser && userId && channelName && serverId) {
-      const serverData = await getServerData(serverId);
-      if (serverData) {
-        const serverAdminList = serverData.admins;
-        if (serverAdminList.includes(userId)) {
-          const channelId = createCustomId();
-          const date = new Date();
-          const currentDate = date.toUTCString();
-          await serverChannelsDataModel.create({
-            _id: `${channelId}`,
-            name: `${channelName}`,
-            createdDate: `${currentDate}`,
-            channelId: `${channelId}`,
-            serverId: `${serverId}`,
-          });
-          const serverMemberList = serverData.members;
-          serverMemberList.map(async (x) => {
-            await serverChannelsDataModel.findOneAndUpdate(
-              { channelId: `${channelId}` },
-              { $push: { members: `${x}` } }
-            );
-          });
+  // app.post("/v1/me/createChannel/:serverId", checkJwt, async (req, res) => {
+  //   const userId = req.userId;
+  //   const serverId = req.params.serverId;
+  //   const channelName = req.body.channel;
+  //   if (req.validUser && userId && channelName && serverId) {
+  //     const serverData = await getServerData(serverId);
+  //     if (serverData) {
+  //       const serverAdminList = serverData.admins;
+  //       if (serverAdminList.includes(userId)) {
+  //         const channelId = createCustomId();
+  //         const date = new Date();
+  //         const currentDate = date.toUTCString();
+  //         await serverChannelsDataModel.create({
+  //           _id: `${channelId}`,
+  //           name: `${channelName}`,
+  //           createdDate: `${currentDate}`,
+  //           channelId: `${channelId}`,
+  //           serverId: `${serverId}`,
+  //         });
+  //         const serverMemberList = serverData.members;
+  //         serverMemberList.map(async (x) => {
+  //           await serverChannelsDataModel.findOneAndUpdate(
+  //             { channelId: `${channelId}` },
+  //             { $push: { members: `${x}` } }
+  //           );
+  //         });
 
-          await serverDataModel.findOneAndUpdate(
-            { serverId: `${serverId}` },
-            { $push: { channels: `${channelId}` } }
-          );
-          res.json({ status: "channelCreated", channelId: `${channelId}` });
-        } else {
-          res.json({ status: "invalidUser" });
-        }
-      } else {
-        res.json({ status: "invalidData" });
-      }
-    } else {
-      console.log("noo");
-      res.json({ status: "invalidData" });
-    }
-  });
-  app.get("/v1/inviteCode/:serverId", checkJwt, async (req, res) => {
-    const serverId = req.params.serverId;
-    const userId = req.userId;
-    if (req.validUser && serverId) {
-      const serverData = await getServerData(serverId);
-      if (serverData) {
-        const serverAdminList = serverData.admins;
-        if (serverAdminList.includes(userId)) {
-          try {
-            const serverInviteCode = await inviteDataModel.findOne({
-              serverId: `${serverId}`,
-            });
-            if (serverInviteCode) {
-              res.json({
-                status: "created",
-                inviteCode: `${serverInviteCode.inviteCode}`,
-              });
-            } else {
-              const inviteCode = await validInviteCode(serverId);
-              res.json({ status: "created", inviteCode: `${inviteCode}` });
-            }
-          } catch (error) {
-            console.log(error, "create invite code");
-          }
-        } else {
-          res.json({ status: "notAdmin" });
-        }
-      } else {
-        res.json({ status: "invalidData" });
-      }
-    }
-  });
+  //         await serverDataModel.findOneAndUpdate(
+  //           { serverId: `${serverId}` },
+  //           { $push: { channels: `${channelId}` } }
+  //         );
+  //         res.json({ status: "channelCreated", channelId: `${channelId}` });
+  //       } else {
+  //         res.json({ status: "invalidUser" });
+  //       }
+  //     } else {
+  //       res.json({ status: "invalidData" });
+  //     }
+  //   } else {
+  //     console.log("noo");
+  //     res.json({ status: "invalidData" });
+  //   }
+  // });
 
-  app.post("/v1/me/joinServer", checkJwt, async (req, res) => {
-    if (req.validUser) {
-      const serverInviteCodeJoin = req.body.serverInviteCode;
-      try {
-        const serverInviteCode = await inviteDataModel.findOne({
-          inviteCode: `${serverInviteCodeJoin}`,
-        });
-        if (serverInviteCode) {
-          const getUserid = req.userId;
+  // app.get("/v1/inviteCode/:serverId", checkJwt, async (req, res) => {
+  //   const serverId = req.params.serverId;
+  //   const userId = req.userId;
+  //   if (req.validUser && serverId) {
+  //     const serverData = await getServerData(serverId);
+  //     if (serverData) {
+  //       const serverAdminList = serverData.admins;
+  //       if (serverAdminList.includes(userId)) {
+  //         try {
+  //           const serverInviteCode = await inviteDataModel.findOne({
+  //             serverId: `${serverId}`,
+  //           });
+  //           if (serverInviteCode) {
+  //             res.json({
+  //               status: "created",
+  //               inviteCode: `${serverInviteCode.inviteCode}`,
+  //             });
+  //           } else {
+  //             const inviteCode = await validInviteCode(serverId);
+  //             res.json({ status: "created", inviteCode: `${inviteCode}` });
+  //           }
+  //         } catch (error) {
+  //           console.log(error, "create invite code");
+  //         }
+  //       } else {
+  //         res.json({ status: "notAdmin" });
+  //       }
+  //     } else {
+  //       res.json({ status: "invalidData" });
+  //     }
+  //   }
+  // });
 
-          const userInServerCheck = await userDataModel.findOne({
-            userid: `${getUserid}`,
-          });
+  // app.post("/v1/me/joinServer", checkJwt, async (req, res) => {
+  //   if (req.validUser) {
+  //     const serverInviteCodeJoin = req.body.serverInviteCode;
+  //     try {
+  //       const serverInviteCode = await inviteDataModel.findOne({
+  //         inviteCode: `${serverInviteCodeJoin}`,
+  //       });
+  //       if (serverInviteCode) {
+  //         const getUserid = req.userId;
 
-          if (userInServerCheck.servers.includes(serverInviteCode.serverId)) {
-            await res.json({
-              status: "alreadyJoined",
-              serverId: `${serverInviteCode.serverId}`,
-            });
-          } else {
-            const channelList = await serverDataModel.findOne({
-              serverId: serverInviteCode.serverId,
-            });
-            await userDataModel.findOneAndUpdate(
-              { userid: `${getUserid}` },
-              { $push: { servers: `${serverInviteCode.serverId}` } }
-            );
-            await serverDataModel.findOneAndUpdate(
-              { serverId: `${serverInviteCode.serverId}` },
-              { $push: { members: `${getUserid}` } }
-            );
-            const channelListId = channelList.channels;
-            channelListId.map(async (x) => {
-              await serverChannelsDataModel.findOneAndUpdate(
-                { channelId: `${x}` },
-                { $push: { members: `${getUserid}` } }
-              );
-            });
-            await res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
-          }
-        } else {
-          res.json({ status: "invalidCode" });
-        }
-      } catch (error) {
-        console.log(error, "error in joining server ");
-      }
-    }
-  });
+  //         const userInServerCheck = await userDataModel.findOne({
+  //           userid: `${getUserid}`,
+  //         });
+
+  //         if (userInServerCheck.servers.includes(serverInviteCode.serverId)) {
+  //           await res.json({
+  //             status: "alreadyJoined",
+  //             serverId: `${serverInviteCode.serverId}`,
+  //           });
+  //         } else {
+  //           const channelList = await serverDataModel.findOne({
+  //             serverId: serverInviteCode.serverId,
+  //           });
+  //           await userDataModel.findOneAndUpdate(
+  //             { userid: `${getUserid}` },
+  //             { $push: { servers: `${serverInviteCode.serverId}` } }
+  //           );
+  //           await serverDataModel.findOneAndUpdate(
+  //             { serverId: `${serverInviteCode.serverId}` },
+  //             { $push: { members: `${getUserid}` } }
+  //           );
+  //           const channelListId = channelList.channels;
+  //           channelListId.map(async (x) => {
+  //             await serverChannelsDataModel.findOneAndUpdate(
+  //               { channelId: `${x}` },
+  //               { $push: { members: `${getUserid}` } }
+  //             );
+  //           });
+  //           await res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
+  //         }
+  //       } else {
+  //         res.json({ status: "invalidCode" });
+  //       }
+  //     } catch (error) {
+  //       console.log(error, "error in joining server ");
+  //     }
+  //   }
+  // });
 
   app.get("/v1/messageData/:serverId/:channelId/:messageLength",checkJwt,async (req, res) => {
       const userId = req.userId;
@@ -479,44 +480,6 @@ app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
     }
   );
 
-
-  app.post("/v1/me/userProfile", checkJwt, async (req, res) => {
-    if (req.validUser) {
-        console.log("ff")
-        console.log(req.body.image)
-    }
-  });
-
-  app.post("/v1/updateServerPermission/:serverId/:permissionType", checkJwt, async (req, res) => {
-    const userId = req.userId;
-    const serverId = req.params.serverId;
-    const permissionName = req.params.permissionType;
-    console.log(userId)
-    if (req.validUser && userId && permissionName && serverId) {
-      const serverData = await getServerData(serverId);
-      if (serverData) {
-        const serverAdminList = serverData.admins;
-        if (serverAdminList.includes(userId)) {
-          await serverDataModel.findOneAndUpdate({
-            serverId:serverId,
-            
-          },{
-            permissions:{"permissionNameff":"fa"}
-          })
-          const a =await getServerPermission(serverId)
-          console.log(a.permissions,"hmmm")
-        
-        } else {
-          res.json({ status: "invalidUser" });
-        }
-      } else {
-        res.json({ status: "invalidData" });
-      }
-    } else {
-      console.log("ff");
-      res.json({ status: "invalidData" });
-    }
-  });
   app.post("/v1/updateServerName/:serverId", checkJwt, async (req, res) => {
     const userId = req.userId;
     const serverId = req.params.serverId;

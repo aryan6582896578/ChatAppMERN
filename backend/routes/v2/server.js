@@ -1,10 +1,10 @@
 import express from "express";
 import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../database/managedata/authData.js";
-import { getChannelName, getServerChannelMemberList, getServerData, getUserData, getUsername, validServerChannelList } from "../../database/managedata.js";
-import { serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
+import { getChannelName, getServerChannelMemberList, getServerData, getUserData, getUsername, validInviteCode, validServerChannelList } from "../../database/managedata.js";
+import { inviteDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
-export const router = express.Router({ mergeParams: true })
-export default function serverV2(){
+const router = express.Router({ mergeParams: true })
+export default function serverV2(app,socket,upload){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt);
@@ -26,7 +26,6 @@ export default function serverV2(){
     router.get("/:serverId/channelList", checkJwt, async (req, res) => {
     const serverId = req.params.serverId;
     const userId= req.userId;
-    console.log(serverId)
     if (req.validUser && serverId) {
       const serverData = await getServerData(req.params.serverId);
       if (serverData) {
@@ -139,6 +138,91 @@ export default function serverV2(){
       }
     }
   );
+
+  router.get("/:serverId/inviteCode", checkJwt, async (req, res) => {
+    const serverId = req.params.serverId;
+    const userId = req.userId;
+    if (req.validUser && serverId) {
+      const serverData = await getServerData(serverId);
+      if (serverData) {
+        const serverAdminList = serverData.admins;
+        if (serverAdminList.includes(userId)) {
+          try {
+            const serverInviteCode = await inviteDataModel.findOne({
+              serverId: `${serverId}`,
+            });
+            if (serverInviteCode) {
+              res.json({
+                status: "created",
+                inviteCode: `${serverInviteCode.inviteCode}`,
+              });
+            } else {
+              const inviteCode = await validInviteCode(serverId);
+              res.json({ status: "created", inviteCode: `${inviteCode}` });
+            }
+          } catch (error) {
+            console.log(error, "create invite code");
+          }
+        } else {
+          res.json({ status: "notAdmin" });
+        }
+      } else {
+        res.json({ status: "invalidData" });
+      }
+    }
+  });
+  router.post("/:serverId/createChannel", checkJwt, async (req, res) => {
+    const userId = req.userId;
+    const serverId = req.params.serverId;
+    const channelName = req.body.channel;
+    if (req.validUser && userId && channelName && serverId) {
+      const serverData = await getServerData(serverId);
+      if (serverData) {
+        const serverAdminList = serverData.admins;
+        if (serverAdminList.includes(userId)) {
+          const channelId = createCustomId();
+          const date = new Date();
+          const currentDate = date.toUTCString();
+          await serverChannelsDataModel.create({
+            _id: `${channelId}`,
+            name: `${channelName}`,
+            createdDate: `${currentDate}`,
+            channelId: `${channelId}`,
+            serverId: `${serverId}`,
+          });
+          const serverMemberList = serverData.members;
+          serverMemberList.map(async (x) => {
+            await serverChannelsDataModel.findOneAndUpdate(
+              { channelId: `${channelId}` },
+              { $push: { members: `${x}` } }
+            );
+          });
+
+          await serverDataModel.findOneAndUpdate(
+            { serverId: `${serverId}` },
+            { $push: { channels: `${channelId}` } }
+          );
+          res.json({ status: "channelCreated", channelId: `${channelId}` });
+        } else {
+          res.json({ status: "invalidUser" });
+        }
+      } else {
+        res.json({ status: "invalidData" });
+      }
+    } else {
+      console.log("noo");
+      res.json({ status: "invalidData" });
+    }
+  });
+
+
+
+
+
+
+
+
+
 
     return router
 }

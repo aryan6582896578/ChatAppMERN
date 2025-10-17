@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { ServerListComponent } from "./chatPage/ServerListComponent.jsx";
-import { UserProfileComponent } from "./UserProfileComponent.jsx";
-import { SettingComponent } from "./SettingComponent.jsx";
+import { ServerListComponent } from "../userComponents/ServerListComponent.jsx";
+import { UserProfileComponent } from "../userComponents/UserProfileComponent.jsx";
+import { SettingComponent } from "../userComponents/SettingComponent.jsx";
 
 export default function ChatPage() {
   const[dmListDisplay,setdmListDisplay]=useState("flex")

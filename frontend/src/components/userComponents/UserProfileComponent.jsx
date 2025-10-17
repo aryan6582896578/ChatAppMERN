@@ -26,9 +26,9 @@ export function UserProfileComponent() {
     return (
       <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor hidden sm:flex border-solid border-t-[1px] border-secondaryColor relative">
         <div className=" ml-[5px] flex mt-auto mb-auto w-[40px] h-[40px]">
-          <img src={userProfileInfo.userprofileurl} className="w-[100%] h-[100%] rounded-[100%]"/>
+          <img src={userProfileInfo.userprofileurl} className="w-[100%] h-[100%] rounded-[100%] " draggable={false}/>
         </div>
-        <div className="text-[25px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer"> {userProfileInfo.username}</div>
+        <div className="text-[25px] p-[5px] text-white font-semibold hover:text-otherColor/80 hover:cursor-pointer"> {userProfileInfo.username}</div>
         <button className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-text3Color rounded-[0px] absolute end-0" onClick={()=>{
           setsettingDisplay(true)
         }}/>
