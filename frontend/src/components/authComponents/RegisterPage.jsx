@@ -8,6 +8,7 @@ export default function RegisterPage() {
   const [loadingPage, setloadingPage] = useState(false);
   const [displayPassword, setdisplayPassword] = useState(false);
   const [displayError, setdisplayError] = useState("");
+  const [displayErrorPassword,setdisplayErrorPassword] = useState("");
   const navigate = useNavigate();
 
   async function registerCheck() {
@@ -36,11 +37,11 @@ export default function RegisterPage() {
         }else if(registerData.data.status==="passwordLimitMax"){
           setloadingPage(false);
           setuserData({ username: "", password: "" })
-          setdisplayError("password cannot be greater than 30 character");        
+          setdisplayErrorPassword("password cannot be greater than 30 character");        
         }else if(registerData.data.status==="passwordLimitMin"){
           setloadingPage(false);
           setuserData({ username: "", password: "" })
-          setdisplayError("password cannot be less than 10 character");        
+          setdisplayErrorPassword("password cannot be less than 10 character");        
         }
       } catch (error) {
         console.error("api error", error);
@@ -80,7 +81,7 @@ export default function RegisterPage() {
 
             <div className="flex flex-col mb-[5px] p-[10px]">
               <div className="text-[13px] mb-[5px] font-semibold text-otherColor/80">USERNAME 
-                <span className="text-text3Color font-semibold ml-[2px]">*</span> 
+                <span className="text-red-500 font-semibold ml-[2px]">*</span> 
                 <span className="text-red-500 font-semibold text-[12px] ml-[5px]">
                   {displayError?displayError:""}
                 </span>
@@ -89,20 +90,23 @@ export default function RegisterPage() {
               
                <div className="text-[13px] mb-[5px] font-semibold text-otherColor/80">
                 PASSWORD 
-                <span className="text-text3Color font-semibold ml-[2px]">*</span>
+                <span className="text-red-500 font-semibold ml-[2px]">*</span>
+                <span className="text-red-500 font-semibold text-[12px] ml-[5px]">
+                  {displayErrorPassword?displayErrorPassword:""}
+                </span>
               </div>
 
               <div className="relative">
-                <input type={displayPassword ? "text" : "password"} maxLength={30} onChange={(e) =>setuserData({ ...userData, password: e.target.value })} value={userData.password}className="p-[5px] outline-none bg-primaryColor text-otherColor w-full rounded-[5px]"/>
+                <input type={displayPassword ? "text" : "password"} maxLength={30} onChange={(e) =>setuserData({ ...userData, password: e.target.value })} value={userData.password} className="p-[5px] outline-none bg-primaryColor text-otherColor w-full rounded-[5px]"/>
                 <button onMouseEnter={changedisplayPassword} onMouseLeave={changedisplayPassword} className="absolute right-[5px] top-[5px] p-0">
-                  <div className="bg-text3Color hover:bg-otherColor min-w-[5px] min-h-[25px] duration-[0.5s] rounded-[5px]"></div>
+                  <div className="bg-red-500 hover:bg-otherColor min-w-[5px] min-h-[25px] duration-[0.5s] rounded-[5px]"></div>
                 </button>
               </div> {/*  add password regex */}
 
             </div>
 
             <div className="flex flex-col">
-              <button onClick={() => {registerCheck();}} className="bg-textColor text-otherColor/90 text-[20px]  ml-[10px] mr-[10px] mt-[5px] p-[5px] rounded-[5px] font-semibold hover:text-otherColor hover:bg-textColor/70 duration-[0.5s] hover:cursor-pointer">
+              <button onClick={() => {registerCheck();}} className="bg-textColor text-otherColor/90 text-[20px]  ml-[10px] mr-[10px] mt-[5px] p-[5px] rounded-[5px] font-semibold hover:text-otherColor hover:bg-textColor/60 duration-[0.5s] hover:cursor-pointer">
                   Register
               </button>   
               <div>

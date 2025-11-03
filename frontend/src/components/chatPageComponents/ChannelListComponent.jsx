@@ -59,11 +59,9 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
           <div className=" sm:w-[250px] h-[100%]  flex flex-col pt-[10px] relative bg-primaryColor">   
           <div className=" text-[10px] font-bold ml-[5px] flex min-h-[20px] hover:underline hover:cursor-pointer text-otherColor/60">
             TEXT CHANNELS 
-          {adminCheck?<button className="end-[0px] top-0 flex absolute font-bold text-[20px] hover:text-text1Color duration-[0.5s]" onClick={()=>{
+          <button className={`end-[0px] top-0 flex absolute font-bold text-[20px] hover:text-red-500 duration-[0.5s] cursor-pointer ${adminCheck?"flex":"hidden"}`} onClick={()=>{
               setdisplayCreateChannelBox(true)
-            }}>
-              +
-            </button>:""}  
+            }}> + </button>
           </div>
                 {channelName.map((channelName,x)=>{
                   return (

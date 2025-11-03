@@ -7,8 +7,8 @@ const router = express.Router({ mergeParams: true })
 export default function serverV2(app,socket,upload){
   async function checkJwt(req, res, next) {
       try {
-        const validToken = verifyJwt(req.cookies.tokenJwt);
-        console.log("jwt check in server v2")
+        const validToken = verifyJwt(req.cookies.tokenJwt , "v2 server");
+        // console.log("jwt check in server v2")
         if (validToken) {
           const usernameValidToken = validToken.username;
           const userIdValidToken = validToken.userId;
@@ -202,6 +202,7 @@ export default function serverV2(app,socket,upload){
             { serverId: `${serverId}` },
             { $push: { channels: `${channelId}` } }
           );
+          
           res.json({ status: "channelCreated", channelId: `${channelId}` });
         } else {
           res.json({ status: "invalidUser" });
@@ -214,15 +215,5 @@ export default function serverV2(app,socket,upload){
       res.json({ status: "invalidData" });
     }
   });
-
-
-
-
-
-
-
-
-
-
     return router
 }

@@ -49,6 +49,7 @@ app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
           },{
             userprofileurl:`${cldRes.url}`
           })
+          socket.to(`${req.userId}`).emit(`${req.userId}`, "profile updated");
           res.json({status:"updated"});
   } catch (error) {
     console.log(error);

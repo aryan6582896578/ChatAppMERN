@@ -8,14 +8,15 @@ const router = express.Router({ mergeParams: true })
 export default function user(app,socket,upload){
   async function checkJwt(req, res, next) {
       try {
-        const validToken = verifyJwt(req.cookies.tokenJwt);
-        console.log("jwt check in user v2")
+        const validToken = verifyJwt(req.cookies.tokenJwt , "v2 user ");
+        // console.log("jwt check in user v2")
         if (validToken) {
           const usernameValidToken = validToken.username;
           const userIdValidToken = validToken.userId;
           req.validUser = true,
           req.username = usernameValidToken,
           req.userId = userIdValidToken;
+          // socket.to("testserver").emit("testserver", "hmmmmmm  testserver auth");
         } else {
           req.validUser = false;
         }

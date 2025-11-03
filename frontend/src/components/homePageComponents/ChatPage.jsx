@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router";
 import { ServerListComponent } from "../userComponents/ServerListComponent.jsx";
 import { UserProfileComponent } from "../userComponents/UserProfileComponent.jsx";
 import { SettingComponent } from "../userComponents/SettingComponent.jsx";
+import { getJwtCookie, socket } from "../managesocket.js";
+import axios from "axios";
 
 export default function ChatPage() {
   const[dmListDisplay,setdmListDisplay]=useState("flex")
@@ -11,8 +13,26 @@ export default function ChatPage() {
   const[serverListDisplay,setserverListDisplay]=useState("flex")
   const[userSettingDisplay,setuserSettingDisplay]=useState("hidden")
   const[userSettingDisplayCheck,setuserSettingDisplayCheck]=useState(false)
-
+  const[userInfo,setuserInfo]=useState(null);
   document.title =`Chat | ${import.meta.env.VITE_NAME}`
+  async function verifyUser(){
+    const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`, {
+      withCredentials: true,
+    })
+    if(userData.data.status === "userValid"){
+      setuserInfo(userData.data.userId);
+    }
+  }
+  useEffect(() => { 
+    verifyUser();
+    const jwtToken = getJwtCookie();
+    socket.emit("joinUserUpdates",{jwtToken});
+    socket.on(userInfo,(x)=>{
+      console.log("yess",x);
+    })
+  }, [])
+  
+  
   return (
     
     <div className="bg-primaryColor w-[100%] text-textColor flex flex-col overflow-hidden h-screen">
@@ -22,7 +42,7 @@ export default function ChatPage() {
         </div>
         
         <div className={`w-[100%] ${dmListDisplay} min-h-[90%] sm:max-w-[250px]`}>
-          <DmListComponent setserverListDisplay={setserverListDisplay}/>
+          <DmListComponent setserverListDisplay={setserverListDisplay} />
         </div>
         <div className={`${friendListDisplay} sm:block w-[100%]`}>
         <FriendListComponent/>
@@ -45,7 +65,7 @@ export default function ChatPage() {
 function DmListComponent({setserverListDisplay}){
   return(
       <div className="flex overflow-hidden flex-col bg-primaryColor w-[100%] ">
-        <input className="bg-secondaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] hover:cursor-not-allowed border-solid border-[2px] border-primaryColor text-otherColor/80 " disabled placeholder="search (soon)"/>
+        <input className="bg-secondaryColor m-[10px] min-h-[40px] rounded-[5px] font-medium pl-[10px] border-solid border-[2px] border-primaryColor text-otherColor/80 " disabled placeholder="Search"/>
         <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px] h-[100%]"> </span>
         <UserProfileComponent setserverListDisplay={setserverListDisplay} />     
       </div>
@@ -54,9 +74,9 @@ function DmListComponent({setserverListDisplay}){
 
 function FriendListComponent(){
   return(
-    <div className="flex w-[100%] flex-col bg-primaryColor hover:cursor-not-allowed h-[100%] border-l-secondaryColor sm:border-l-[1px]">
+    <div className="flex w-[100%] flex-col bg-primaryColor h-[100%] border-l-secondaryColor sm:border-l-[1px]">
       <div className="text-[25px] ml-[10px] text-otherColor/50">
-        Friends (soon)
+        Friends
       </div>      
     </div>
   )
@@ -64,9 +84,9 @@ function FriendListComponent(){
 
 function NotificationListComponent(){
   return(
-    <div className="flex w-[100%] flex-col bg-primaryColor hover:cursor-not-allowed h-[100%] border-l-secondaryColor sm:border-l-[1px] ">
+    <div className="flex w-[100%] flex-col bg-primaryColor h-[100%] border-l-secondaryColor sm:border-l-[1px] ">
       <div className="text-[25px] ml-[10px] text-otherColor/50">
-        Notifications (soon)
+        Notifications
       </div>   
     </div>
   )

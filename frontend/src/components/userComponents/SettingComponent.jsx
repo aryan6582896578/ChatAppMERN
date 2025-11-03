@@ -17,7 +17,7 @@ export function SettingComponent({setsettingDisplay}){
         setuserData({...userData,username: getUserData.data.username,userprofileurl: getUserData.data.userprofileurl}); //userprofileurl:getUserData.data.userprofileurl
       }
     } catch (error) {
-      console.log(error, "error get server list");
+      console.log(error, "error get user info");
     }
   }
   function logoutUser() {
@@ -56,11 +56,11 @@ export function SettingComponent({setsettingDisplay}){
       <div className="bg-primaryColor h-[70px] w-[100%]  border-b-otherColor/80 border-b-[1px] relative ">
         <div className="flex">
           <div className="text-[30px] text-otherColor font-semibold ml-[10px] mt-[10px]">
-            Setting
+            Settings
           </div>
           <div className="absolute end-[10px] top-[15px] hidden md:flex">
             <button
-              className="min-w-[5px] min-h-[40px] bg-red-500 rounded-[10%] hover:bg-text3Color transition-[1s] cursor-pointer"
+              className="min-w-[5px] min-h-[40px] bg-red-500 rounded-[10px] hover:bg-red-500/80 transition-[1s] cursor-pointer"
               onClick={() => {
                 setsettingDisplay(false);
               }}
@@ -70,19 +70,10 @@ export function SettingComponent({setsettingDisplay}){
       </div>
 
       <div className="w-[100%] h-[100%] flex text-otherColor relative">
-        <div className="min-w-fit p-[20px] text-[20px] bg-primaryColor flex flex-col">
-          <button className="bg-secondaryColor min-w-[200px] rounded-[3px] text-left p-[5px] hover:text-white font-semibold duration-100 cursor-pointer">
-            Profile
-          </button>
-          <button
-            className="bg-red-600 mt-[20px] rounded-[3px] font-semibold hover:bg-red-700 cursor-pointer"onClick={() => {
-              logoutUser();
-            }}>
-            LOGOUT
-          </button>
-        </div>
+            
+            <SettingSideBarComponent logoutUser={logoutUser}/>
 
-        <div className="bg-secondaryColor rounded-[5px] w-[100%] mb-[50px] p-[50px] pt-[0px] flex flex-col">
+        <div className="bg-secondaryColor rounded-[5px] w-[100%] mb-[50px] p-[50px] pt-[0px] flex flex-col relative">
           <div className="text-[50px] ml-auto mr-auto flex">
             Hi,<span className="text-textColor ml-[10px]">{userData.username}</span>
           </div>
@@ -91,70 +82,91 @@ export function SettingComponent({setsettingDisplay}){
               <div className="">
                 <div className="relative">
                   <img src={userData.userprofileurl} alt="err" className="w-[80px] h-[80px] rounded-[100%] bg-gray-900"/>
-                  <button className=" bg-primaryColor w-[100%] mt-[5px] rounded-[3px] font-semibold  hover:bg-otherColor/60 cursor-pointer hover:text-secondaryColor duration-[0.5s]" onClick={()=>{
+                  <button className=" bg-textColor w-[80%] ml-auto mr-auto flex  mt-[5px] rounded-[3px] font-semibold  hover:bg-red-500 cursor-pointer duration-[0.5s]" onClick={()=>{
                     setuploadProfileComponentDisplay(true)
                   }}>
-                    Upload
+                    <div className="flex ml-auto mr-auto">Edit</div>
                   </button>
                 </div>
               </div>
             </div>
           </div>
+        {uploadProfileComponentDisplay?<UploadProfileComponent setuploadProfileComponentDisplay={setuploadProfileComponentDisplay} userData={userData} setuploadedImage={setuploadedImage} saveProfile={saveProfile} />:""}
         </div>
-    
-        {uploadProfileComponentDisplay?<UploadProfileComponent  uploadProfileComponentDisplay={uploadProfileComponentDisplay} setuploadProfileComponentDisplay={setuploadProfileComponentDisplay} userData={userData} setuserData={setuserData} setuploadedImage={setuploadedImage} saveProfile={saveProfile} uploadedImage={uploadedImage}/>:""}
-
       </div>
     </div>
   );
 }
 
-function UploadProfileComponent({uploadProfileComponentDisplay,setuploadProfileComponentDisplay,userData,setuserData,setuploadedImage,saveProfile,uploadedImage}){
-  const [disableButton,setdisableButton]=useState(false)
-  const[errorMessage,seterrorMessage]=useState("")
-  return(
-<div className={` flex-col bg-textColor/20 w-[50%] h-[fit] absolute top-[10%] left-1/3 rounded-[5px]`}>
-          <div className="absolute end-[10px] top-[15px] hidden md:flex">
-            <button className="min-w-[5px] min-h-[40px] bg-red-500 rounded-[10%] hover:bg-text3Color cursor-pointer transition-[1s]" onClick={() => {
-                setuploadProfileComponentDisplay(false)
+function UploadProfileComponent({setuploadProfileComponentDisplay,userData,setuploadedImage,saveProfile}) {
+  const [disableButton, setdisableButton] = useState(false);
+  const[uploadedImagePreview,setuploadedImagePreview] = useState({name:"",url:null});
+  const [selectedImage,setselectedImage]=useState(false);
+  useEffect(() => {
+    setuploadedImagePreview({...uploadedImagePreview,url:userData.userprofileurl})
+  }, [])
+  return (
+    <div className={`bg-primaryColor absolute w-[60%] h-[fit] rounded-[5px]  left-[15%] top-[10%] p-[10px] flex flex-col`}>
+      {disableButton? <CustomLoading/>:""}
+      <div className="absolute end-[10px] top-[10px] hidden md:flex">
+        <button className="min-w-[5px] min-h-[35px] rounded-[10px] bg-red-500 hover:bg-red-500/80 cursor-pointer transition-[1s]" onClick={() => {
+            setuploadProfileComponentDisplay(false);
+          }}
+        />
+      </div>
+      <div className="font-semibold text-[25px] text-center">EDIT PROFILE</div>
+      <div className="ml-auto mr-auto flex mt-[20px]">
+        <img src={uploadedImagePreview.url}
+          className=" max-w-[100px] min-w-[150px] max-h-[150px] min-h-[150px] rounded-[100%] object-cover border-[2px] border-textColor cursor-pointer text-center "
+        />
+      </div>
+      <div className="mt-[20px] font-semibold ml-auto mr-auto">
+          <label htmlFor="filebox" className="bg-textColor mt-[30px] text-center text-[15px] font-semibold rounded-[3px] p-[5px] cursor-pointer hover:bg-textColor/80 overflow-hidden">
+            {selectedImage?`Selected ${uploadedImagePreview.name}`:"Select Image"}
+          </label>
+          <input type="file"id="filebox"className="hidden max-w-[120px]  "accept="image/png, image/jpeg" onChange={(e) => {
+            console.log("hm");
+              setuploadedImage(e.target.files[0]);
+              setuploadedImagePreview({...setuploadedImagePreview,name:e.target.files[0].name,url:URL.createObjectURL(e.target.files[0])});
+              setselectedImage(true);
               }}/>
-          </div>
-          <div className="font-semibold text-center text-[25px] w-[100%]">
-            Edit Profile Picture
-          </div>
-          <div className="w-[100%] h-[100%] mb-[15%] flex flex-col">
-
-            <div className="max-h-[60%] mt-[5%] ml-auto mr-auto max-w-[100%] flex">
-              <img src={userData.userprofileurl} className=" max-w-[150px] min-w-[150px] max-h-[150px] min-h-[150px] rounded-[100%] object-cover " />
-            </div>
-
-            <div className="flex mr-auto ml-auto w-[100%] text-center">
-              <div className="relative w-[100%] mt-[20px]">
-                <label htmlFor="filebox" className="bg-textColor mt-[30px] text-center text-[20px] font-semibold rounded-[3px] p-[5px] cursor-pointer hover:bg-textColor/80">Select File </label>
-                <input  type="file" id="filebox" className="hidden w-[120px]  " accept="image/png, image/jpeg" onChange={(e)=>{
-                  setuploadedImage(e.target.files[0])
-                  setuserData({...userData,userprofileurl:URL.createObjectURL(e.target.files[0])})
-                  seterrorMessage("")
-                }}/>
-                <span className="text-red-600 font-bold absolute  min-w-fit ml-[5px]">{errorMessage}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute bottom-[20px]  justify-evenly flex w-[100%]" >
-            <button className={`bg-red-600 font-semibold text-[25px] w-[130px] rounded-[5px] hover:bg-red-700 ${disableButton} disabled cursor-pointer`}  onClick={()=>{
-              setuploadProfileComponentDisplay(false)
-            }}>Cancel</button>
-            <button className="bg-textColor font-semibold text-[25px] w-[130px] rounded-[5px] hover:bg-textColor/80 cursor-pointer" onClick={()=>{
-              setdisableButton(true)
-              if(uploadedImage){
-                seterrorMessage("")
-                saveProfile()
-              }else{
-                seterrorMessage("*Select a image")
-              } 
-            }}>Save</button>
-          </div>
         </div>
+
+      <div className="ml-auto mr-auto flex mt-[20px] mb-[20px] text-[25px] font-semibold ">
+        <button className="bg-red-500 w-[120px] rounded-[3px] cursor-pointer hover:bg-red-500/80" onClick={()=>{
+          setuploadProfileComponentDisplay(false)
+        }}>Cancel</button>
+        <button className={` w-[120px] rounded-[3px] ml-[10px] ${selectedImage?"bg-textColor hover:bg-textColor/80 cursor-pointer":"bg-secondaryColor cursor-not-allowed "}`} disabled={selectedImage?false:true} onClick={()=>{
+          setdisableButton(true)
+          saveProfile()
+        }}>{disableButton?"Saving":"Save"}</button>
+      </div>
+    </div>
+
+  );
+}
+
+function CustomLoading(){
+  return(
+    <div className="text-[50px] font-bold flex bg-primaryColor/90 w-[100%] h-[100%] absolute m-[-10px] z-1 rounded-[5px]">
+        <div className="flex m-auto animate-pulse text-otherColor">
+          UPDATING...
+        </div>
+    </div>
   )
+}
+
+function SettingSideBarComponent({logoutUser}) {
+  return (
+    <div className="min-w-fit p-[20px] text-[20px] bg-primaryColor flex flex-col">
+      <button className="bg-secondaryColor min-w-[200px] rounded-[3px] text-left p-[5px] hover:text-white font-semibold duration-100 cursor-pointer">
+        Profile
+      </button>
+      <button
+        className="bg-red-500 mt-[20px] rounded-[3px] font-semibold hover:bg-red-500/80 cursor-pointer" onClick={() => {
+          logoutUser();
+        }}> LOGOUT
+      </button>
+    </div>
+  );
 }

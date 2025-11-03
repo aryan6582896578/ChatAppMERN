@@ -9,12 +9,12 @@ export function signJwt(username, userId) {
   return createJwtToken;
 }
 
-export function verifyJwt(token) {
+export function verifyJwt(token,location) {
   try {
     const verifyJwtToken = jwt.verify(token, process.env.privateKey);
     return verifyJwtToken;
   } catch (error) {
-    console.log("invalid jwt",token);
+    console.log("invalid jwt",token , location);
   }
 }
 

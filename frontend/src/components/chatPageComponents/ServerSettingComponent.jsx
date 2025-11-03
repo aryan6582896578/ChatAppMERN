@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect } from "react";
-import { data, Link, useNavigate, useParams } from "react-router";
+import { useState,useEffect } from "react";
+import { useParams } from "react-router";
 import axios from "axios";
 import { socket } from "../managesocket";
 export function ServerSettingComponent() {
-  const navigate = useNavigate();
   const parms = useParams();
   const [serverInfo, setserverInfo] = useState({serverName:"Loading...",serverInviteCode:false});
   const [serverSettingDisplay, setserverSettingDisplay] = useState(false);
   const [ adminCheck , setadminCheck] = useState(false)
+  const [ socketConnection , setsocketConnection] = useState(false);
 
   async function createServerInvite() {
       const getInviteCode = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/inviteCode`,{
@@ -30,44 +30,63 @@ export function ServerSettingComponent() {
     }
     if(serverData.data.adminStatus===true){
       setadminCheck(true)
+      
     }
 
   }
+
   function getJwtCookie(){  
       const cookie = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
       if(cookie){
         return cookie[1]
       }
-  }
-
-  function setSocketData(){
-      const jwtToken = getJwtCookie()
-      const serverId = parms.serverId
-      const channelId = parms.channelId
-      socket.auth = {jwtToken,serverId,channelId}
-  }
-
+    }
   const[updateFromServer,setupdateFromServer]=useState("");
   useEffect(() => {
     getServerData();
     setserverSettingDisplay(false);
-    setSocketData();
-    socket.connect();
-    socket.on(`${parms.serverId}`, (data) => {
-      console.log(data);
-      setupdateFromServer(data)
-    });
-    return ()=>{
-      getServerData();
-      socket.disconnect();
+    const jwtToken = getJwtCookie();
+    const serverId = parms.serverId;
+    const channelId = parms.channelId;
+
+    // socket.emit("joinServer", { jwtToken,serverId,channelId},()=>{
+    //   socket.on(`${serverId}`,async (data)=>{
+    //     console.log(messageData)
+    //     setupdateFromServer(data)
+    //   })
+    // });
+    // socket.emit("joinServer", { jwtToken,serverId,channelId});
+    //     socket.on(`${serverId}`,async (data)=>{
+    //     console.log(messageData)
+    //     setupdateFromServer(data)
+    //   })
+
+    if(socket.connected){
+      setsocketConnection(true)
     }
-  },[parms.serverId,updateFromServer]);
+    return ()=>{
+      setadminCheck(false);
+      setserverSettingDisplay(false);
+      // socket.off(`${parms.serverId}`)
+      setsocketConnection(false)
+    }
+    
+  },[parms.serverId]);
+
+  useEffect(() => {
+    socket.off(`${parms.serverId}`);
+    getServerData()
+  
+  }, [updateFromServer])
+  
+  
   
   document.title =`${serverInfo.serverName} | ${import.meta.env.VITE_NAME}`
+
   return (
-    <div className="sm:w-[250px] h-[45px] bg-primaryColor relative flex overflow-hidden flex-col ">
-      <div className="text-[20px] p-[5px] font-semibold hover:text-otherColor hover:cursor-pointer duration-[0.5s]">
-        {serverInfo.serverName}
+    <div className="sm:w-[250px] h-[45px] bg-primaryColor relative flex overflow-hidden flex-col text-otherColor">
+      <div className={`text-[20px] p-[5px] font-semibold hover:text-otherColor cursor-pointer duration-[0.5s] ${socketConnection?"":"text-red-500"} `}>
+        {socketConnection?serverInfo.serverName:"socket error"}
       </div>
       <button className={`min-w-[5px] min-h-[100%] absolute end-0 bg-textColor  ${adminCheck?"hover:bg-red-500":"hover:bg-otherColor/50"}  rounded-[10%] hover:cursor-pointer duration-[0.5s]`} onClick={()=>{
         {adminCheck?setserverSettingDisplay(true):""}

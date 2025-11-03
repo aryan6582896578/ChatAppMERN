@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { socket } from "../managesocket";
+import { getJwtCookie, socket } from "../managesocket";
 import axios from "axios";
 
 
@@ -81,25 +81,11 @@ export function ChatBoxComponent() {
         userprofileurl:userProfileInfo.userprofileurl
       }
       socket.emit(`${parms.serverId}/${parms.channelId}`, userMessage)
+      socket.emit("testserver","yep frontend");
+      setmessageData("")
     }
   };
 
-
-
-  function getJwtCookie(){  
-      const cookie = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
-      if(cookie){
-        return cookie[1]
-      }
-  }
-
-  function setSocketData(){
-      const jwtToken = getJwtCookie()
-      const serverId = parms.serverId
-      const channelId = parms.channelId
-      socket.auth = {jwtToken,serverId,channelId}
-  }
-  
   async function getUserData() {
     const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`,{
         withCredentials: true,
@@ -109,18 +95,31 @@ export function ChatBoxComponent() {
     suId(userData.data.userId)
     return userId;
   }
+
   useEffect(() => {
     getUserData()
     getMessage()
     
-    setSocketData()
-    socket.connect()
-    socket.on(`${parms.serverId}/${parms.channelId}`,async (messageData)=>{
+    const jwtToken = getJwtCookie();
+    const serverId = parms.serverId;
+    const channelId = parms.channelId;
+    // socket.emit("joinServer", { jwtToken,serverId,channelId},()=>{
+    //   socket.on(`${serverId}/${channelId}`,async (messageData)=>{
+    //     console.log(messageData)
+    //     setdisplayMessageSocket(a=>[...a,messageData])    
+    //   })
+    // });
+    socket.emit("joinServer", { jwtToken,serverId,channelId});
+    socket.on(`${serverId}/${channelId}`,async (messageData)=>{
       console.log(messageData)
       setdisplayMessageSocket(a=>[...a,messageData])    
     })
+    // socket.emit("test");
+    // socket.on("testserver",async (x)=>{
+    // console.log(x)  
+    // })
     return () => {
-      socket.disconnect();
+      socket.off(`${parms.serverId}/${parms.channelId}`);
       setdisplayMessageSocket([])
       setdisplayMessageDb([])
     }
@@ -136,7 +135,7 @@ export function ChatBoxComponent() {
                 return( 
                   <div key={x} className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer" >
                                 
-                    <div className="font-medium text-[20px]" >{displayMessageDb[x].username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{displayMessageDb[x].displayDate}</span></div>
+                    <div className="font-medium text-textColor text-[20px]" >{displayMessageDb[x].username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{displayMessageDb[x].displayDate}</span></div>
                     <div className="text-otherColor text-opacity-[80%] break-before-column">{displayMessageDb[x].message}</div>
                   </div>
                 )

@@ -22,6 +22,9 @@ export function UserProfileComponent() {
     }
     
   }, [])
+ useEffect(() => {
+console.log("hmm")
+ }, [])
  
     return (
       <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor hidden sm:flex border-solid border-t-[1px] border-secondaryColor relative">
@@ -29,7 +32,7 @@ export function UserProfileComponent() {
           <img src={userProfileInfo.userprofileurl} className="w-[100%] h-[100%] rounded-[100%] " draggable={false}/>
         </div>
         <div className="text-[25px] p-[5px] text-white font-semibold hover:text-otherColor/80 hover:cursor-pointer"> {userProfileInfo.username}</div>
-        <button className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-text3Color rounded-[0px] absolute end-0" onClick={()=>{
+        <button className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-red-500 rounded-[0px] absolute end-0 cursor-pointer duration-[0.5s]" onClick={()=>{
           setsettingDisplay(true)
         }}/>
         {settingDisplay? <SettingComponent setsettingDisplay={setsettingDisplay} /> :""}

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import axios from "axios";
-import LoadingPage from "../otherComponents/loadingPage";
 import ServerError from "../otherComponents/ServerErrorPage";
 export default function AuthCheckMain() {
   const navigate = useNavigate();
@@ -20,6 +19,7 @@ export default function AuthCheckMain() {
 
   useEffect(() => {
     verifyUser()
+
   }, []);
 
   if(userStatus){
